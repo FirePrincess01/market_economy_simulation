@@ -30,7 +30,11 @@ impl MarketEconomySimulation {
         let scale_factor = window.scale_factor() as f32;
 
         let renderer = renderer::Renderer::new(window).await;
-        let world = ecs::World::new();
+        let mut world = ecs::World::new();
+
+        for i in 0..100 {
+            create_entities::create_agent(&mut world);
+        }
 
         // performance monitor
         // const WATCHPOINTS_SIZE: usize  = 4;
@@ -93,6 +97,7 @@ impl default_window::DefaultWindowApp for MarketEconomySimulation
 
     fn update(&mut self, dt: instant::Duration) {
         self.renderer.update(dt);
+        ecs::system::move_agents(&mut self.world);
     }
 
     fn input(&mut self, event: &winit::event::WindowEvent) -> bool {

@@ -1791,7 +1791,6 @@ dependencies = [
 [[package]]
 name = "wgpu_renderer"
 version = "0.1.0"
-source = "git+https://github.com/FirePrincess01/wgpu_renderer.git?branch=main#898eb7d23063dd2cb24f43a4daf21340e376bc9e"
 dependencies = [
  "anyhow",
  "bytemuck",

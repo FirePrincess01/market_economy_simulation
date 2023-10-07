@@ -5,7 +5,7 @@ use super::*;
 
 pub fn create_position(world: &mut World) {
     let entity_index = world.add_entity(Entity::new());
-    world.add(entity_index, ColoredMesh::new());
+    world.add(entity_index, ColoredMesh::new(1));
     world.add(entity_index, Position::new());
 }
 
