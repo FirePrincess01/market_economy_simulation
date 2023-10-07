@@ -4,6 +4,9 @@ use crate::ecs;
 use crate::ecs::component::ColoredMesh;
 use wgpu_renderer::renderer::{WgpuRenderer, self};
 use wgpu_renderer::vertex_color_shader;
+use winit::event::{VirtualKeyCode, ElementState, MouseScrollDelta};
+
+use super::geometry;
 
 pub struct Renderer 
 {   
@@ -13,7 +16,7 @@ pub struct Renderer
 
     // camera
     camera: renderer::camera::Camera,
-    camera_controller: renderer::camera::CameraController,
+    camera_controller: super::camera_controller::CameraController,
     projection: renderer::camera::Projection,
 
     camera_uniform: vertex_color_shader::CameraUniform,
@@ -21,6 +24,9 @@ pub struct Renderer
 
     camera_uniform_orthographic: vertex_color_shader::CameraUniform,
     camera_uniform_orthographic_buffer: vertex_color_shader::CameraUniformBuffer,
+
+    // meshes
+    meshes: Vec<vertex_color_shader::Mesh>,
 }
 
 impl Renderer {
@@ -43,11 +49,13 @@ impl Renderer {
         let yaw = cgmath::Deg(0.0);
         let pitch = cgmath::Deg(0.0);
         let mut camera = renderer::camera::Camera::new(position, yaw, pitch);
-        Self::top_view_point(&mut camera);
+        // Self::top_view_point(&mut camera);
+        Self::side_view_point(&mut camera);
 
-        let speed = 1.0;
+        let speed = 4.0;
         let sensitivity = 1.0;
-        let camera_controller = renderer::camera::CameraController::new(speed, sensitivity);
+        let sensitivity_scroll = 1.0;
+        let camera_controller = super::camera_controller::CameraController::new(speed, sensitivity, sensitivity_scroll);
 
         let width = wgpu_renderer.config().width;
         let height = wgpu_renderer.config().height;
@@ -69,6 +77,31 @@ impl Renderer {
 
         camera_uniform_orthographic_buffer.update(wgpu_renderer.queue(), camera_uniform_orthographic);   // add uniform identity matrix
 
+        // meshes
+        let circle = geometry::Circle::new(0.15, 16);
+        let quad = geometry::Quad::new(10.0);
+
+        const INSTANCES: &[vertex_color_shader::Instance] = &[ 
+            vertex_color_shader::Instance{
+                position: glam::Vec3::new(0.0, 0.0, 0.0),
+                rotation: glam::Quat::IDENTITY,
+            },
+        ];
+
+        let circle_mesh = vertex_color_shader::Mesh::new(&mut wgpu_renderer.device(), 
+        &circle.vertices, 
+        &circle.colors, 
+        &circle.indices, 
+        &INSTANCES);
+
+        let quad_mesh = vertex_color_shader::Mesh::new(&mut wgpu_renderer.device(), 
+        &quad.vertices, 
+        &quad.colors, 
+        &quad.indices, 
+        &INSTANCES);
+
+        let meshes = vec![quad_mesh, circle_mesh];
+
 
         Self {
             wgpu_renderer,
@@ -84,6 +117,8 @@ impl Renderer {
 
             camera_uniform_orthographic,
             camera_uniform_orthographic_buffer,
+
+            meshes,
         } 
     }
 
@@ -91,6 +126,16 @@ impl Renderer {
         let position = cgmath::Point3::new(0.0, 0.0, 10.0);
         let yaw = cgmath::Deg(-90.0).into();
         let pitch = cgmath::Deg(0.0).into();
+
+        camera.position = position;
+        camera.yaw = yaw;
+        camera.pitch = pitch;
+    }
+
+    fn side_view_point(camera: &mut renderer::camera::Camera) {
+        let position = cgmath::Point3::new(0.0, -2.0, 5.0);
+        let yaw = cgmath::Deg(-90.0).into();
+        let pitch = cgmath::Deg(30.0).into();
 
         camera.position = position;
         camera.yaw = yaw;
@@ -113,6 +158,16 @@ impl Renderer {
         self.camera_controller.update_camera(&mut self.camera, dt);
         self.camera_uniform.update_view_proj(&self.camera, &self.projection);
         self.camera_uniform_buffer.update(self.wgpu_renderer.queue(), self.camera_uniform);
+    }
+
+    pub fn process_keyboard(&mut self, key: VirtualKeyCode, state: ElementState) -> bool 
+    {
+        self.camera_controller.process_keyboard(key, state)
+    }
+
+    pub fn process_scroll(&mut self, delta: &MouseScrollDelta) 
+    {
+        self.camera_controller.process_scroll(delta);
     }
 
 }
@@ -158,9 +213,12 @@ impl ecs::system::IRenderer for Renderer
             self.pipeline_color.bind(&mut render_pass);
             self.camera_uniform_buffer.bind(&mut render_pass);
 
-            for mesh in meshes {
-                // mesh.draw(&mut render_pass);
-            }
+            // for mesh in meshes {
+            //     // mesh.draw(&mut render_pass);
+            // }
+
+            self.meshes[0].draw(&mut render_pass);
+            self.meshes[1].draw(&mut render_pass);
         }
 
         // self.watch.start(0);

@@ -3,6 +3,7 @@
 
 pub trait DefaultWindowApp
 {
+    fn get_size(&self) -> winit::dpi::PhysicalSize<u32>;
     fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>);
     fn update_scale_factor(&mut self, scale_factor: f32);
     fn update(&mut self, dt: instant::Duration);
@@ -78,7 +79,7 @@ pub fn run<T:DefaultWindowApp + 'static>(default_window: DefaultWindow, app: T)
             // on the web, the resize event does not fire, so we check the value manually
             #[cfg(target_arch = "wasm32")] 
             {
-                if window.inner_size() != state.size
+                if window.inner_size() != state.get_size()
                 {
                     let scale = window.scale_factor() as f32;
                     let size = window.inner_size();
@@ -131,8 +132,8 @@ pub fn run<T:DefaultWindowApp + 'static>(default_window: DefaultWindow, app: T)
                     match state.render() {
                         Ok(_) => {}
                         // Reconfigure the surface if lost
-                        Err(wgpu::SurfaceError::Lost) => {},
-                        // Err(wgpu::SurfaceError::Lost) => state.resize(state.size),
+                        // Err(wgpu::SurfaceError::Lost) => { *control_flow = winit::event_loop::ControlFlow::Exit; },
+                        Err(wgpu::SurfaceError::Lost) => state.resize(state.get_size()),
                         Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = winit::event_loop::ControlFlow::Exit,
                         Err(e) => eprintln!("{:?}", e),
                     }

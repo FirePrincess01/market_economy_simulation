@@ -9,7 +9,7 @@ use super::World;
 
 
 
-pub fn draw(world: &World, renderer: &mut impl IRenderer) -> Result<(), wgpu::SurfaceError>
+pub fn draw_meshes(world: &World, renderer: &mut impl IRenderer) -> Result<(), wgpu::SurfaceError>
 {
     renderer.render(&world.meshes)
 

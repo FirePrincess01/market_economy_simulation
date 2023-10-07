@@ -21,7 +21,7 @@ pub fn create_agent(world: &mut World) {
     world.add(entity_index, LiveStates::new());
 }
 
-pub fn create_fam(world: &mut World) {
+pub fn create_farm(world: &mut World) {
     let entity_index = world.add_entity(Entity::new());
     world.add(entity_index, ColoredMesh::new());
     world.add(entity_index, FarmStates::new());

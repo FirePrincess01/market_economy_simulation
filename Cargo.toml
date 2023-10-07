@@ -22,6 +22,7 @@ pollster = "0.3"
 wgpu = "0.17"
 instant = "0.1"
 cgmath = "0.18"
+glam = "0.24"
 wgpu_renderer = { git = "https://github.com/FirePrincess01/wgpu_renderer.git", branch = "main" } 
 # other  
 
