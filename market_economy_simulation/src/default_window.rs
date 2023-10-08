@@ -72,7 +72,7 @@ pub fn run<T:DefaultWindowApp + 'static>(default_window: DefaultWindow, app: T)
         let event_loop = default_window.event_loop;
     
         let mut last_render_time = instant::Instant::now();
-    
+
         event_loop.run(move |event, _, control_flow| {
             *control_flow = winit::event_loop::ControlFlow::Poll;
     

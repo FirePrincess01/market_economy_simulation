@@ -1,18 +1,21 @@
 
 
+use crate::agents_shader::AgentsShaderDraw;
 use crate::ecs;
 use crate::ecs::component::ColoredMesh;
+use crate::performance_monitor::PerformanceMonitor;
 use wgpu_renderer::renderer::{WgpuRenderer, self};
-use wgpu_renderer::vertex_color_shader;
+use wgpu_renderer::vertex_color_shader::{self, VertexColorShaderDraw};
 use winit::event::{VirtualKeyCode, ElementState, MouseScrollDelta};
 
-use super::geometry;
+use crate::geometry;
 
 pub struct Renderer 
 {   
     // wgpu_renderer
-    wgpu_renderer: WgpuRenderer,
+    pub wgpu_renderer: WgpuRenderer,
     pipeline_color: vertex_color_shader::Pipeline,
+    pipeline_lines: vertex_color_shader::Pipeline,
 
     // camera
     camera: renderer::camera::Camera,
@@ -39,6 +42,13 @@ impl Renderer {
         // pipeline color
         let camera_bind_group_layout = vertex_color_shader::CameraBindGroupLayout::new(wgpu_renderer.device());
         let pipeline_color = vertex_color_shader::Pipeline::new(
+            wgpu_renderer.device(), 
+            &camera_bind_group_layout, 
+            surface_format,
+        );
+
+        // pipeline lines
+        let pipeline_lines = vertex_color_shader::Pipeline::new_lines(
             wgpu_renderer.device(), 
             &camera_bind_group_layout, 
             surface_format,
@@ -107,6 +117,7 @@ impl Renderer {
             wgpu_renderer,
 
             pipeline_color,
+            pipeline_lines,
 
             camera,
             camera_controller,
@@ -170,13 +181,15 @@ impl Renderer {
         self.camera_controller.process_scroll(delta);
     }
 
-}
-
-impl ecs::system::IRenderer for Renderer
-{
-    fn render(&mut self, meshes: &[ColoredMesh]) -> Result<(), wgpu::SurfaceError>
+    pub fn render(&mut self, 
+        mesh: & impl AgentsShaderDraw, 
+        performance_monitor: &mut PerformanceMonitor) -> Result<(), wgpu::SurfaceError>
     {
+        performance_monitor.watch.start(0);
         let output = self.wgpu_renderer.get_current_texture()?;
+        performance_monitor.watch.stop(0);
+
+        performance_monitor.watch.start(1);
 
         let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
 
@@ -213,20 +226,25 @@ impl ecs::system::IRenderer for Renderer
             self.pipeline_color.bind(&mut render_pass);
             self.camera_uniform_buffer.bind(&mut render_pass);
 
-            // for mesh in meshes {
-            //     // mesh.draw(&mut render_pass);
-            // }
-
+            // plane
             self.meshes[0].draw(&mut render_pass);
-            self.meshes[1].draw(&mut render_pass);
+
+            // agents
+            mesh.draw(&mut render_pass);
+
+            // performance monitor
+            self.pipeline_lines.bind(&mut render_pass);
+            self.camera_uniform_orthographic_buffer.bind(&mut render_pass);
+            performance_monitor.draw(&mut render_pass);
         }
 
-        // self.watch.start(0);
-            self.wgpu_renderer.queue().submit(std::iter::once(encoder.finish()));
-            output.present();
-        // self.watch.stop(0);
+        self.wgpu_renderer.queue().submit(std::iter::once(encoder.finish()));
+        output.present();
+
+        performance_monitor.watch.stop(1);
         
         Ok(())
     }
 }
+
 

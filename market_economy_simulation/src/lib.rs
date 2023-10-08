@@ -3,11 +3,15 @@ mod ecs;
 mod create_entities;
 mod default_window;
 mod renderer;
+mod agents_shader;
+mod geometry;
+mod performance_monitor;
 
+use ecs::system::{DrawAgents, IRenderer};
 #[cfg(target_arch="wasm32")]
 use wasm_bindgen::prelude::*;
-use wgpu_renderer::{performance_monitor, vertex_color_shader};
-use winit::event::{WindowEvent, KeyboardInput};
+use wgpu_renderer::{vertex_color_shader};
+use winit::event::{WindowEvent, KeyboardInput, VirtualKeyCode, ElementState};
 
 
 struct MarketEconomySimulation {
@@ -17,10 +21,10 @@ struct MarketEconomySimulation {
     renderer: renderer::Renderer,
     world: ecs::World,
 
+    draw_agents: ecs::system::DrawAgents,
+
     // performance monitor
-    // watch: performance_monitor::Watch<4>,
-    // graph_host: performance_monitor::Graph,
-    // graph_device: vertex_color_shader::Mesh,
+    performance_monitor: performance_monitor::PerformanceMonitor,
 }
 
 impl MarketEconomySimulation {
@@ -29,29 +33,19 @@ impl MarketEconomySimulation {
         let size = window.inner_size();
         let scale_factor = window.scale_factor() as f32;
 
-        let renderer = renderer::Renderer::new(window).await;
+        let mut renderer = renderer::Renderer::new(window).await;
         let mut world = ecs::World::new();
 
-        for i in 0..100 {
+        let max_agents = 20000;
+        let nr_agents =    20000;
+        for i in 0..nr_agents {
             create_entities::create_agent(&mut world);
         }
 
+        let draw_agents = DrawAgents::new(&mut renderer.wgpu_renderer, max_agents);
+
         // performance monitor
-        // const WATCHPOINTS_SIZE: usize  = 4;
-        // let watch: performance_monitor::Watch<WATCHPOINTS_SIZE> = performance_monitor::Watch::new(); 
-        // let graph_host = performance_monitor::Graph::new(WATCHPOINTS_SIZE);
-        // let graph_instance = vertex_color_shader::Instance{
-        //     position: glam::Vec3::ZERO,
-        //     rotation: glam::Quat::IDENTITY,
-        // };
-        // let graph_instances = [graph_instance];
-        // let graph_device = vertex_color_shader::Mesh::new(
-        //     wgpu_renderer.device(),
-        //     graph_host.vertices.as_slice(),
-        //     graph_host.colors.as_slice(),
-        //     graph_host.indices.as_slice(),
-        //     &graph_instances,
-        // );
+        let performance_monitor = performance_monitor::PerformanceMonitor::new(&mut renderer.wgpu_renderer);
 
         Self {
             size,
@@ -59,6 +53,9 @@ impl MarketEconomySimulation {
 
             renderer,
             world,
+
+            draw_agents,
+            performance_monitor,
         }
     }
 }
@@ -97,30 +94,57 @@ impl default_window::DefaultWindowApp for MarketEconomySimulation
 
     fn update(&mut self, dt: instant::Duration) {
         self.renderer.update(dt);
-        ecs::system::move_agents(&mut self.world);
+
+        self.performance_monitor.watch.start(3);
+            ecs::system::move_agents(&mut self.world);
+        self.performance_monitor.watch.stop(3);
+        
+        self.performance_monitor.watch.start(4);
+            self.draw_agents.update(&mut self.world, &mut self.renderer.wgpu_renderer);
+        self.performance_monitor.watch.stop(4);
+
+        self.performance_monitor.update(&mut self.renderer.wgpu_renderer);
     }
 
     fn input(&mut self, event: &winit::event::WindowEvent) -> bool {
-        match event {
-            WindowEvent::KeyboardInput {
-                input:
-                    KeyboardInput {
-                        virtual_keycode: Some(key),
-                        state,
-                        ..
-                    },
-                ..
-            } => self.renderer.process_keyboard(*key, *state),
-            WindowEvent::MouseWheel { delta, .. } => {
-                self.renderer.process_scroll(delta);
-                true
-            }
-            _ => false,
-        }
+        self.performance_monitor.watch.start(2);
+            let res = match event {
+                WindowEvent::KeyboardInput {
+                    input:
+                        KeyboardInput {
+                            virtual_keycode: Some(VirtualKeyCode::F2),
+                            state: ElementState::Pressed,
+                            ..
+                        },
+                    ..
+                } => { 
+                    self.performance_monitor.show = !self.performance_monitor.show;
+                    true
+                },
+                WindowEvent::KeyboardInput {
+                    input:
+                        KeyboardInput {
+                            virtual_keycode: Some(key),
+                            state,
+                            ..
+                        },
+                    ..
+                } => self.renderer.process_keyboard(*key, *state),
+                WindowEvent::MouseWheel { delta, .. } => {
+                    self.renderer.process_scroll(delta);
+                    true
+                }
+                _ => false,
+            };
+        self.performance_monitor.watch.stop(2);
+
+        res
     }
 
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
-        ecs::system::draw_meshes(&self.world, &mut self.renderer)
+        self.renderer.render(
+            &self.draw_agents, 
+            &mut self.performance_monitor)
     }
 
 
