@@ -1,16 +1,14 @@
 
 
-mod mesh;
-mod g_buffer;
+mod g_buffer_bind_group_layout;
+mod deferred_light_shader_draw;
+
 mod pipeline;
-mod deferred_color_shader_draw;
+
+pub use g_buffer_bind_group_layout::GBufferBindGroupLayout;
+pub use deferred_light_shader_draw::DeferredLightShaderDraw;
 
 pub use pipeline::Pipeline;
-pub use mesh::Mesh;
-pub use deferred_color_shader_draw::DeferredShaderDraw;
-
-pub use g_buffer::GBufferFormat;
-pub use g_buffer::GBuffer;
 
 pub use wgpu_renderer::vertex_color_shader::Vertex;
 pub use wgpu_renderer::vertex_color_shader::VertexBuffer;
@@ -25,3 +23,4 @@ pub use wgpu_renderer::vertex_color_shader::InstanceBuffer;
 pub use wgpu_renderer::vertex_color_shader::CameraBindGroupLayout;
 pub use wgpu_renderer::vertex_color_shader::CameraUniform;
 pub use wgpu_renderer::vertex_color_shader::CameraUniformBuffer;
+

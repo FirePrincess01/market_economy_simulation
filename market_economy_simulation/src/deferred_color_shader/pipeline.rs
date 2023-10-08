@@ -104,11 +104,11 @@ impl Pipeline
                         blend: None,
                         write_mask: wgpu::ColorWrites::ALL,
                     }),
-                    Some(wgpu::ColorTargetState { 
-                        format: g_buffer_format.albedo,
-                        blend: None,
-                        write_mask: wgpu::ColorWrites::ALL,
-                    }),
+                    // Some(wgpu::ColorTargetState { 
+                    //     format: g_buffer_format.albedo,
+                    //     blend: None,
+                    //     write_mask: wgpu::ColorWrites::ALL,
+                    // }),
                     // Some(wgpu::ColorTargetState { 
                     //     format: g_buffer_format.specular,
                     //     blend: None,

@@ -5,7 +5,7 @@ mod renderer;
 pub use renderer::IRenderer;
 use wgpu_renderer::{vertex_color_shader::Instance, vertex_color_shader::InstanceRaw, renderer::WgpuRendererInterface};
 
-use crate::deferred_color_shader::DeferredShaderMeshDraw;
+use crate::deferred_color_shader::DeferredShaderDraw;
 use crate::geometry;
 
 use super::super::deferred_color_shader::Mesh;
@@ -74,9 +74,11 @@ impl DrawAgents {
 
 }
 
-impl DeferredShaderMeshDraw for DrawAgents {
+impl DeferredShaderDraw for DrawAgents {
     fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         self.mesh.draw(render_pass);
     }
 }
+
+
 

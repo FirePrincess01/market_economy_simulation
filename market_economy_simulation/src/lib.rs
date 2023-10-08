@@ -4,6 +4,7 @@ mod create_entities;
 mod default_window;
 mod renderer;
 mod deferred_color_shader;
+mod deferred_light_shader;
 mod geometry;
 mod performance_monitor;
 
