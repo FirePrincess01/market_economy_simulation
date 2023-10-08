@@ -51,12 +51,7 @@ fn vs_main(
 @group(1) @binding(0)
 var t_position: texture_2d<f32>;
 @group(1) @binding(1)
-var s_position: sampler;
-
-@group(1) @binding(2)
 var t_normal: texture_2d<f32>;
-@group(1) @binding(3)
-var s_normal: sampler;
 
 struct FragmentOutput {
     @location(0) surface: vec4<f32>,
