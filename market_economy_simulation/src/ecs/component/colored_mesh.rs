@@ -9,6 +9,7 @@ pub struct ColoredMesh {
     // mesh: vertex_color_shader::Mesh,
 }
 
+#[allow(dead_code)]
 impl ColoredMesh {
     pub fn new(mesh_index: usize) -> Self 
     {

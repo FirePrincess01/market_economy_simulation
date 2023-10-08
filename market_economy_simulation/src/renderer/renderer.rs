@@ -1,8 +1,6 @@
 
 
 use crate::agents_shader::AgentsShaderDraw;
-use crate::ecs;
-use crate::ecs::component::ColoredMesh;
 use crate::performance_monitor::PerformanceMonitor;
 use wgpu_renderer::renderer::{WgpuRenderer, self};
 use wgpu_renderer::vertex_color_shader::{self, VertexColorShaderDraw};
@@ -133,7 +131,7 @@ impl Renderer {
         } 
     }
 
-    fn top_view_point(camera: &mut renderer::camera::Camera) {
+    fn _top_view_point(camera: &mut renderer::camera::Camera) {
         let position = cgmath::Point3::new(0.0, 0.0, 10.0);
         let yaw = cgmath::Deg(-90.0).into();
         let pitch = cgmath::Deg(0.0).into();

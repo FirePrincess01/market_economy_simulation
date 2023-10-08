@@ -33,7 +33,7 @@ impl Circle {
 
         let color = Color { color: [0.5, 0.5, 0.5] };
         colors.push(color); // center
-        for i in 0..n 
+        for _i in 0..n 
         {
             colors.push(color);
         }

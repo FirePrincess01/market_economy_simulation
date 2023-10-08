@@ -7,11 +7,11 @@ mod agents_shader;
 mod geometry;
 mod performance_monitor;
 
-use ecs::system::{DrawAgents, IRenderer};
+use ecs::system::DrawAgents;
+use winit::event::{WindowEvent, KeyboardInput, VirtualKeyCode, ElementState};
+
 #[cfg(target_arch="wasm32")]
 use wasm_bindgen::prelude::*;
-use wgpu_renderer::{vertex_color_shader};
-use winit::event::{WindowEvent, KeyboardInput, VirtualKeyCode, ElementState};
 
 
 struct MarketEconomySimulation {
@@ -38,7 +38,7 @@ impl MarketEconomySimulation {
 
         let max_agents = 20000;
         let nr_agents =    20000;
-        for i in 0..nr_agents {
+        for _i in 0..nr_agents {
             create_entities::create_agent(&mut world);
         }
 
@@ -60,6 +60,7 @@ impl MarketEconomySimulation {
     }
 }
 
+#[allow(unused)]
 fn apply_scale_factor(position: winit::dpi::PhysicalPosition<f64>, scale_factor: f32) 
 -> winit::dpi::PhysicalPosition<f64> 
 {

@@ -77,7 +77,7 @@ impl CameraController {
         }
     }
 
-    pub fn process_mouse(&mut self, mouse_dx: f64, mouse_dy: f64) {
+    pub fn _process_mouse(&mut self, mouse_dx: f64, mouse_dy: f64) {
         self.rotate_horizontal = mouse_dx as f32;
         self.rotate_vertical = mouse_dy as f32;
     }

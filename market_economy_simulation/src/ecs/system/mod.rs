@@ -3,7 +3,7 @@
 mod renderer;
 
 pub use renderer::IRenderer;
-use wgpu_renderer::{vertex_color_shader::Instance, vertex_color_shader::InstanceBuffer, vertex_color_shader::InstanceRaw, renderer::WgpuRendererInterface};
+use wgpu_renderer::{vertex_color_shader::Instance, vertex_color_shader::InstanceRaw, renderer::WgpuRendererInterface};
 
 use crate::agents_shader::AgentsShaderDraw;
 use crate::geometry;
