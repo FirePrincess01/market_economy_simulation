@@ -1,18 +1,21 @@
 
 use super::Component;
-use wgpu_renderer::vertex_color_shader;
 
 pub struct ColoredMesh {
     pub entity_index: usize,
 
+    pub mesh_index: usize,
+
     // mesh: vertex_color_shader::Mesh,
 }
 
+#[allow(dead_code)]
 impl ColoredMesh {
-    pub fn new() -> Self 
+    pub fn new(mesh_index: usize) -> Self 
     {
         Self {
             entity_index: 0,
+            mesh_index,
         }
     }
 }

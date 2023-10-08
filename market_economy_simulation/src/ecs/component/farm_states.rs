@@ -2,6 +2,7 @@
 
 use super::Component;
 
+#[allow(dead_code)]
 pub struct FarmStates {
     pub entity_index: usize,
 
@@ -9,6 +10,7 @@ pub struct FarmStates {
     progress: u32,
 }
 
+#[allow(dead_code)]
 impl FarmStates {
     pub fn new() -> Self 
     {

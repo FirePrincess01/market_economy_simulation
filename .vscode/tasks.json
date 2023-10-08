@@ -57,7 +57,7 @@
 			"label": "wasm-pack",
 			"type": "shell",
 			// "command": "RUSTFLAGS=--cfg=web_sys_unstable_apis wasm-pack build --target web",
-			"command": "wasm-pack build --target web",
+			"command": "wasm-pack build market_economy_simulation --target web",
 			"problemMatcher": [
 				"$rustc"
 			],

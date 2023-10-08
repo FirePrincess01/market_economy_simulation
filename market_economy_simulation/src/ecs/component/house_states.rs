@@ -1,12 +1,14 @@
 
 use super::Component;
 
+#[allow(dead_code)]
 pub struct HouseStates {
     pub entity_index: usize,
 
     residents: u32,
 }
 
+#[allow(dead_code)]
 impl HouseStates {
     pub fn new() -> Self 
     {

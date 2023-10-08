@@ -1,6 +1,7 @@
 
 use super::Component;
 
+#[allow(dead_code)]
 pub struct LiveStates {
     pub entity_index: usize,
 
