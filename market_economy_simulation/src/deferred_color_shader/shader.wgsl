@@ -60,6 +60,9 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
 
     var out: FragmentOutput;
     out.surface = vec4<f32>(in.color, 1.0);
+    // out.position = in.clip_position;
+    out.position =  vec4<f32>(0.5, 0.5, 0.5, 1.0);
+    out.normal =  vec4<f32>(0.5, 0.5, 0.5, 1.0);
     // out.albedo = vec4<f32>(in.color, 1.0);
 
     return out;

@@ -1,11 +1,10 @@
 
 
-mod renderer;
 
-pub use renderer::IRenderer;
 use wgpu_renderer::{vertex_color_shader::Instance, vertex_color_shader::InstanceRaw, renderer::WgpuRendererInterface};
 
 use crate::deferred_color_shader::DeferredShaderDraw;
+use crate::deferred_light_shader::DeferredLightShaderDraw;
 use crate::geometry;
 
 use super::super::deferred_color_shader::Mesh;
@@ -35,12 +34,14 @@ pub fn move_agents(world: &mut World)
 pub struct DrawAgents {
     instances_host: Vec<InstanceRaw>,
     mesh: Mesh,
+    mesh_light: Mesh,
 }
 
 impl DrawAgents {
     pub fn new(wgpu_renderer: &mut impl WgpuRendererInterface, max_agents: usize) -> Self {
         
         let circle = geometry::Circle::new(0.15, 16);
+        let circle_light = geometry::Circle::new(0.30, 16);
         let instances_host =  vec![InstanceRaw::new(); max_agents];
 
         let mesh = Mesh::new(wgpu_renderer.device(), 
@@ -48,10 +49,17 @@ impl DrawAgents {
             &circle.colors, 
             &circle.indices, 
             &instances_host);
+
+        let mesh_light = Mesh::new(wgpu_renderer.device(), 
+            &circle_light.vertices, 
+            &circle_light.colors, 
+            &circle_light.indices, 
+            &instances_host);
         
         Self {
             instances_host,
             mesh,
+            mesh_light,
         }
     }
 
@@ -70,6 +78,7 @@ impl DrawAgents {
         }  
 
         self.mesh.update_instance_buffer(wgpu_renderer.queue(), &self.instances_host);
+        self.mesh_light.update_instance_buffer(wgpu_renderer.queue(), &self.instances_host);
     }
 
 }
@@ -80,5 +89,9 @@ impl DeferredShaderDraw for DrawAgents {
     }
 }
 
-
+impl DeferredLightShaderDraw for DrawAgents {
+    fn draw_lights<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
+        self.mesh_light.draw(render_pass);
+    }
+}
 

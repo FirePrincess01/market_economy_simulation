@@ -1,6 +1,7 @@
 
 
-use crate::deferred_color_shader::{DeferredShaderDraw, self};
+use crate::deferred_color_shader::{DeferredShaderDraw, self, GBuffer};
+use crate::deferred_light_shader::DeferredLightShaderDraw;
 use crate::performance_monitor::PerformanceMonitor;
 use wgpu_renderer::renderer::{WgpuRenderer, self};
 use wgpu_renderer::vertex_color_shader::{self, VertexColorShaderDraw};
@@ -16,6 +17,7 @@ pub struct Renderer
     pipeline_color: vertex_color_shader::Pipeline,
     pipeline_lines: vertex_color_shader::Pipeline,
 
+    g_buffer_bind_group_layout: deferred_light_shader::GBufferBindGroupLayout,
     g_buffer: deferred_color_shader::GBuffer,
     pipeline_deferred_color: deferred_color_shader::Pipeline,
     pipeline_deferred_light: deferred_light_shader::Pipeline,
@@ -66,14 +68,12 @@ impl Renderer {
             &g_buffer_bind_group_layout,
             surface_width, 
             surface_height);
-        let g_buffer_format = g_buffer.get_format();
 
         // pipeline deferred color
         let pipeline_deferred_color = deferred_color_shader::Pipeline::new(
             wgpu_renderer.device(), 
             &camera_bind_group_layout, 
             surface_format,
-            &g_buffer_format,
         );
 
         // pipeline deferred light
@@ -149,6 +149,7 @@ impl Renderer {
             pipeline_color,
             pipeline_lines,
 
+            g_buffer_bind_group_layout,
             g_buffer,
             pipeline_deferred_color,
             pipeline_deferred_light,
@@ -192,10 +193,11 @@ impl Renderer {
         
         self.projection.resize(new_size.width, new_size.height);
         self.wgpu_renderer.resize(new_size);
-        self.g_buffer.resize(&self.wgpu_renderer.device(), 
-            new_size.width, 
+        self.g_buffer = GBuffer::new(&mut self.wgpu_renderer,
+            &self.g_buffer_bind_group_layout,
+            new_size.width,
             new_size.height);
-        
+    
         self.camera_uniform_orthographic.resize_orthographic(new_size.width, new_size.height);
         self.camera_uniform_orthographic_buffer.update(self.wgpu_renderer.queue(), self.camera_uniform_orthographic);
     }
@@ -226,7 +228,7 @@ impl Renderer {
     )
     {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor { 
-            label: Some("Render Pass"), 
+            label: Some("Deferred Render Pass"), 
             color_attachments: &[
             Some(wgpu::RenderPassColorAttachment {
                 view: &view,
@@ -246,9 +248,9 @@ impl Renderer {
                 resolve_target: None,
                 ops: wgpu::Operations {
                     load: wgpu::LoadOp::Clear(wgpu::Color {
-                        r: 0.0,
-                        g: 0.0,
-                        b: 0.0,
+                        r: 1.0,
+                        g: 1.0,
+                        b: 1.0,
                         a: 1.0,
                     }),
                     store: true,
@@ -259,9 +261,9 @@ impl Renderer {
                 resolve_target: None,
                 ops: wgpu::Operations {
                     load: wgpu::LoadOp::Clear(wgpu::Color {
-                        r: 0.0,
-                        g: 0.0,
-                        b: 0.0,
+                        r: 1.0,
+                        g: 1.0,
+                        b: 1.0,
                         a: 1.0,
                     }),
                     store: true,
@@ -288,12 +290,37 @@ impl Renderer {
         mesh.draw(&mut render_pass);
     }
 
-    fn render_lights(&self, 
+    fn render_light(&self, 
         view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
+        mesh: & impl DeferredLightShaderDraw,
     )
     {
+        let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor { 
+            label: Some("Light Render Pass"), 
+            color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                view: &view,
+                resolve_target: None,
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Load,
+                    store: true,
+                }
+            })], 
+            depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                view: self.wgpu_renderer.get_depth_texture_view(),
+                depth_ops: Some(wgpu::Operations {
+                    load: wgpu::LoadOp::Load,
+                    store: true,
+                }),
+                stencil_ops: None,
+            }) 
+        });
 
+        // lights
+        self.pipeline_deferred_light.bind(&mut render_pass);
+        self.camera_uniform_buffer.bind(&mut render_pass);
+        self.g_buffer.bind(&mut render_pass);
+        mesh.draw_lights(&mut render_pass);
     }
 
     fn render_forward(&self, 
@@ -303,7 +330,7 @@ impl Renderer {
     )
     {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor { 
-            label: Some("Render Pass"), 
+            label: Some("Forward Render Pass"), 
             color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                 view: &view,
                 resolve_target: None,
@@ -330,7 +357,7 @@ impl Renderer {
 
 
     pub fn render(&mut self, 
-        mesh: & impl DeferredShaderDraw, 
+        mesh: & (impl DeferredShaderDraw + DeferredLightShaderDraw), 
         performance_monitor: &mut PerformanceMonitor) -> Result<(), wgpu::SurfaceError>
     {
         performance_monitor.watch.start(0);
@@ -346,48 +373,8 @@ impl Renderer {
         });
 
         self.render_deferred(&view, &mut encoder, mesh);
+        self.render_light(&view, &mut encoder, mesh);
         self.render_forward(&view, &mut encoder, performance_monitor);
-
-        // {
-        //     let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor { 
-        //         label: Some("Render Pass"), 
-        //         color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-        //             view: &view,
-        //             resolve_target: None,
-        //             ops: wgpu::Operations {
-        //                 load: wgpu::LoadOp::Clear(wgpu::Color {
-        //                     r: 0.01,
-        //                     g: 0.02,
-        //                     b: 0.03,
-        //                     a: 1.0,
-        //                 }),
-        //                 store: true,
-        //             }
-        //         })], 
-        //         depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
-        //             view: self.wgpu_renderer.get_depth_texture_view(),
-        //             depth_ops: Some(wgpu::Operations {
-        //                 load: wgpu::LoadOp::Clear(1.0),
-        //                 store: true,
-        //             }),
-        //             stencil_ops: None,
-        //         }) 
-        //     });
-
-        //     self.pipeline_color.bind(&mut render_pass);
-        //     self.camera_uniform_buffer.bind(&mut render_pass);
-
-        //     // plane
-        //     self.meshes[0].draw(&mut render_pass);
-
-        //     // agents
-        //     mesh.draw(&mut render_pass);
-
-        //     // performance monitor
-        //     self.pipeline_lines.bind(&mut render_pass);
-        //     self.camera_uniform_orthographic_buffer.bind(&mut render_pass);
-        //     performance_monitor.draw(&mut render_pass);
-        // }
 
         self.wgpu_renderer.queue().submit(std::iter::once(encoder.finish()));
         output.present();

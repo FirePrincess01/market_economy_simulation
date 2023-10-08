@@ -71,7 +71,32 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
 
     var out: FragmentOutput;
     // in.clip_position
-    out.surface = vec4<f32>(in.color, 1.0);
+
+
+    // let pos0: vec4<f32> = textureSample(t_position, s_position, in.clip_position.xy);
+
+    // clip_position is in pixels on the screen
+    let index = vec2<u32>(u32(in.clip_position.x), u32(in.clip_position.y));
+    let pos0: vec4<f32> = textureLoad(t_position, index, 0);
+
+    // let dim: vec2<u32> = textureDimensions(t_position);
+    // let width = dim.x;
+    // let height = dim.y;
+
+    // var alpha: f32 = 0.01;
+    // if pos0.x == 1.0 {
+    //     alpha = 0.5;
+    // }
+
+    var alpha: f32 = 0.5;
+    if pos0.x == 1.0 {
+        alpha = 0.0;
+    }
+    // if height > 600u {
+    //     alpha = 0.5;
+    // }
+
+    out.surface = vec4<f32>(in.color, alpha);
     // out.albedo = vec4<f32>(in.color, 1.0);
 
     return out;

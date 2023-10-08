@@ -9,7 +9,6 @@ pub use pipeline::Pipeline;
 pub use mesh::Mesh;
 pub use deferred_color_shader_draw::DeferredShaderDraw;
 
-pub use g_buffer::GBufferFormat;
 pub use g_buffer::GBuffer;
 
 pub use wgpu_renderer::vertex_color_shader::Vertex;

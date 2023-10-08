@@ -2,31 +2,6 @@ use wgpu_renderer::renderer::WgpuRendererInterface;
 
 use crate::deferred_light_shader::GBufferBindGroupLayout;
 
-
-pub struct GBufferFormat {
-    pub position: wgpu::TextureFormat,
-    pub normal: wgpu::TextureFormat,
-    // pub albedo: wgpu::TextureFormat,
-    // pub specular: wgpu::TextureFormat,
-}
-
-impl GBufferFormat {
-    pub fn new() -> Self {
-
-        let position = wgpu::TextureFormat::Rgba16Float;
-        let normal = wgpu::TextureFormat::Rgba16Float;
-        // let albedo = wgpu::TextureFormat::Rgba8UnormSrgb;
-        // let specular = wgpu::TextureFormat::R16Float;
-
-        Self {
-            position,
-            normal,
-            // albedo,
-            // specular,
-        }
-    }
-}
-
 pub struct GBufferTexture {
     pub texture: wgpu::Texture,
     pub view: wgpu::TextureView,
@@ -78,9 +53,8 @@ impl GBufferTexture {
     }
 }
 
-pub struct GBuffer {
-    format: GBufferFormat,
 
+pub struct GBuffer {
     pub position: GBufferTexture,
     pub normal: GBufferTexture,
     // pub albedo: GBufferTexture,
@@ -90,15 +64,23 @@ pub struct GBuffer {
 }
 
 impl GBuffer {
+    pub const G_BUFFER_FORMAT_POSITION: wgpu::TextureFormat = wgpu::TextureFormat::Rgba16Float;
+    pub const G_BUFFER_FORMAT_NORMAL: wgpu::TextureFormat = wgpu::TextureFormat::Rgba16Float;
+
     pub fn new(wgpu_renderer: &mut impl WgpuRendererInterface,
          g_buffer_bind_group_layout: &GBufferBindGroupLayout,
          surface_width: u32, 
          surface_height: u32) -> Self 
     {
-        let format = GBufferFormat::new();
+        let position = GBufferTexture::new(wgpu_renderer.device(), 
+            surface_width, surface_height, 
+            Self::G_BUFFER_FORMAT_POSITION, 
+            "GBuffer Position");
 
-        let (position, normal, ) = 
-        Self::create_buffers(wgpu_renderer.device(), surface_width, surface_height, &format);
+        let normal = GBufferTexture::new(wgpu_renderer.device(), 
+            surface_width, surface_height, 
+            Self::G_BUFFER_FORMAT_NORMAL, 
+            "GBuffer Normal");
 
         let bind_group = wgpu_renderer.device().create_bind_group(
             &wgpu::BindGroupDescriptor {
@@ -121,13 +103,11 @@ impl GBuffer {
                         resource: wgpu::BindingResource::Sampler(&normal.sampler),
                     },
                 ],
-                label: Some("texture_bind_group"),
+                label: Some("g_buffer_bind_group"),
             }
         );
 
         Self {
-            format,
-            
             position,
             normal,
             // albedo,
@@ -138,46 +118,10 @@ impl GBuffer {
         }
     }
 
-    fn create_buffers(device: &wgpu::Device, 
-        surface_width: u32, surface_height: u32,
-        format: &GBufferFormat) 
-        -> (GBufferTexture, GBufferTexture)
-    {
-        let position = GBufferTexture::new(device, 
-            surface_width, surface_height, 
-            format.position, 
-            "GBuffer Position");
 
-        let normal = GBufferTexture::new(device, 
-            surface_width, surface_height, 
-            format.normal, 
-            "GBuffer Normal");
 
-        // let albedo = GBufferTexture::new(device, 
-        //     surface_width, surface_height, 
-        //     format.albedo, 
-        //     "GBuffer Albedo");
-
-        // let specular = GBufferTexture::new(device, 
-        //     surface_width, surface_height, 
-        //     format.specular, 
-        //     "GBuffer Specular");
-
-        (position, normal)
-    }
-
-    pub fn resize(&mut self, device: &wgpu::Device, surface_width: u32, surface_height: u32) {
-        let (position, normal, ) = 
-            Self::create_buffers(device, surface_width, surface_height, &self.format);
-
-        self.position = position;
-        self.normal = normal;
-        // self.albedo = albedo;
-        // self.specular = specular;
-    }
-
-    pub fn get_format(&self) -> &GBufferFormat {
-        &self.format
+    pub fn bind<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>,) {
+        render_pass.set_bind_group(1, &self.bind_group, &[]);
     }
 
 }

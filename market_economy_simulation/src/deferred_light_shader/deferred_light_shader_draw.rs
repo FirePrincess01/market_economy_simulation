@@ -2,5 +2,5 @@
 
 pub trait DeferredLightShaderDraw
 {
-    fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>);
+    fn draw_lights<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>);
 }

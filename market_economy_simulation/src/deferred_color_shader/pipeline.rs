@@ -9,7 +9,7 @@ use wgpu_renderer;
 use super::Vertex;
 use super::Color;
 use super::InstanceRaw;
-use super::GBufferFormat;
+use super::GBuffer;
 use super::CameraBindGroupLayout;
 use wgpu_renderer::renderer::depth_texture;
 
@@ -26,33 +26,28 @@ impl Pipeline
     pub fn new_lines(device: &wgpu::Device, 
         camera_bind_group_layout: &CameraBindGroupLayout, 
         surface_format: wgpu::TextureFormat,
-        g_buffer_format: &GBufferFormat,
     ) -> Self 
     {
         Self::new_parameterized(device, 
             camera_bind_group_layout, 
             surface_format, 
-            g_buffer_format,
             wgpu::PrimitiveTopology::LineList)
     }
 
     pub fn new(device: &wgpu::Device, 
         camera_bind_group_layout: &CameraBindGroupLayout, 
         surface_format: wgpu::TextureFormat, 
-        g_buffer_format: &GBufferFormat,
     ) -> Self 
     {
         Self::new_parameterized(device, 
             camera_bind_group_layout, 
             surface_format, 
-            g_buffer_format,
             wgpu::PrimitiveTopology::TriangleList)
     }
 
     fn new_parameterized(device: &wgpu::Device, 
         camera_bind_group_layout: &CameraBindGroupLayout, 
         surface_format: wgpu::TextureFormat, 
-        g_buffer_format: &GBufferFormat,
         topology: wgpu::PrimitiveTopology) -> Self
     {
         // Shader
@@ -95,12 +90,12 @@ impl Pipeline
                         write_mask: wgpu::ColorWrites::ALL,
                     }),
                     Some(wgpu::ColorTargetState { 
-                        format: g_buffer_format.position,
+                        format: GBuffer::G_BUFFER_FORMAT_POSITION,
                         blend: None,
                         write_mask: wgpu::ColorWrites::ALL,
                     }),
                     Some(wgpu::ColorTargetState { 
-                        format: g_buffer_format.normal,
+                        format: GBuffer::G_BUFFER_FORMAT_NORMAL,
                         blend: None,
                         write_mask: wgpu::ColorWrites::ALL,
                     }),

@@ -36,7 +36,11 @@ impl DefaultWindow {
         let window: winit::window::Window = winit::window::WindowBuilder::new().build(&event_loop).unwrap();
 
         use winit::dpi::PhysicalSize;
-        window.set_inner_size(PhysicalSize::new(700, 800));
+        let size = PhysicalSize::new(700, 800);
+        window.set_inner_size(size);
+
+        // wait for the window to resize
+        while window.inner_size() != size {}
 
         // we need to add a canvas to the HTML document that we will host our application
         #[cfg(target_arch = "wasm32")]
