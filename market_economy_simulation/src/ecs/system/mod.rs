@@ -18,7 +18,7 @@ pub fn move_agents(world: &mut World)
     let iter = World::filter(&world.entities, &mut world.positions, &world.live_stats);
 
     let mut i = 0;
-    let max_y = 1000;
+    let max_y = 150;
     for (pos, _live) in iter 
     {
         let x = i % max_y;
