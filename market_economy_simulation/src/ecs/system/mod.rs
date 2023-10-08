@@ -5,10 +5,10 @@ mod renderer;
 pub use renderer::IRenderer;
 use wgpu_renderer::{vertex_color_shader::Instance, vertex_color_shader::InstanceRaw, renderer::WgpuRendererInterface};
 
-use crate::agents_shader::AgentsShaderDraw;
+use crate::deferred_color_shader::DeferredShaderMeshDraw;
 use crate::geometry;
 
-use super::super::agents_shader::Mesh;
+use super::super::deferred_color_shader::Mesh;
 
 use super::World;
 
@@ -74,7 +74,7 @@ impl DrawAgents {
 
 }
 
-impl AgentsShaderDraw for DrawAgents {
+impl DeferredShaderMeshDraw for DrawAgents {
     fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         self.mesh.draw(render_pass);
     }

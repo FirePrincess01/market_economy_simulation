@@ -1,6 +1,6 @@
 
 
-use crate::agents_shader::AgentsShaderDraw;
+use crate::deferred_color_shader::DeferredShaderMeshDraw;
 use crate::performance_monitor::PerformanceMonitor;
 use wgpu_renderer::renderer::{WgpuRenderer, self};
 use wgpu_renderer::vertex_color_shader::{self, VertexColorShaderDraw};
@@ -180,7 +180,7 @@ impl Renderer {
     }
 
     pub fn render(&mut self, 
-        mesh: & impl AgentsShaderDraw, 
+        mesh: & impl DeferredShaderMeshDraw, 
         performance_monitor: &mut PerformanceMonitor) -> Result<(), wgpu::SurfaceError>
     {
         performance_monitor.watch.start(0);

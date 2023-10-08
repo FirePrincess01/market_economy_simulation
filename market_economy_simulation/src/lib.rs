@@ -3,7 +3,7 @@ mod ecs;
 mod create_entities;
 mod default_window;
 mod renderer;
-mod agents_shader;
+mod deferred_color_shader;
 mod geometry;
 mod performance_monitor;
 
