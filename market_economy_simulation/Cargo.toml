@@ -14,7 +14,7 @@ crate-type = ["cdylib", "rlib"]
 [[bin]]
 name = "app"
 test = false
-doc = false
+doc = false 
 
 [dependencies]
 # dependencies for wgpu 
