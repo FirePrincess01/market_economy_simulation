@@ -1,7 +1,6 @@
 
 mod ecs;
 mod create_entities;
-mod default_window;
 mod renderer;
 mod deferred_color_shader;
 mod deferred_light_shader;
@@ -9,6 +8,7 @@ mod geometry;
 mod performance_monitor;
 
 use ecs::system::DrawAgents;
+use wgpu_renderer::default_window;
 use winit::event::{WindowEvent, KeyboardInput, VirtualKeyCode, ElementState};
 
 #[cfg(target_arch="wasm32")]
