@@ -14,7 +14,7 @@ pub struct Renderer
     // wgpu_renderer
     pub wgpu_renderer: WgpuRenderer,
 
-    pipeline_color: vertex_color_shader::Pipeline,
+    _pipeline_color: vertex_color_shader::Pipeline,
     pipeline_lines: vertex_color_shader::Pipeline,
 
     g_buffer_bind_group_layout: deferred_light_shader::GBufferBindGroupLayout,
@@ -42,7 +42,7 @@ impl Renderer {
     {   
         // wgpu renderer
         let mut wgpu_renderer = WgpuRenderer::new(window).await; 
-        let surface_format = wgpu_renderer.config().format;
+        let _surface_format = wgpu_renderer.config().format;
         let surface_width = wgpu_renderer.config().width;
         let surface_height = wgpu_renderer.config().height;
         let surface_format = wgpu_renderer.config().format;
@@ -146,7 +146,7 @@ impl Renderer {
         Self {
             wgpu_renderer,
 
-            pipeline_color,
+            _pipeline_color: pipeline_color,
             pipeline_lines,
 
             g_buffer_bind_group_layout,

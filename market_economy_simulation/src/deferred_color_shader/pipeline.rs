@@ -22,8 +22,8 @@ pub struct Pipeline
 }
 
 impl Pipeline
-{
-    pub fn new_lines(device: &wgpu::Device, 
+{   
+    pub fn _new_lines(device: &wgpu::Device, 
         camera_bind_group_layout: &CameraBindGroupLayout, 
         surface_format: wgpu::TextureFormat,
     ) -> Self 
@@ -65,8 +65,6 @@ impl Pipeline
                 ],
                 push_constant_ranges: &[],
             });
-
-        let blend = wgpu::BlendState::REPLACE;
 
         let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("Render Pipeline"),
