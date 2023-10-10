@@ -357,7 +357,7 @@ impl Renderer {
 
 
     pub fn render(&mut self, 
-        mesh: & (impl DeferredShaderDraw + DeferredLightShaderDraw), 
+        mesh: & (impl DeferredShaderDraw), 
         performance_monitor: &mut PerformanceMonitor) -> Result<(), wgpu::SurfaceError>
     {
         performance_monitor.watch.start(0);
@@ -373,7 +373,7 @@ impl Renderer {
         });
 
         self.render_deferred(&view, &mut encoder, mesh);
-        self.render_light(&view, &mut encoder, mesh);
+        // self.render_light(&view, &mut encoder, mesh);
         self.render_forward(&view, &mut encoder, performance_monitor);
 
         self.wgpu_renderer.queue().submit(std::iter::once(encoder.finish()));

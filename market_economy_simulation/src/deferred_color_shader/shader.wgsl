@@ -9,40 +9,54 @@ var<uniform> camera: CameraUniform;
 
 struct VertexInput {
     @location(0) position: vec3<f32>,
+    @location(1) normal: vec3<f32>,
 }
 
-struct ColorInput {
-    @location(1) color: vec3<f32>,
-}
+// struct ColorInput {
+//     @location(1) color: vec3<f32>,
+// }
 
 struct InstanceInput {
-    @location(5) model_matrix_0: vec4<f32>,
-    @location(6) model_matrix_1: vec4<f32>,
-    @location(7) model_matrix_2: vec4<f32>,
-    @location(8) model_matrix_3: vec4<f32>,
+    // @location(5) model_matrix_0: vec4<f32>,
+    // @location(6) model_matrix_1: vec4<f32>,
+    // @location(7) model_matrix_2: vec4<f32>,
+    // @location(8) model_matrix_3: vec4<f32>,
+
+    @location(5) position: vec3<f32>,
+    @location(6) color: vec3<f32>,
+    @location(7) entity: vec3<u32>,
 }
 
 struct VertexOutput {
     @builtin(position) clip_position: vec4<f32>,
     @location(0) color: vec3<f32>,
+    @location(1) position: vec3<f32>,
+    @location(2) normal: vec3<f32>,
+    @location(3) entity: vec3<u32>,
 };
 
 @vertex 
 fn vs_main(
     model: VertexInput,
-    model_color: ColorInput,
+    // model_color: ColorInput,
     instance: InstanceInput,
 ) -> VertexOutput {
-    let model_matrix = mat4x4<f32>(
-        instance.model_matrix_0,
-        instance.model_matrix_1,
-        instance.model_matrix_2,
-        instance.model_matrix_3,
-    );
+    // let model_matrix = mat4x4<f32>(
+    //     instance.model_matrix_0,
+    //     instance.model_matrix_1,
+    //     instance.model_matrix_2,
+    //     instance.model_matrix_3,
+    // );
+
+    let position = instance.position + model.position;
 
     var out: VertexOutput;
-    out.color = model_color.color;
-    out.clip_position = camera.view_proj * model_matrix * vec4<f32>(model.position, 1.0);
+    out.clip_position = camera.view_proj * vec4<f32>(position, 1.0);
+    out.color = instance.color;
+    out.position = position;
+    out.normal = model.normal;
+    out.entity = instance.entity;
+
     return out;
 }
 

@@ -4,11 +4,15 @@ use std::f32::consts::PI;
 use wgpu_renderer::vertex_color_shader::Vertex as Vertex;
 use wgpu_renderer::vertex_color_shader::Color as Color;
 
+use crate::deferred_color_shader;
+
 
 pub struct Circle {
     pub vertices: Vec<Vertex>,
     pub colors: Vec<Color>,
     pub indices: Vec<u32>,
+
+    pub deferred_vertices: Vec::<deferred_color_shader::Vertex>,
 }
 
 impl Circle {
@@ -18,6 +22,8 @@ impl Circle {
         let mut colors = Vec::<Color>::new();
         let mut indices = Vec::<u32>::new();
 
+        let mut deferred_vertices = Vec::<deferred_color_shader::Vertex>::new();
+        
         let z = r;
         vertices.push(Vertex { position: [0.0, 0.0, z] }); // center
         
@@ -49,10 +55,21 @@ impl Circle {
         indices.push((n) as u32);
         indices.push(1 as u32);
 
+        let normal = [0.0, 0.0, 1.0];
+        for vertex in &vertices {
+            deferred_vertices.push(deferred_color_shader::Vertex { 
+                position: vertex.position,
+                normal: normal,
+                }
+            )
+        }
+
         Self {
             vertices,
             colors,
             indices,
+
+            deferred_vertices,
         }
     }
 }
