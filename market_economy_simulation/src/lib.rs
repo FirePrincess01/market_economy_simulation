@@ -37,8 +37,8 @@ impl MarketEconomySimulation {
         let mut renderer = renderer::Renderer::new(window).await;
         let mut world = ecs::World::new();
 
-        let max_agents = 200000;
-        let nr_agents =    200000;
+        let max_agents = 50000;
+        let nr_agents =    50000;
         for _i in 0..nr_agents {
             create_entities::create_agent(&mut world);
         }

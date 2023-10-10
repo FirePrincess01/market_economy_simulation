@@ -33,6 +33,9 @@
 				"panel": "shared",
 				"showReuseMessage": true,
 				"clear": true
+			},
+			"env": {
+				"RUST_BACKTRACE": "1"
 			}
 		},
 		{

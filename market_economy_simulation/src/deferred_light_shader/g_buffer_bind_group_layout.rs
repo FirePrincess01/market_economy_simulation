@@ -33,6 +33,26 @@ impl GBufferBindGroupLayout {
                     },
                     count: None,
                 },
+                wgpu::BindGroupLayoutEntry {    // albedo
+                    binding: 2,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Texture {
+                        multisampled: false,
+                        view_dimension: wgpu::TextureViewDimension::D2,
+                        sample_type: wgpu::TextureSampleType::Float { filterable: false },
+                    },
+                    count: None,
+                },
+                wgpu::BindGroupLayoutEntry {    // entity
+                    binding: 3,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Texture {
+                        multisampled: false,
+                        view_dimension: wgpu::TextureViewDimension::D2,
+                        sample_type: wgpu::TextureSampleType::Uint,
+                    },
+                    count: None,
+                },
             ],
             label: Some("g_buffer bind_group_layout"),
         });

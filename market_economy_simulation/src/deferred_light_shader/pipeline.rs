@@ -4,8 +4,7 @@
 use wgpu_renderer::renderer::depth_texture::DepthTexture;
 
 use super::Vertex;
-use super::Color;
-use super::InstanceRaw;
+use super::Instance;
 use super::GBufferBindGroupLayout;
 use super::CameraBindGroupLayout;
 
@@ -53,8 +52,7 @@ impl Pipeline
                 entry_point: "vs_main", 
                 buffers: &[
                     Vertex::desc(),
-                    Color::desc(),
-                    InstanceRaw::desc(),
+                    Instance::desc(),
                 ],
             },
             fragment: Some(wgpu::FragmentState { 

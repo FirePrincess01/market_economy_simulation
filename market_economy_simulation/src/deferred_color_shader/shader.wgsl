@@ -65,8 +65,8 @@ struct FragmentOutput {
     @location(0) surface: vec4<f32>,
     @location(1) position: vec4<f32>,
     @location(2) normal: vec4<f32>,
-    // @location(3) albedo: vec4<f32>,
-    // @location(4) specular: f32,
+    @location(3) albedo: vec4<f32>,
+    @location(4) entity: u32,
 };
 
 @fragment
@@ -75,9 +75,12 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
     var out: FragmentOutput;
     out.surface = vec4<f32>(in.color, 1.0);
     // out.position = in.clip_position;
-    out.position =  vec4<f32>(0.5, 0.5, 0.5, 1.0);
-    out.normal =  vec4<f32>(0.5, 0.5, 0.5, 1.0);
-    // out.albedo = vec4<f32>(in.color, 1.0);
+    // out.position =  vec4<f32>(0.5, 0.5, 0.5, 1.0);
+    // out.normal =  vec4<f32>(0.5, 0.5, 0.5, 1.0);
+    out.position =  vec4<f32>(in.position, 1.0);
+    out.normal =  vec4<f32>(in.normal, 1.0);
+    out.albedo = vec4<f32>(in.color, 1.0);
+    out.entity = in.entity[0];
 
     return out;
 }

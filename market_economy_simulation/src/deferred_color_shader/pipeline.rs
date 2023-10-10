@@ -95,16 +95,16 @@ impl Pipeline
                         blend: None,
                         write_mask: wgpu::ColorWrites::ALL,
                     }),
-                    // Some(wgpu::ColorTargetState { 
-                    //     format: g_buffer_format.albedo,
-                    //     blend: None,
-                    //     write_mask: wgpu::ColorWrites::ALL,
-                    // }),
-                    // Some(wgpu::ColorTargetState { 
-                    //     format: g_buffer_format.specular,
-                    //     blend: None,
-                    //     write_mask: wgpu::ColorWrites::ALL,
-                    // })
+                    Some(wgpu::ColorTargetState { 
+                        format: GBuffer::G_BUFFER_FORMAT_ALBEDO,
+                        blend: None,
+                        write_mask: wgpu::ColorWrites::ALL,
+                    }),
+                    Some(wgpu::ColorTargetState { 
+                        format: GBuffer::G_BUFFER_FORMAT_ENTITY,
+                        blend: None,
+                        write_mask: wgpu::ColorWrites::ALL,
+                    })
                 ],
             }),
             primitive: wgpu::PrimitiveState {

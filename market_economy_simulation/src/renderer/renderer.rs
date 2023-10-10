@@ -269,6 +269,32 @@ impl Renderer {
                     store: true,
                 }
             }),
+            Some(wgpu::RenderPassColorAttachment {
+                view: &self.g_buffer.albedo.view,
+                resolve_target: None,
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(wgpu::Color {
+                        r: 1.0,
+                        g: 1.0,
+                        b: 1.0,
+                        a: 1.0,
+                    }),
+                    store: true,
+                }
+            }),
+            Some(wgpu::RenderPassColorAttachment {
+                view: &self.g_buffer.entity.view,
+                resolve_target: None,
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(wgpu::Color {
+                        r: 1.0,
+                        g: 1.0,
+                        b: 1.0,
+                        a: 1.0,
+                    }),
+                    store: true,
+                }
+            }),
             ], 
             depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                 view: self.wgpu_renderer.get_depth_texture_view(),
@@ -357,7 +383,7 @@ impl Renderer {
 
 
     pub fn render(&mut self, 
-        mesh: & (impl DeferredShaderDraw), 
+        mesh: & (impl DeferredShaderDraw + DeferredLightShaderDraw), 
         performance_monitor: &mut PerformanceMonitor) -> Result<(), wgpu::SurfaceError>
     {
         performance_monitor.watch.start(0);
@@ -373,7 +399,7 @@ impl Renderer {
         });
 
         self.render_deferred(&view, &mut encoder, mesh);
-        // self.render_light(&view, &mut encoder, mesh);
+        self.render_light(&view, &mut encoder, mesh);
         self.render_forward(&view, &mut encoder, performance_monitor);
 
         self.wgpu_renderer.queue().submit(std::iter::once(encoder.finish()));
