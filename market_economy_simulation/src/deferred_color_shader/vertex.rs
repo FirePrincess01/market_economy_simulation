@@ -11,7 +11,7 @@ pub struct Vertex {
 }
 
 impl Vertex {
-    pub fn zero() -> Self {
+    pub fn _zero() -> Self {
         Self { 
             position: [0.0, 0.0, 0.0],
             normal: [0.0, 0.0, 0.0],

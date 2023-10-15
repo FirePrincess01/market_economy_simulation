@@ -6,7 +6,7 @@ use wgpu::util::DeviceExt;
 
 pub struct InstanceBuffer {
     buffer: wgpu::Buffer,
-    size: u32,
+    _size: u32,
 }
 
 impl InstanceBuffer {
@@ -24,7 +24,7 @@ impl InstanceBuffer {
 
         Self {
             buffer,
-            size,
+            _size: size,
         }
     }
 
@@ -47,8 +47,8 @@ impl InstanceBuffer {
     //     render_pass.set_vertex_buffer(slot, self.buffer.slice(..));
     // }
 
-    pub fn size(&self) -> u32 {
-        self.size
+    pub fn _size(&self) -> u32 {
+        self._size
     }
 
 }

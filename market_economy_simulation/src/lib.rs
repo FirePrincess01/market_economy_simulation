@@ -8,7 +8,7 @@ mod geometry;
 mod performance_monitor;
 
 use ecs::system::DrawAgents;
-use wgpu_renderer::default_window;
+use wgpu_renderer::{default_window};
 use winit::event::{WindowEvent, KeyboardInput, VirtualKeyCode, ElementState};
 
 #[cfg(target_arch="wasm32")]
@@ -21,6 +21,7 @@ struct MarketEconomySimulation {
 
     renderer: renderer::Renderer,
     world: ecs::World,
+    ground_plane_mesh: deferred_color_shader::Mesh,
 
     draw_agents: ecs::system::DrawAgents,
 
@@ -43,6 +44,22 @@ impl MarketEconomySimulation {
             create_entities::create_agent(&mut world);
         }
 
+        // ground plane
+        let quad = geometry::Quad::new(10.0);
+
+        const INSTANCES: &[deferred_color_shader::Instance] = &[ 
+            deferred_color_shader::Instance{
+                position: [0.0, 0.0, 0.0],
+                color: [0.2, 0.2, 0.2],
+                entity: [0, 0, 0],
+            },
+        ];
+
+        let ground_plane_mesh = deferred_color_shader::Mesh::new(&mut renderer.wgpu_renderer.device(), 
+        &quad.deferred_vertices, 
+        &quad.indices, 
+        &INSTANCES);
+
         let draw_agents = DrawAgents::new(&mut renderer.wgpu_renderer, max_agents);
 
         // performance monitor
@@ -55,7 +72,9 @@ impl MarketEconomySimulation {
             renderer,
             world,
 
+            ground_plane_mesh,
             draw_agents,
+            
             performance_monitor,
         }
     }
@@ -145,6 +164,7 @@ impl default_window::DefaultWindowApp for MarketEconomySimulation
 
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
         self.renderer.render(
+            &self.ground_plane_mesh,
             &self.draw_agents, 
             &mut self.performance_monitor)
     }

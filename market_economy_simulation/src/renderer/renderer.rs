@@ -7,7 +7,7 @@ use wgpu_renderer::renderer::{WgpuRenderer, self};
 use wgpu_renderer::vertex_color_shader::{self, VertexColorShaderDraw};
 use winit::event::{VirtualKeyCode, ElementState, MouseScrollDelta};
 
-use crate::{geometry, deferred_light_shader};
+use crate::{deferred_light_shader};
 
 pub struct Renderer 
 {   
@@ -32,9 +32,6 @@ pub struct Renderer
 
     camera_uniform_orthographic: vertex_color_shader::CameraUniform,
     camera_uniform_orthographic_buffer: vertex_color_shader::CameraUniformBuffer,
-
-    // meshes
-    meshes: Vec<vertex_color_shader::Mesh>,
 }
 
 impl Renderer {
@@ -117,32 +114,6 @@ impl Renderer {
 
         camera_uniform_orthographic_buffer.update(wgpu_renderer.queue(), camera_uniform_orthographic);   // add uniform identity matrix
 
-        // meshes
-        let circle = geometry::Circle::new(0.15, 16);
-        let quad = geometry::Quad::new(10.0);
-
-        const INSTANCES: &[vertex_color_shader::Instance] = &[ 
-            vertex_color_shader::Instance{
-                position: glam::Vec3::new(0.0, 0.0, 0.0),
-                rotation: glam::Quat::IDENTITY,
-            },
-        ];
-
-        let circle_mesh = vertex_color_shader::Mesh::new(&mut wgpu_renderer.device(), 
-        &circle.vertices, 
-        &circle.colors, 
-        &circle.indices, 
-        &INSTANCES);
-
-        let quad_mesh = vertex_color_shader::Mesh::new(&mut wgpu_renderer.device(), 
-        &quad.vertices, 
-        &quad.colors, 
-        &quad.indices, 
-        &INSTANCES);
-
-        let meshes = vec![quad_mesh, circle_mesh];
-
-
         Self {
             wgpu_renderer,
 
@@ -163,8 +134,6 @@ impl Renderer {
 
             camera_uniform_orthographic,
             camera_uniform_orthographic_buffer,
-
-            meshes,
         } 
     }
 
@@ -224,7 +193,7 @@ impl Renderer {
     fn render_deferred(&self, 
         view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
-        mesh: & impl DeferredShaderDraw,
+        meshes: & [&dyn DeferredShaderDraw],
     )
     {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor { 
@@ -309,11 +278,10 @@ impl Renderer {
         self.pipeline_deferred_color.bind(&mut render_pass);
         self.camera_uniform_buffer.bind(&mut render_pass);
 
-        // plane
-        self.meshes[0].draw(&mut render_pass);
-
-        // agents
-        mesh.draw(&mut render_pass);
+        // meshes
+        for mesh in meshes {
+            mesh.draw(&mut render_pass);
+        }        
     }
 
     fn render_light(&self, 
@@ -328,14 +296,21 @@ impl Renderer {
                 view: &view,
                 resolve_target: None,
                 ops: wgpu::Operations {
-                    load: wgpu::LoadOp::Load,
+                    // load: wgpu::LoadOp::Load,
+                    load: wgpu::LoadOp::Clear(wgpu::Color {
+                        r: 0.01,
+                        g: 0.02,
+                        b: 0.03,
+                        a: 1.0,
+                    }),
                     store: true,
                 }
             })], 
             depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
                 view: self.wgpu_renderer.get_depth_texture_view(),
                 depth_ops: Some(wgpu::Operations {
-                    load: wgpu::LoadOp::Load,
+                    // load: wgpu::LoadOp::Load,
+                    load: wgpu::LoadOp::Clear(1.0),
                     store: true,
                 }),
                 stencil_ops: None,
@@ -383,6 +358,7 @@ impl Renderer {
 
 
     pub fn render(&mut self, 
+        mesh_deferred: & impl DeferredShaderDraw,
         mesh: & (impl DeferredShaderDraw + DeferredLightShaderDraw), 
         performance_monitor: &mut PerformanceMonitor) -> Result<(), wgpu::SurfaceError>
     {
@@ -398,7 +374,7 @@ impl Renderer {
             label: Some("Render Encoder"),
         });
 
-        self.render_deferred(&view, &mut encoder, mesh);
+        self.render_deferred(&view, &mut encoder, &[mesh_deferred, mesh]);
         self.render_light(&view, &mut encoder, mesh);
         self.render_forward(&view, &mut encoder, performance_monitor);
 

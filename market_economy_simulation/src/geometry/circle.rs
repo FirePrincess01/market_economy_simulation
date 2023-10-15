@@ -24,7 +24,7 @@ impl Circle {
 
         let mut deferred_vertices = Vec::<deferred_color_shader::Vertex>::new();
         
-        let z = r;
+        let z = 0.01;
         vertices.push(Vertex { position: [0.0, 0.0, z] }); // center
         
         let angle = 2.0 * PI / n as f32;

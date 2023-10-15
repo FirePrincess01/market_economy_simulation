@@ -26,8 +26,8 @@ pub fn move_agents(world: &mut World)
         let x = i % max_y;
         let y = i / max_y;
 
-        pos.pos[0] = x as f32 * 0.4;
-        pos.pos[1] = y as f32 * 0.4;
+        pos.pos[0] = x as f32 * 0.4 * 2.0;
+        pos.pos[1] = y as f32 * 0.4 * 2.0;
         pos.pos[2] = 0.0;
 
         i += 1;
@@ -39,13 +39,17 @@ pub struct DrawAgents {
     instances_mesh_light_host: Vec<deferred_light_shader::Instance>,
     mesh: deferred_color_shader::Mesh,
     mesh_light: deferred_light_shader::Mesh,
+
+    light_radius: f32,
 }
 
 impl DrawAgents {
     pub fn new(wgpu_renderer: &mut impl WgpuRendererInterface, max_agents: usize) -> Self {
         
+        let light_radius = 0.4;
+
         let circle = geometry::Circle::new(0.15, 16);
-        let circle_light = geometry::Circle::new(0.30, 16);
+        let circle_light = geometry::Circle::new(light_radius, 16);
         let instances_mesh_host =  vec![deferred_color_shader::Instance::new(); max_agents];
         let instances_mesh_light_host =  vec![deferred_light_shader::Instance::new(); max_agents];
 
@@ -64,6 +68,8 @@ impl DrawAgents {
             instances_mesh_light_host,
             mesh,
             mesh_light,
+
+            light_radius,
         }
     }
 
@@ -90,7 +96,7 @@ impl DrawAgents {
         {
             let instance = deferred_light_shader::Instance{ 
                 position: [pos.pos[0], pos.pos[1], pos.pos[2]], 
-                intensity: [0.5, 0.5, 0.5], 
+                intensity: [1.0/self.light_radius, 0.0, 0.0], 
             };
 
             self.instances_mesh_light_host.push(instance);
