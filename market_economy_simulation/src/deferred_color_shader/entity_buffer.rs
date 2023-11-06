@@ -22,7 +22,7 @@ pub struct EntityBuffer {
 
 
 impl EntityBuffer {
-    pub const FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::R32Uint;
+    pub const FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Rgba8Unorm;
 
     pub fn new(wgpu_renderer: &mut impl WgpuRendererInterface, 
         // entity_buffer_bind_group_layout: &EntityBufferBindGroupLayout,
@@ -41,7 +41,7 @@ impl EntityBuffer {
             mip_level_count: 1,
             sample_count: 1,
             dimension: wgpu::TextureDimension::D2,
-            format: wgpu::TextureFormat::R32Uint,
+            format: wgpu::TextureFormat::Rgba8Unorm,
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::COPY_SRC,
             view_formats: Default::default(),
         };
