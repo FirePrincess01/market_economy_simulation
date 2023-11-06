@@ -10,6 +10,7 @@ use super::Vertex;
 use super::Instance;
 use super::GBuffer;
 use super::CameraBindGroupLayout;
+use super::entity_buffer::EntityBuffer;
 use wgpu_renderer::renderer::depth_texture;
 
 
@@ -101,7 +102,7 @@ impl Pipeline
                         write_mask: wgpu::ColorWrites::ALL,
                     }),
                     Some(wgpu::ColorTargetState { 
-                        format: GBuffer::G_BUFFER_FORMAT_ENTITY,
+                        format: EntityBuffer::FORMAT,
                         blend: None,
                         write_mask: wgpu::ColorWrites::ALL,
                     })

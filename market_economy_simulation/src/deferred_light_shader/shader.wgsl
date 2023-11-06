@@ -57,8 +57,6 @@ var t_position: texture_2d<f32>;
 var t_normal: texture_2d<f32>;
 @group(1) @binding(2)
 var t_albedo: texture_2d<f32>;
-@group(1) @binding(3)
-var t_entity: texture_2d<u32>;
 
 struct FragmentOutput {
     @location(0) surface: vec4<f32>,

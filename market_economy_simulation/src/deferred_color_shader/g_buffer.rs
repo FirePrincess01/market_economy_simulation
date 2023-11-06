@@ -45,7 +45,6 @@ pub struct GBuffer {
     pub position: GBufferTexture,
     pub normal: GBufferTexture,
     pub albedo: GBufferTexture,
-    pub entity: GBufferTexture,
 
     pub bind_group: wgpu::BindGroup,
 }
@@ -54,7 +53,6 @@ impl GBuffer {
     pub const G_BUFFER_FORMAT_POSITION: wgpu::TextureFormat = wgpu::TextureFormat::Rgba16Float;
     pub const G_BUFFER_FORMAT_NORMAL: wgpu::TextureFormat = wgpu::TextureFormat::Rgba16Float;
     pub const G_BUFFER_FORMAT_ALBEDO: wgpu::TextureFormat = wgpu::TextureFormat::Rgba8UnormSrgb;
-    pub const G_BUFFER_FORMAT_ENTITY: wgpu::TextureFormat = wgpu::TextureFormat::R32Uint;
 
     pub fn new(wgpu_renderer: &mut impl WgpuRendererInterface,
          g_buffer_bind_group_layout: &GBufferBindGroupLayout,
@@ -76,10 +74,6 @@ impl GBuffer {
             Self::G_BUFFER_FORMAT_ALBEDO, 
             "GBuffer Albedo");
 
-        let entity = GBufferTexture::new(wgpu_renderer.device(), 
-            surface_width, surface_height, 
-            Self::G_BUFFER_FORMAT_ENTITY, 
-            "GBuffer Entity");
 
         let bind_group = wgpu_renderer.device().create_bind_group(
             &wgpu::BindGroupDescriptor {
@@ -97,10 +91,6 @@ impl GBuffer {
                         binding: 2,
                         resource: wgpu::BindingResource::TextureView(&albedo.view), 
                     },
-                    wgpu::BindGroupEntry {
-                        binding: 3,
-                        resource: wgpu::BindingResource::TextureView(&entity.view), 
-                    },
                 ],
                 label: Some("g_buffer_bind_group"),
             }
@@ -110,7 +100,6 @@ impl GBuffer {
             position,
             normal,
             albedo,
-            entity,
 
             bind_group,
         }

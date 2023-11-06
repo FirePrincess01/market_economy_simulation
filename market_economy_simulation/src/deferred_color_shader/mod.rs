@@ -10,8 +10,12 @@ mod vertex_buffer;
 mod instance;
 mod instance_buffer;
 
+mod entity_buffer;
+mod entity_buffer_slice;
+
 pub use pipeline::Pipeline;
 pub use g_buffer::GBuffer;
+pub use entity_buffer::EntityBuffer;
 pub use mesh::Mesh;
 pub use deferred_color_shader_draw::DeferredShaderDraw;
 
