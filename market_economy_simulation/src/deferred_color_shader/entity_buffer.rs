@@ -1,4 +1,5 @@
-
+//! Contains the textures with all the entity indices
+//!
 
 use std::mem;
 

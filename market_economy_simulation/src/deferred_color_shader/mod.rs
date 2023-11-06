@@ -1,4 +1,5 @@
-
+//! Deferred shader drawing colored objects
+//!
 
 mod pipeline;
 mod g_buffer;

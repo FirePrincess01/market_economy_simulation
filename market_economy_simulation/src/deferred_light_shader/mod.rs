@@ -1,4 +1,5 @@
-
+//! Deferred shader pipeline drawing light stage
+//!
 
 mod pipeline;
 mod mesh;

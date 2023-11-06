@@ -1,3 +1,5 @@
+//! Creates vertex data to draw a quad
+//!
 
 use wgpu_renderer::vertex_color_shader::Vertex as Vertex;
 use wgpu_renderer::vertex_color_shader::Color as Color;

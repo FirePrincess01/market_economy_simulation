@@ -1,3 +1,6 @@
+//! Contains the textures used for the next shader pipeline
+//!
+
 use wgpu_renderer::renderer::WgpuRendererInterface;
 
 use crate::deferred_light_shader::GBufferBindGroupLayout;

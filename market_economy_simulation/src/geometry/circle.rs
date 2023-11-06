@@ -1,3 +1,5 @@
+//! Creates vertex data to draw a circle
+//! 
 
 use std::f32::consts::PI;
 
