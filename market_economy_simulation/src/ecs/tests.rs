@@ -21,7 +21,7 @@ fn simple() -> Result<(), String>
         &mut world.positions, 
         &world.meshes);
 
-    for (pos, mesh) in iter {
+    for (pos, _mesh) in iter {
         pos.pos[0] = 1.0;
     }
 

@@ -800,6 +800,7 @@ dependencies = [
 name = "market_economy_simulation"
 version = "0.1.0"
 dependencies = [
+ "bytemuck",
  "cfg-if",
  "cgmath",
  "console_error_panic_hook",
@@ -809,6 +810,7 @@ dependencies = [
  "instant",
  "log",
  "pollster",
+ "rusttype",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
