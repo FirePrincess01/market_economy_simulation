@@ -1,4 +1,4 @@
-//! A general purpose pipeline using vertices, textures and instances
+//! Deferred shader pipeline drawing light stage
 //!
 
 use wgpu_renderer::renderer::depth_texture::DepthTexture;

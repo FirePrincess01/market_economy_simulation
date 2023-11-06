@@ -1,5 +1,5 @@
-
-
+//! Contains a reference to the gpu buffer with all the entity indices
+//!
 
 pub struct EntityBufferSlice<'a> {
     buffer: &'a wgpu::Buffer,

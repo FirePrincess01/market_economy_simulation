@@ -1,7 +1,4 @@
-//! A general purpose pipeline using vertices, colors and instances
-//!
-//! Vertices and Colors are independently updateable
-//! The implementation uses wgpu for rendering
+//! Deferred shader drawing colored objects
 //!
 
 use wgpu_renderer;

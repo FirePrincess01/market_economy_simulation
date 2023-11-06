@@ -1,4 +1,5 @@
-
+//! Renders everything
+//!
 
 use crate::deferred_color_shader::{DeferredShaderDraw, self, GBuffer, EntityBuffer};
 use crate::deferred_light_shader::DeferredLightShaderDraw;
@@ -432,7 +433,7 @@ impl Renderer {
         output.present();
 
         // wait to see how high the gpu load is
-        self.wgpu_renderer.device().poll(wgpu::Maintain::Wait); 
+        // self.wgpu_renderer.device().poll(wgpu::Maintain::Wait); 
 
         performance_monitor.watch.stop(1);
         

@@ -1,4 +1,5 @@
-
+//! Functions operating on the data of the entities with components
+//! 
 
 
 use wgpu_renderer::renderer::WgpuRendererInterface;

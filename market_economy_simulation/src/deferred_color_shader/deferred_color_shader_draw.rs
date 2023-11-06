@@ -1,4 +1,5 @@
-
+//! Interface to draw objects of this shader
+//!
 
 pub trait DeferredShaderDraw
 {

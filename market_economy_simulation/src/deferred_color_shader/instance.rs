@@ -1,8 +1,6 @@
 //! Contains the position and the of an object
 //!
 
-
-
 #[repr(C)]
 #[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct Instance {
@@ -49,11 +47,6 @@ impl Instance {
                     shader_location: 7,
                     format: wgpu::VertexFormat::Uint32x3,
                 },
-                // wgpu::VertexAttribute {
-                //     offset: mem::size_of::<[f32; 12]>() as wgpu::BufferAddress,
-                //     shader_location: 8,
-                //     format: wgpu::VertexFormat::Float32x4,
-                // },
             ],
         }
     }
