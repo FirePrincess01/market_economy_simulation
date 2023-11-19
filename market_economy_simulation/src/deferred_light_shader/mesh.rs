@@ -1,6 +1,7 @@
 //! Contains the device buffers to render an object with this shader
 //!
 
+use super::DeferredLightShaderDraw;
 use super::Vertex;
 use super::Instance;
 
@@ -61,5 +62,11 @@ impl Mesh
         self.instance_buffer.bind(render_pass);
 
         render_pass.draw_indexed(0..self.index_buffer.size(), 0, 0..self.nr_instances);
+    }
+}
+
+impl DeferredLightShaderDraw for Mesh {
+    fn draw_lights<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
+        self.draw(render_pass);
     }
 }

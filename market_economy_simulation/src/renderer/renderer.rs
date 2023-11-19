@@ -314,7 +314,7 @@ impl Renderer {
     fn render_light(&self, 
         view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
-        mesh: & impl DeferredLightShaderDraw,
+        meshes: & [&dyn DeferredLightShaderDraw],
     )
     {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor { 
@@ -348,7 +348,10 @@ impl Renderer {
         self.pipeline_deferred_light.bind(&mut render_pass);
         self.camera_uniform_buffer.bind(&mut render_pass);
         self.g_buffer.bind(&mut render_pass);
-        mesh.draw_lights(&mut render_pass);
+
+        for mesh in meshes {
+            mesh.draw_lights(&mut render_pass);
+        }
     }
 
     fn render_forward(&self, 
@@ -403,8 +406,9 @@ impl Renderer {
     }
 
     pub fn render(&mut self, 
-        mesh_deferred: & impl DeferredShaderDraw,
-        mesh_light: & (impl DeferredShaderDraw + DeferredLightShaderDraw), 
+        deferred: & impl DeferredShaderDraw,
+        deferred_light: & (impl DeferredLightShaderDraw), 
+        deferred_combined: & (impl DeferredShaderDraw + DeferredLightShaderDraw), 
         mesh_textured_gui: & impl VertexTextureShaderDraw,
         performance_monitor: &mut PerformanceMonitor) -> Result<(), wgpu::SurfaceError>
     {
@@ -421,8 +425,8 @@ impl Renderer {
         });
 
         // draw
-        self.render_deferred(&view, &mut encoder, &[mesh_deferred, mesh_light]);
-        self.render_light(&view, &mut encoder, mesh_light);
+        self.render_deferred(&view, &mut encoder, &[deferred, deferred_combined]);
+        self.render_light(&view, &mut encoder, &[deferred_light, deferred_combined]);
         self.render_forward(&view, &mut encoder, mesh_textured_gui, performance_monitor);
 
         // copy entity texture
