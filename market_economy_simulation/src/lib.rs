@@ -6,6 +6,7 @@ mod deferred_color_shader;
 mod deferred_light_shader;
 mod geometry;
 mod performance_monitor;
+mod ground_plane;
 
 use ecs::system::DrawAgents;
 use wgpu_renderer::{default_window, vertex_texture_shader};
@@ -15,6 +16,8 @@ use rusttype;
 #[cfg(target_arch="wasm32")]
 use wasm_bindgen::prelude::*;
 
+use crate::ground_plane::GroundPlane;
+
 
 struct MarketEconomySimulation {
     size: winit::dpi::PhysicalSize<u32>,
@@ -22,7 +25,10 @@ struct MarketEconomySimulation {
 
     renderer: renderer::Renderer,
     world: ecs::World,
+
+    _ground_plane: ground_plane::GroundPlane,
     ground_plane_mesh: deferred_color_shader::Mesh,
+    ground_plane_light_mesh: deferred_light_shader::Mesh,
 
     draw_agents: ecs::system::DrawAgents,
 
@@ -54,21 +60,55 @@ impl MarketEconomySimulation {
         }
 
         // ground plane
-        let quad = geometry::Quad::new(10.0);
+        let ground_plane_width = 100;
+        let ground_plane_height = 100;
+        let ground_plane = GroundPlane::new(ground_plane_width, ground_plane_height);
 
-        const INSTANCES: &[deferred_color_shader::Instance] = &[ 
-            deferred_color_shader::Instance{
-                position: [0.0, 0.0, 0.0],
-                color: [0.2, 0.2, 0.2],
-                entity: [0, 0, 0],
-            },
-        ];
+        // ground plane mesh
+        let quad_size = 3.0;
+        let quad = geometry::Quad::new(quad_size);
+
+        let mut instances: Vec<deferred_color_shader::Instance> = Vec::new();
+        instances.reserve(ground_plane.size());
+
+        for y in 0..ground_plane.height() {
+            for x in 0.. ground_plane.width() {
+
+                let field = ground_plane.get(y, x);
+
+                let instance = deferred_color_shader::Instance{
+                    position: [quad_size * x as f32, quad_size * y as f32, 0.0],
+                    color: [0.2, 0.2, 0.2],
+                    entity: [field.index as u32, 0, 0],
+                };
+
+                instances.push(instance);
+            }
+        }
+
+
 
         let ground_plane_mesh = deferred_color_shader::Mesh::new(&mut renderer.wgpu_renderer.device(), 
         &quad.deferred_vertices, 
         &quad.indices, 
+        &instances);
+
+        // ground plane light
+        let ground_plane_light_quad = geometry::Quad::new(ground_plane_width as f32 * quad_size);
+
+        const INSTANCES: &[deferred_light_shader::Instance] = &[ 
+            deferred_light_shader::Instance{
+                position: [0.0, 0.0, 0.0],
+                intensity: [0.0, 0.4, 0.0],
+            },
+        ];
+
+        let ground_plane_light_mesh = deferred_light_shader::Mesh::new(&mut renderer.wgpu_renderer.device(), 
+        &ground_plane_light_quad.vertices, 
+        &ground_plane_light_quad.indices, 
         &INSTANCES);
 
+        // agents
         let draw_agents = DrawAgents::new(&mut renderer.wgpu_renderer, max_agents);
 
         // performance monitor
@@ -100,7 +140,10 @@ impl MarketEconomySimulation {
             renderer,
             world,
 
+            _ground_plane: ground_plane,
             ground_plane_mesh,
+            ground_plane_light_mesh,
+
             draw_agents,
             
             performance_monitor,
@@ -217,6 +260,7 @@ impl default_window::DefaultWindowApp for MarketEconomySimulation
         // render current frame
         self.renderer.render(   
             &self.ground_plane_mesh,
+            &self.ground_plane_light_mesh,
             &self.draw_agents, 
             &self.entity_index_mesh,
             &mut self.performance_monitor)
