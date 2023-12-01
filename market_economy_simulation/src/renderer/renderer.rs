@@ -407,7 +407,7 @@ impl Renderer {
 
     pub fn render(&mut self, 
         deferred: & impl DeferredShaderDraw,
-        deferred_light: & (impl DeferredLightShaderDraw), 
+        deferred_light: & impl DeferredLightShaderDraw, 
         deferred_combined: & (impl DeferredShaderDraw + DeferredLightShaderDraw), 
         mesh_textured_gui: & impl VertexTextureShaderDraw,
         performance_monitor: &mut PerformanceMonitor) -> Result<(), wgpu::SurfaceError>

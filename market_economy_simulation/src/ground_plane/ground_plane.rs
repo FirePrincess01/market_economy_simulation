@@ -1,6 +1,6 @@
+//! The ground field
 
-
-
+#[allow(dead_code)]
 pub enum GroundResource {
     Red,
     Green,

@@ -26,7 +26,7 @@ struct MarketEconomySimulation {
     renderer: renderer::Renderer,
     world: ecs::World,
 
-    ground_plane: ground_plane::GroundPlane,
+    _ground_plane: ground_plane::GroundPlane,
     ground_plane_mesh: deferred_color_shader::Mesh,
     ground_plane_light_mesh: deferred_light_shader::Mesh,
 
@@ -140,7 +140,7 @@ impl MarketEconomySimulation {
             renderer,
             world,
 
-            ground_plane,
+            _ground_plane: ground_plane,
             ground_plane_mesh,
             ground_plane_light_mesh,
 
