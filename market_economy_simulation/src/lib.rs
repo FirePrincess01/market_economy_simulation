@@ -1,5 +1,6 @@
 
 mod ecs;
+mod ecs2;
 mod create_entities;
 mod renderer;
 mod deferred_color_shader;
@@ -7,6 +8,8 @@ mod deferred_light_shader;
 mod geometry;
 mod performance_monitor;
 mod ground_plane;
+mod base_factory;
+mod world_mesh;
 
 use ecs::system::DrawAgents;
 use ground_plane::GroundPlaneMesh;
@@ -25,12 +28,13 @@ struct MarketEconomySimulation {
     scale_factor: f32,
 
     renderer: renderer::Renderer,
-    world: ecs::World,
+    world: ecs2::World,
+    world_mesh: world_mesh::WorldMesh,
 
-    _ground_plane: ground_plane::GroundPlane,
-    ground_plane_mesh: GroundPlaneMesh,
+    // _ground_plane: ground_plane::GroundPlane,
+    // ground_plane_mesh: GroundPlaneMesh,
 
-    draw_agents: ecs::system::DrawAgents,
+    // draw_agents: ecs::system::DrawAgents,
 
     // performance monitor
     performance_monitor: performance_monitor::PerformanceMonitor,
@@ -51,29 +55,34 @@ impl MarketEconomySimulation {
         let scale_factor = window.scale_factor() as f32;
 
         let mut renderer = renderer::Renderer::new(window).await;
-        let mut world = ecs::World::new();
 
-        let max_agents = 50000;
-        let nr_agents =    50000;
-        for _i in 0..nr_agents {
-            create_entities::create_agent(&mut world);
-        }
-
-        // ground plane
-        let ground_plane_width = 100;
-        let ground_plane_height = 100;
-        let mut ground_plane = GroundPlane::new(ground_plane_width, ground_plane_height);
-        ground_plane.generate_resource(0.005, GroundResource::Red);
-        ground_plane.generate_resource(0.01, GroundResource::Blue);
-        ground_plane.generate_resource(0.001, GroundResource::Green);
-
-        // ground plane mesh
-        let ground_plane_mesh = GroundPlaneMesh::new(
+        // world
+        let world = ecs2::World::new();
+        let world_mesh = world_mesh::WorldMesh::new(
             &mut renderer.wgpu_renderer, 
-            &ground_plane);
+            &world);
 
-        // agents
-        let draw_agents = DrawAgents::new(&mut renderer.wgpu_renderer, max_agents);
+        // let max_agents = 50000;
+        // let nr_agents =    50000;
+        // for _i in 0..nr_agents {
+        //     create_entities::create_agent(&mut world);
+        // }
+
+        // // ground plane
+        // let ground_plane_width = 100;
+        // let ground_plane_height = 100;
+        // let mut ground_plane = GroundPlane::new(ground_plane_width, ground_plane_height);
+        // ground_plane.generate_resource(0.005, GroundResource::Red);
+        // ground_plane.generate_resource(0.01, GroundResource::Blue);
+        // ground_plane.generate_resource(0.001, GroundResource::Green);
+
+        // // ground plane mesh
+        // let ground_plane_mesh = GroundPlaneMesh::new(
+        //     &mut renderer.wgpu_renderer, 
+        //     &ground_plane);
+
+        // // agents
+        // let draw_agents = DrawAgents::new(&mut renderer.wgpu_renderer, max_agents);
 
         // performance monitor
         let performance_monitor = performance_monitor::PerformanceMonitor::new(&mut renderer.wgpu_renderer);
@@ -102,12 +111,9 @@ impl MarketEconomySimulation {
             scale_factor,
 
             renderer,
+            
             world,
-
-            _ground_plane: ground_plane,
-            ground_plane_mesh,
-
-            draw_agents,
+            world_mesh,
             
             performance_monitor,
 
@@ -163,11 +169,11 @@ impl default_window::DefaultWindowApp for MarketEconomySimulation
         self.entity_index_mesh.update_texture(&mut self.renderer.wgpu_renderer.queue(), self.entity_index_label.get_image());
 
         self.performance_monitor.watch.start(3);
-            ecs::system::move_agents(&mut self.world);
+            // ecs::system::move_agents(&mut self.world);
         self.performance_monitor.watch.stop(3);
         
         self.performance_monitor.watch.start(4);
-            self.draw_agents.update(&mut self.world, &mut self.renderer.wgpu_renderer);
+            // self.draw_agents.update(&mut self.world, &mut self.renderer.wgpu_renderer);
         self.performance_monitor.watch.stop(4);
 
         self.performance_monitor.update(&mut self.renderer.wgpu_renderer);
@@ -222,9 +228,7 @@ impl default_window::DefaultWindowApp for MarketEconomySimulation
 
         // render current frame
         self.renderer.render(   
-            &self.ground_plane_mesh,
-            &self.ground_plane_mesh,
-            &self.draw_agents, 
+            &self.world_mesh, 
             &self.entity_index_mesh,
             &mut self.performance_monitor)
     }

@@ -406,8 +406,8 @@ impl Renderer {
     }
 
     pub fn render(&mut self, 
-        deferred: & impl DeferredShaderDraw,
-        deferred_light: & impl DeferredLightShaderDraw, 
+        // deferred: & impl DeferredShaderDraw,
+        // deferred_light: & impl DeferredLightShaderDraw, 
         deferred_combined: & (impl DeferredShaderDraw + DeferredLightShaderDraw), 
         mesh_textured_gui: & impl VertexTextureShaderDraw,
         performance_monitor: &mut PerformanceMonitor) -> Result<(), wgpu::SurfaceError>
@@ -425,8 +425,8 @@ impl Renderer {
         });
 
         // draw
-        self.render_deferred(&view, &mut encoder, &[deferred, deferred_combined]);
-        self.render_light(&view, &mut encoder, &[deferred_light, deferred_combined]);
+        self.render_deferred(&view, &mut encoder, &[deferred_combined]);
+        self.render_light(&view, &mut encoder, &[deferred_combined]);
         self.render_forward(&view, &mut encoder, mesh_textured_gui, performance_monitor);
 
         // copy entity texture
@@ -437,7 +437,7 @@ impl Renderer {
         output.present();
 
         // wait to see how high the gpu load is
-        // self.wgpu_renderer.device().poll(wgpu::Maintain::Wait); 
+        self.wgpu_renderer.device().poll(wgpu::Maintain::Wait); 
 
         performance_monitor.watch.stop(1);
         

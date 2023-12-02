@@ -3,19 +3,8 @@
 // use rand::Rng;
 use fastrand;
 
-#[derive(Copy, Clone, PartialEq)]
-pub enum GroundResource {
-    None,
-    Red,
-    Green,
-    Blue,
-}
+use super::{ground_field::GroundField, GroundResource};
 
-pub struct GroundField {
-    pub resource: GroundResource,
-    pub entity_index: Option<usize>,
-    pub index: usize,
-}
 
 
 pub struct GroundPlane
@@ -36,8 +25,7 @@ impl GroundPlane {
         for i in 0..size {
             let ground_field = GroundField { 
                 resource: GroundResource::None, 
-                entity_index: None, 
-                index: i 
+                entity_index: 0, 
             };
             fields.push(ground_field)
         }
@@ -67,6 +55,14 @@ impl GroundPlane {
 
         &self.fields[index]
     }
+
+    pub fn get_mut(&mut self, y: usize, x: usize) -> &mut GroundField   
+    {
+        let index = y * self.width + x;
+
+        &mut self.fields[index]
+    }
+
 
     pub fn width(&self) -> usize {
         self.width

@@ -39,7 +39,7 @@ impl GroundPlaneMesh {
                 let instance = deferred_color_shader::Instance{
                     position: [quad_size * x as f32, quad_size * y as f32, 0.0],
                     color: color,
-                    entity: [field.index as u32, 0, 0],
+                    entity: [field.entity_index as u32, 0, 0],
                 };
                 instances.push(instance);
             }
