@@ -1,14 +1,18 @@
 //! The ground field
 
-#[allow(dead_code)]
+// use rand::Rng;
+use fastrand;
+
+#[derive(Copy, Clone, PartialEq)]
 pub enum GroundResource {
+    None,
     Red,
     Green,
     Blue,
 }
 
 pub struct GroundField {
-    pub resource: Option<GroundResource>,
+    pub resource: GroundResource,
     pub entity_index: Option<usize>,
     pub index: usize,
 }
@@ -31,7 +35,7 @@ impl GroundPlane {
         fields.reserve(size);
         for i in 0..size {
             let ground_field = GroundField { 
-                resource: None, 
+                resource: GroundResource::None, 
                 entity_index: None, 
                 index: i 
             };
@@ -44,6 +48,17 @@ impl GroundPlane {
             size, 
             fields,
         } 
+    }
+
+    pub fn generate_resource(&mut self, probability: f64, resource: GroundResource)
+    {
+        let mut rng = fastrand::Rng::new();
+        for elem in &mut self.fields {
+            let rand = rng.f64();
+            if rand < probability {
+                elem.resource = resource;
+            }
+        }
     }
 
     pub fn get(&self, y: usize, x: usize) -> &GroundField   
