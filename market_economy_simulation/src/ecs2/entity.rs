@@ -1,3 +1,5 @@
+//! Visit element function for a selector (to implement in the future)
+
 use super::{entity_interface::EntityInterface, components::Components};
 
 

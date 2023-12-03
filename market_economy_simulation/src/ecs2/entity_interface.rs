@@ -1,4 +1,4 @@
-
+//! Interface for a selector
 
 
 pub trait EntityInterface {

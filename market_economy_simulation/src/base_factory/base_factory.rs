@@ -1,3 +1,5 @@
+//! Factory controlled by the player
+
 use crate::{ecs2::{EntityInterface, BlueToken,  AgentBlueToken, Resources2, Agents}, ground_plane::Location};
 
 pub enum Recipe {

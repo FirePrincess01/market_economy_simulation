@@ -1,7 +1,6 @@
+//! Contains all information of a ground field
+
 use crate::ecs2::EntityInterface;
-
-
-
 
 
 #[derive(Copy, Clone, PartialEq)]

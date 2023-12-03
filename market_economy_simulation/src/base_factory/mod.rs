@@ -1,4 +1,4 @@
-
+//! Factory controlled by the player
 
 mod base_factory;
 mod base_factory_mesh;

@@ -1,3 +1,5 @@
+//! contains all data of the world
+
 use crate::{ground_plane::{GroundPlane, GroundResource, Location}, base_factory::BaseFactory};
 
 use super::{entity::Entity, components::Agents, Blues, Resources2, AgentsBlue, };

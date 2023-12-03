@@ -28,10 +28,6 @@ struct MarketEconomySimulation {
     _world: ecs2::World,
     world_mesh: world_mesh::WorldMesh,
 
-    // _ground_plane: ground_plane::GroundPlane,
-    // ground_plane_mesh: GroundPlaneMesh,
-
-    // draw_agents: ecs::system::DrawAgents,
 
     // performance monitor
     performance_monitor: performance_monitor::PerformanceMonitor,
@@ -65,28 +61,6 @@ impl MarketEconomySimulation {
         let world_mesh = world_mesh::WorldMesh::new(
             &mut renderer.wgpu_renderer, 
             &world);
-
-        // let max_agents = 50000;
-        // let nr_agents =    50000;
-        // for _i in 0..nr_agents {
-        //     create_entities::create_agent(&mut world);
-        // }
-
-        // // ground plane
-        // let ground_plane_width = 100;
-        // let ground_plane_height = 100;
-        // let mut ground_plane = GroundPlane::new(ground_plane_width, ground_plane_height);
-        // ground_plane.generate_resource(0.005, GroundResource::Red);
-        // ground_plane.generate_resource(0.01, GroundResource::Blue);
-        // ground_plane.generate_resource(0.001, GroundResource::Green);
-
-        // // ground plane mesh
-        // let ground_plane_mesh = GroundPlaneMesh::new(
-        //     &mut renderer.wgpu_renderer, 
-        //     &ground_plane);
-
-        // // agents
-        // let draw_agents = DrawAgents::new(&mut renderer.wgpu_renderer, max_agents);
 
         // performance monitor
         let performance_monitor = performance_monitor::PerformanceMonitor::new(&mut renderer.wgpu_renderer);

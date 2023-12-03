@@ -1,5 +1,4 @@
-
-
+//! contains all data of the world
 
 mod entity;
 mod entity_interface;

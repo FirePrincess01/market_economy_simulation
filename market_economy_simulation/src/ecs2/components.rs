@@ -1,3 +1,5 @@
+//! Hodgepodge of various world components
+
 use crate::{ground_plane::GroundPlane, base_factory::BaseFactory};
 
 
