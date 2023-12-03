@@ -1,14 +1,16 @@
-use crate::{ground_plane::{GroundPlane, GroundResource}, base_factory::BaseFactory};
+use crate::{ground_plane::{GroundPlane, GroundResource, Location}, base_factory::BaseFactory};
 
-use super::{entity::Entity, components::Components};
-
-
-
+use super::{entity::Entity, components::Agents, Blues, Resources2, AgentsBlue, };
 
 
 pub struct World {
     pub entities: Vec<Entity>,
-    pub components: Components,
+
+    pub ground_plane: GroundPlane,
+    pub base_factory: BaseFactory,
+
+    pub resources: Resources2,
+    pub agents: Agents,
 }
 
 impl World {
@@ -36,18 +38,28 @@ impl World {
         // base factory
         let base_factory = BaseFactory::new(
             entities.len(),
-            [10, 10],
+            Location{ y: 10, x: 10 },
         );
         entities.push(Entity::BaseFactory);
 
-        // agents
+        // resources
+        let blues2 = Blues::new();     
 
-        // components
-        let components = Components{ ground_plane, base_factory: base_factory };
+        let resources = Resources2{ blues2 };
+
+        // agents
+        let agent_blue = AgentsBlue::new();
+        let agents = Agents{ agent_blue };
 
         Self {
             entities,
-            components,
+            ground_plane,
+            base_factory,
+            resources,
+            agents,
         }
     }
+
 }
+
+

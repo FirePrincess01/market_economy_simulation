@@ -109,7 +109,7 @@ impl Renderer {
         // Self::top_view_point(&mut camera);
         Self::side_view_point(&mut camera);
 
-        let speed = 4.0;
+        let speed = 40.0;
         let sensitivity = 1.0;
         let sensitivity_scroll = 1.0;
         let camera_controller = super::camera_controller::CameraController::new(speed, sensitivity, sensitivity_scroll);
@@ -172,7 +172,7 @@ impl Renderer {
     }
 
     fn side_view_point(camera: &mut renderer::camera::Camera) {
-        let position = cgmath::Point3::new(0.0, -2.0, 5.0);
+        let position = cgmath::Point3::new(100.0, 90.0, 20.0);
         let yaw = cgmath::Deg(-90.0).into();
         let pitch = cgmath::Deg(30.0).into();
 

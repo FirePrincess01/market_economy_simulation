@@ -23,6 +23,7 @@ pub struct Entity {
     pub position: Option<usize>,
 }
 
+#[allow(dead_code)]
 impl Entity {
     pub fn new() -> Self 
     {
@@ -46,6 +47,8 @@ pub struct World {
     pub positions: Vec<Position>,
 }
 
+
+#[allow(dead_code)]
 impl World {
     pub fn new() -> Self
     {

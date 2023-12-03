@@ -10,6 +10,7 @@ pub enum Entity {
 }
 
 
+#[allow(dead_code)]
 impl Entity {
     pub fn visit<'a>(&'a self, components: &'a Components) -> &'a dyn EntityInterface 
     {

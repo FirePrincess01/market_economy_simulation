@@ -15,6 +15,7 @@ use super::World;
 use super::component::Component;
 
 
+#[allow(dead_code)]
 pub fn move_agents(world: &mut World) 
 {
     let iter = World::filter(&world.entities, &mut world.positions, &world.live_stats);
@@ -35,6 +36,7 @@ pub fn move_agents(world: &mut World)
     }
 }
 
+#[allow(dead_code)]
 pub struct DrawAgents {
     instances_mesh_host: Vec<deferred_color_shader::Instance>,
     instances_mesh_light_host: Vec<deferred_light_shader::Instance>,
@@ -44,6 +46,7 @@ pub struct DrawAgents {
     light_radius: f32,
 }
 
+#[allow(dead_code)]
 impl DrawAgents {
     pub fn new(wgpu_renderer: &mut impl WgpuRendererInterface, max_agents: usize) -> Self {
         

@@ -11,8 +11,6 @@ mod ground_plane;
 mod base_factory;
 mod world_mesh;
 
-use ecs::system::DrawAgents;
-use ground_plane::GroundPlaneMesh;
 use wgpu_renderer::{default_window, vertex_texture_shader};
 use winit::event::{WindowEvent, KeyboardInput, VirtualKeyCode, ElementState};
 use rusttype;
@@ -20,7 +18,6 @@ use rusttype;
 #[cfg(target_arch="wasm32")]
 use wasm_bindgen::prelude::*;
 
-use crate::ground_plane::{GroundPlane, GroundResource};
 
 
 struct MarketEconomySimulation {
@@ -28,7 +25,7 @@ struct MarketEconomySimulation {
     scale_factor: f32,
 
     renderer: renderer::Renderer,
-    world: ecs2::World,
+    _world: ecs2::World,
     world_mesh: world_mesh::WorldMesh,
 
     // _ground_plane: ground_plane::GroundPlane,
@@ -57,7 +54,14 @@ impl MarketEconomySimulation {
         let mut renderer = renderer::Renderer::new(window).await;
 
         // world
-        let world = ecs2::World::new();
+        let mut world = ecs2::World::new();
+
+        let blue_token = world.resources.blues2.create(0.0, 1.0, 1.0);
+
+        world.base_factory.add_blue(blue_token, &mut world.resources);
+        world.base_factory.produce(&mut world.resources, &mut world.agents);
+
+        // world mesh
         let world_mesh = world_mesh::WorldMesh::new(
             &mut renderer.wgpu_renderer, 
             &world);
@@ -112,7 +116,7 @@ impl MarketEconomySimulation {
 
             renderer,
             
-            world,
+            _world: world,
             world_mesh,
             
             performance_monitor,

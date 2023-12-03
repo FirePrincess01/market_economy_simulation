@@ -6,6 +6,10 @@ use fastrand;
 use super::{ground_field::GroundField, GroundResource};
 
 
+pub struct Location {
+    pub y: u32,
+    pub x: u32,
+}
 
 pub struct GroundPlane
 {
@@ -22,7 +26,7 @@ impl GroundPlane {
 
         let mut fields = Vec::new();
         fields.reserve(size);
-        for i in 0..size {
+        for _i in 0..size {
             let ground_field = GroundField { 
                 resource: GroundResource::None, 
                 entity_index: 0, 

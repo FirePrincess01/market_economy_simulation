@@ -8,7 +8,7 @@ use wgpu_renderer::vertex_color_shader::Color as Color;
 
 use crate::deferred_color_shader;
 
-
+#[allow(dead_code)]
 pub struct Circle {
     pub vertices: Vec<Vertex>,
     pub colors: Vec<Color>,
@@ -17,6 +17,7 @@ pub struct Circle {
     pub deferred_vertices: Vec::<deferred_color_shader::Vertex>,
 }
 
+#[allow(dead_code)]
 impl Circle {
     pub fn new(r: f32, n: usize) -> Self
     {

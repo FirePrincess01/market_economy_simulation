@@ -12,7 +12,7 @@ use super::ecs::{
 };
 
 
-pub fn create_agent(world: &mut World) {
+pub fn _create_agent(world: &mut World) {
     let entity_index = world.add_entity(Entity::new());
     // world.add(entity_index, ColoredMesh::new(1));
     world.add(entity_index, LiveStates::new());
