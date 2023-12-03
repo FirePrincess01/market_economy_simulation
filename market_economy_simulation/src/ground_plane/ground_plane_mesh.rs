@@ -15,10 +15,10 @@ pub struct GroundPlaneMesh {
 
 impl GroundPlaneMesh {
     pub fn new(wgpu_renderer: &mut impl WgpuRendererInterface, 
-        ground_plane: &GroundPlane) -> Self 
+        ground_plane: &GroundPlane, scale: f32) -> Self 
     {
         // ground plane mesh
-        let quad_size = 3.0;
+        let quad_size = 1.0 * scale;
         let quad = geometry::Quad::new(quad_size);
 
         let mut instances: Vec<deferred_color_shader::Instance> = Vec::new();
@@ -39,7 +39,7 @@ impl GroundPlaneMesh {
                 let instance = deferred_color_shader::Instance{
                     position: [quad_size * x as f32, quad_size * y as f32, 0.0],
                     color: color,
-                    entity: [field.index as u32, 0, 0],
+                    entity: [field.entity_index as u32, 0, 0],
                 };
                 instances.push(instance);
             }
@@ -55,7 +55,7 @@ impl GroundPlaneMesh {
 
         const INSTANCES: &[deferred_light_shader::Instance] = &[ 
             deferred_light_shader::Instance{
-                position: [0.0, 0.0, 0.0],
+                position: [0.0, 0.0, 1.0],
                 intensity: [0.0, 0.4, 0.0],
             },
         ];
@@ -80,6 +80,6 @@ impl DeferredShaderDraw for GroundPlaneMesh {
 
 impl DeferredLightShaderDraw for GroundPlaneMesh {
     fn draw_lights<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
-        self.mesh_light.draw(render_pass);
+        self.mesh_light.draw_lights(render_pass);
     }
 }

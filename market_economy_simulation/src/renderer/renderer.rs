@@ -109,7 +109,7 @@ impl Renderer {
         // Self::top_view_point(&mut camera);
         Self::side_view_point(&mut camera);
 
-        let speed = 4.0;
+        let speed = 40.0;
         let sensitivity = 1.0;
         let sensitivity_scroll = 1.0;
         let camera_controller = super::camera_controller::CameraController::new(speed, sensitivity, sensitivity_scroll);
@@ -172,7 +172,7 @@ impl Renderer {
     }
 
     fn side_view_point(camera: &mut renderer::camera::Camera) {
-        let position = cgmath::Point3::new(0.0, -2.0, 5.0);
+        let position = cgmath::Point3::new(100.0, 90.0, 20.0);
         let yaw = cgmath::Deg(-90.0).into();
         let pitch = cgmath::Deg(30.0).into();
 
@@ -406,8 +406,8 @@ impl Renderer {
     }
 
     pub fn render(&mut self, 
-        deferred: & impl DeferredShaderDraw,
-        deferred_light: & impl DeferredLightShaderDraw, 
+        // deferred: & impl DeferredShaderDraw,
+        // deferred_light: & impl DeferredLightShaderDraw, 
         deferred_combined: & (impl DeferredShaderDraw + DeferredLightShaderDraw), 
         mesh_textured_gui: & impl VertexTextureShaderDraw,
         performance_monitor: &mut PerformanceMonitor) -> Result<(), wgpu::SurfaceError>
@@ -425,8 +425,8 @@ impl Renderer {
         });
 
         // draw
-        self.render_deferred(&view, &mut encoder, &[deferred, deferred_combined]);
-        self.render_light(&view, &mut encoder, &[deferred_light, deferred_combined]);
+        self.render_deferred(&view, &mut encoder, &[deferred_combined]);
+        self.render_light(&view, &mut encoder, &[deferred_combined]);
         self.render_forward(&view, &mut encoder, mesh_textured_gui, performance_monitor);
 
         // copy entity texture
@@ -437,7 +437,7 @@ impl Renderer {
         output.present();
 
         // wait to see how high the gpu load is
-        // self.wgpu_renderer.device().poll(wgpu::Maintain::Wait); 
+        self.wgpu_renderer.device().poll(wgpu::Maintain::Wait); 
 
         performance_monitor.watch.stop(1);
         

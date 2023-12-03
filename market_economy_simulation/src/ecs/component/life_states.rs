@@ -11,6 +11,8 @@ pub struct LiveStates {
     food: u32,
 }
 
+
+#[allow(dead_code)]
 impl LiveStates {
     pub fn new() -> Self 
     {

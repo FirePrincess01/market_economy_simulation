@@ -101,8 +101,8 @@ impl CameraController {
         // let forward = Vector3::new(yaw_cos, 0.0, yaw_sin).normalize();
         let forward = Vector3::new(0.0, 1.0, 0.0).normalize();
         let right = Vector3::new(-yaw_sin, 0.0, yaw_cos).normalize();
-        camera.position += forward * (self.amount_forward - self.amount_backward) * self.speed * dt;
-        camera.position += right * (self.amount_right - self.amount_left) * self.speed * dt;
+        camera.position += forward * (self.amount_forward - self.amount_backward) * self.speed * dt * camera.position.z * 0.02;
+        camera.position += right * (self.amount_right - self.amount_left) * self.speed * dt * camera.position.z * 0.02;
 
         // Move in/out (aka. "zoom")
         // Note: this isn't an actual zoom. The camera's position
@@ -111,7 +111,7 @@ impl CameraController {
         let (pitch_sin, pitch_cos) = camera.pitch.0.sin_cos();
         // let scrollward = Vector3::new(0.0, 0.0, -1.0).normalize();
         let scrollward = Vector3::new(pitch_cos * yaw_cos, pitch_sin, pitch_cos * yaw_sin).normalize();
-        camera.position += scrollward * self.scroll * self.sensitivity_scroll * 0.020;
+        camera.position += scrollward * self.scroll * self.sensitivity_scroll * 0.020 * camera.position.z * 0.05;
         self.scroll = 0.0;
 
         // Move up/down. Since we don't use roll, we can just

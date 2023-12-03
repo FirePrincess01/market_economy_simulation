@@ -7,6 +7,7 @@ pub struct Position {
     pub pos: [f32; 3]
 }
 
+#[allow(dead_code)]
 impl Position {
     pub fn new() -> Self {
         Self {
