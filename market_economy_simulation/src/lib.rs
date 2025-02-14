@@ -16,10 +16,7 @@ use wgpu_renderer::{
     renderer::WgpuRendererInterface,
     vertex_texture_shader,
 };
-use winit::{
-    application::ApplicationHandler,
-    event::{self, ElementState, WindowEvent},
-};
+use winit::event::{ElementState, WindowEvent};
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
@@ -53,7 +50,7 @@ impl MarketEconomySimulation {
         // let size: winit::dpi::PhysicalSize<u32> = window.inner_size();
         // let scale_factor = window.scale_factor() as f32;
 
-        let mut renderer = renderer::Renderer::new(renderer_interface);
+        let renderer = renderer::Renderer::new(renderer_interface);
 
         // world
         let mut world = ecs2::World::new();
