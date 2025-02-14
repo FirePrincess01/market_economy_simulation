@@ -1,11 +1,11 @@
 // create some basic geometric shapes
 
-mod quad;
-mod circle; 
-mod rectangle;
-mod mesh;
+mod circle;
 mod frame;
+mod mesh;
+mod quad;
+mod rectangle;
 
-pub use quad::Quad;
 pub use circle::Circle;
 pub use frame::Frame;
+pub use quad::Quad;

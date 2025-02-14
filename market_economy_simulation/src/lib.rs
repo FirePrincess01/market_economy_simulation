@@ -247,5 +247,5 @@ impl<'a> DefaultApplicationInterface for MarketEconomySimulation {
 pub async fn run() {
     let event_loop = winit::event_loop::EventLoop::new().unwrap();
     let mut application: DefaultApplication<MarketEconomySimulation> = DefaultApplication::new();
-    event_loop.run_app(&mut application).unwrap(); 
+    event_loop.run_app(&mut application).unwrap();
 }

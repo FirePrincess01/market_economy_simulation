@@ -1,12 +1,11 @@
 //! Tracks key and mouse inputs to move the camera
 //!
 
-use winit::event::*;
-use winit::dpi::PhysicalPosition;
 use cgmath::*;
 use instant::Duration;
 use wgpu_renderer::renderer::camera::Camera;
-
+use winit::dpi::PhysicalPosition;
+use winit::event::*;
 
 use std::f32::consts::FRAC_PI_2;
 
@@ -46,8 +45,12 @@ impl CameraController {
         }
     }
 
-    pub fn process_keyboard(&mut self, key: winit::keyboard::KeyCode, state: ElementState) -> bool{
-        let amount = if state == ElementState::Pressed { 1.0 } else { 0.0 };
+    pub fn process_keyboard(&mut self, key: winit::keyboard::KeyCode, state: ElementState) -> bool {
+        let amount = if state == ElementState::Pressed {
+            1.0
+        } else {
+            0.0
+        };
         match key {
             winit::keyboard::KeyCode::KeyW | winit::keyboard::KeyCode::ArrowUp => {
                 self.amount_forward = amount;
@@ -86,10 +89,7 @@ impl CameraController {
         self.scroll = match delta {
             // I'm assuming a line is about 100 pixels
             MouseScrollDelta::LineDelta(_, scroll) => scroll * 100.0,
-            MouseScrollDelta::PixelDelta(PhysicalPosition {
-                y: scroll,
-                ..
-            }) => *scroll as f32,
+            MouseScrollDelta::PixelDelta(PhysicalPosition { y: scroll, .. }) => *scroll as f32,
         };
     }
 
@@ -101,8 +101,18 @@ impl CameraController {
         // let forward = Vector3::new(yaw_cos, 0.0, yaw_sin).normalize();
         let forward = Vector3::new(0.0, 1.0, 0.0).normalize();
         let right = Vector3::new(-yaw_sin, 0.0, yaw_cos).normalize();
-        camera.position += forward * (self.amount_forward - self.amount_backward) * self.speed * dt * camera.position.z * 0.02;
-        camera.position += right * (self.amount_right - self.amount_left) * self.speed * dt * camera.position.z * 0.02;
+        camera.position += forward
+            * (self.amount_forward - self.amount_backward)
+            * self.speed
+            * dt
+            * camera.position.z
+            * 0.02;
+        camera.position += right
+            * (self.amount_right - self.amount_left)
+            * self.speed
+            * dt
+            * camera.position.z
+            * 0.02;
 
         // Move in/out (aka. "zoom")
         // Note: this isn't an actual zoom. The camera's position
@@ -110,8 +120,10 @@ impl CameraController {
         // to get closer to an object you want to focus on.
         let (pitch_sin, pitch_cos) = camera.pitch.0.sin_cos();
         // let scrollward = Vector3::new(0.0, 0.0, -1.0).normalize();
-        let scrollward = Vector3::new(pitch_cos * yaw_cos, pitch_sin, pitch_cos * yaw_sin).normalize();
-        camera.position += scrollward * self.scroll * self.sensitivity_scroll * 0.020 * camera.position.z * 0.05;
+        let scrollward =
+            Vector3::new(pitch_cos * yaw_cos, pitch_sin, pitch_cos * yaw_sin).normalize();
+        camera.position +=
+            scrollward * self.scroll * self.sensitivity_scroll * 0.020 * camera.position.z * 0.05;
         self.scroll = 0.0;
 
         // Move up/down. Since we don't use roll, we can just
@@ -136,7 +148,3 @@ impl CameraController {
         }
     }
 }
-
- 
-
- 

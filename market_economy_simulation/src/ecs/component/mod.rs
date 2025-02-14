@@ -1,15 +1,13 @@
-
-
-mod life_states;
+mod colored_mesh;
 mod farm_states;
 mod house_states;
-mod colored_mesh;
+mod life_states;
 mod position;
 
-pub use life_states::LiveStates;
+pub use colored_mesh::ColoredMesh;
 pub use farm_states::FarmStates;
 pub use house_states::HouseStates;
-pub use colored_mesh::ColoredMesh;
+pub use life_states::LiveStates;
 pub use position::Position;
 
 use super::{Entity, World};

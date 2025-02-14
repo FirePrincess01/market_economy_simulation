@@ -1,4 +1,3 @@
-
 use super::Component;
 
 #[allow(dead_code)]
@@ -11,11 +10,9 @@ pub struct LiveStates {
     food: u32,
 }
 
-
 #[allow(dead_code)]
 impl LiveStates {
-    pub fn new() -> Self 
-    {
+    pub fn new() -> Self {
         Self {
             entity_index: 0,
 
@@ -28,7 +25,6 @@ impl LiveStates {
 }
 
 impl Component for LiveStates {
-
     fn get_entity_index(&self) -> usize {
         self.entity_index
     }
@@ -37,7 +33,6 @@ impl Component for LiveStates {
         self.entity_index = entity_index;
     }
 
-
     fn get_value_index(entity: &crate::ecs::Entity) -> Option<usize> {
         entity.live_stat
     }
@@ -45,7 +40,6 @@ impl Component for LiveStates {
     fn set_value_index(entity: &mut crate::ecs::Entity, value_index: Option<usize>) {
         entity.live_stat = value_index;
     }
-
 
     fn move_to_world(self, world: &mut crate::ecs::World) -> usize {
         let index = world.live_stats.len();

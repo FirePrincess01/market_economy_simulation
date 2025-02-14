@@ -5,14 +5,12 @@ use fastrand;
 
 use super::{ground_field::GroundField, GroundResource};
 
-
 pub struct Location {
     pub y: u32,
     pub x: u32,
 }
 
-pub struct GroundPlane
-{
+pub struct GroundPlane {
     width: usize,
     height: usize,
     size: usize,
@@ -20,30 +18,28 @@ pub struct GroundPlane
 }
 
 impl GroundPlane {
-    pub fn new(width: usize, height: usize) -> Self 
-    { 
+    pub fn new(width: usize, height: usize) -> Self {
         let size = width * height;
 
         let mut fields = Vec::new();
         fields.reserve(size);
         for _i in 0..size {
-            let ground_field = GroundField { 
-                resource: GroundResource::None, 
-                entity_index: 0, 
+            let ground_field = GroundField {
+                resource: GroundResource::None,
+                entity_index: 0,
             };
             fields.push(ground_field)
         }
 
-        Self { 
+        Self {
             width,
             height,
-            size, 
+            size,
             fields,
-        } 
+        }
     }
 
-    pub fn generate_resource(&mut self, probability: f64, resource: GroundResource)
-    {
+    pub fn generate_resource(&mut self, probability: f64, resource: GroundResource) {
         let mut rng = fastrand::Rng::new();
         for elem in &mut self.fields {
             let rand = rng.f64();
@@ -53,20 +49,17 @@ impl GroundPlane {
         }
     }
 
-    pub fn get(&self, y: usize, x: usize) -> &GroundField   
-    {
+    pub fn get(&self, y: usize, x: usize) -> &GroundField {
         let index = y * self.width + x;
 
         &self.fields[index]
     }
 
-    pub fn get_mut(&mut self, y: usize, x: usize) -> &mut GroundField   
-    {
+    pub fn get_mut(&mut self, y: usize, x: usize) -> &mut GroundField {
         let index = y * self.width + x;
 
         &mut self.fields[index]
     }
-
 
     pub fn width(&self) -> usize {
         self.width

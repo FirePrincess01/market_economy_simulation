@@ -1,6 +1,9 @@
 //! Factory controlled by the player
 
-use crate::{ecs2::{EntityInterface, BlueToken,  AgentBlueToken, Resources2, Agents}, ground_plane::Location};
+use crate::{
+    ecs2::{AgentBlueToken, Agents, BlueToken, EntityInterface, Resources2},
+    ground_plane::Location,
+};
 
 pub enum Recipe {
     Agent,
@@ -31,8 +34,7 @@ pub struct BaseFactory {
 }
 
 impl BaseFactory {
-    pub fn new(entity_index: usize, location: Location) -> Self 
-    {
+    pub fn new(entity_index: usize, location: Location) -> Self {
         Self {
             entity_index,
             location,
@@ -46,10 +48,7 @@ impl BaseFactory {
         }
     }
 
-    pub fn add_blue(&mut self, blue_token: BlueToken, 
-        resources: &mut Resources2,
-    ) 
-    {
+    pub fn add_blue(&mut self, blue_token: BlueToken, resources: &mut Resources2) {
         let location_offset_y = 0.8;
         let location_offset_x = 0.2;
 
@@ -61,13 +60,12 @@ impl BaseFactory {
         self.blues.push(blue_token);
     }
 
-    pub fn produce(&mut self, 
-        // dt: instant::Duration, 
+    pub fn produce(
+        &mut self,
+        // dt: instant::Duration,
         _resources: &mut Resources2,
         _agents: &mut Agents,
-    ) 
-    {
-
+    ) {
     }
 
     pub fn location(&self) -> &Location {

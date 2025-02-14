@@ -1,6 +1,5 @@
 //! Functions operating on the data of the entities with components
-//! 
-
+//!
 
 use wgpu_renderer::renderer::WgpuRendererInterface;
 
@@ -11,20 +10,17 @@ use crate::geometry;
 use crate::deferred_color_shader;
 use crate::deferred_light_shader;
 
-use super::World;
 use super::component::Component;
-
+use super::World;
 
 #[allow(dead_code)]
-pub fn move_agents(world: &mut World) 
-{
+pub fn move_agents(world: &mut World) {
     let iter = World::filter(&world.entities, &mut world.positions, &world.live_stats);
 
     let mut i = 0;
     // let max_y = 400;
     let max_y = 1000;
-    for (pos, _live) in iter 
-    {
+    for (pos, _live) in iter {
         let x = i % max_y;
         let y = i / max_y;
 
@@ -49,24 +45,27 @@ pub struct DrawAgents {
 #[allow(dead_code)]
 impl DrawAgents {
     pub fn new(wgpu_renderer: &mut impl WgpuRendererInterface, max_agents: usize) -> Self {
-        
         let light_radius = 0.4;
 
         let circle = geometry::Circle::new(0.15, 16);
         let circle_light = geometry::Circle::new(light_radius, 16);
-        let instances_mesh_host =  vec![deferred_color_shader::Instance::new(); max_agents];
-        let instances_mesh_light_host =  vec![deferred_light_shader::Instance::new(); max_agents];
+        let instances_mesh_host = vec![deferred_color_shader::Instance::new(); max_agents];
+        let instances_mesh_light_host = vec![deferred_light_shader::Instance::new(); max_agents];
 
-        let mesh = deferred_color_shader::Mesh::new(wgpu_renderer.device(), 
-            &circle.deferred_vertices, 
-            &circle.indices, 
-            &instances_mesh_host);
+        let mesh = deferred_color_shader::Mesh::new(
+            wgpu_renderer.device(),
+            &circle.deferred_vertices,
+            &circle.indices,
+            &instances_mesh_host,
+        );
 
-        let mesh_light = deferred_light_shader::Mesh::new(wgpu_renderer.device(), 
-            &circle_light.vertices, 
-            &circle_light.indices, 
-            &instances_mesh_light_host);
-        
+        let mesh_light = deferred_light_shader::Mesh::new(
+            wgpu_renderer.device(),
+            &circle_light.vertices,
+            &circle_light.indices,
+            &instances_mesh_light_host,
+        );
+
         Self {
             instances_mesh_host,
             instances_mesh_light_host,
@@ -77,39 +76,37 @@ impl DrawAgents {
         }
     }
 
-    pub fn update(&mut self, world: &mut World, wgpu_renderer: &mut impl WgpuRendererInterface)
-    {
+    pub fn update(&mut self, world: &mut World, wgpu_renderer: &mut impl WgpuRendererInterface) {
         let iter = World::filter(&world.entities, &mut world.positions, &world.live_stats);
 
         self.instances_mesh_host.clear();
-        for (pos, _live) in iter 
-        {
-            let instance = deferred_color_shader::Instance{ 
-                position: [pos.pos[0], pos.pos[1], pos.pos[2]], 
-                color: [0.5, 0.0, 0.5], 
-                entity: [pos.get_entity_index() as u32, 0, 0], 
+        for (pos, _live) in iter {
+            let instance = deferred_color_shader::Instance {
+                position: [pos.pos[0], pos.pos[1], pos.pos[2]],
+                color: [0.5, 0.0, 0.5],
+                entity: [pos.get_entity_index() as u32, 0, 0],
             };
 
             self.instances_mesh_host.push(instance);
-        }  
+        }
 
         let iter = World::filter(&world.entities, &mut world.positions, &world.live_stats);
 
         self.instances_mesh_light_host.clear();
-        for (pos, _live) in iter 
-        {
-            let instance = deferred_light_shader::Instance{ 
-                position: [pos.pos[0], pos.pos[1], pos.pos[2]], 
-                intensity: [1.0/self.light_radius, 0.0, 0.0], 
+        for (pos, _live) in iter {
+            let instance = deferred_light_shader::Instance {
+                position: [pos.pos[0], pos.pos[1], pos.pos[2]],
+                intensity: [1.0 / self.light_radius, 0.0, 0.0],
             };
 
             self.instances_mesh_light_host.push(instance);
-        }  
+        }
 
-        self.mesh.update_instance_buffer(wgpu_renderer.queue(), &self.instances_mesh_host);
-        self.mesh_light.update_instance_buffer(wgpu_renderer.queue(), &self.instances_mesh_light_host);
+        self.mesh
+            .update_instance_buffer(wgpu_renderer.queue(), &self.instances_mesh_host);
+        self.mesh_light
+            .update_instance_buffer(wgpu_renderer.queue(), &self.instances_mesh_light_host);
     }
-
 }
 
 impl DeferredShaderDraw for DrawAgents {
@@ -123,4 +120,3 @@ impl DeferredLightShaderDraw for DrawAgents {
         self.mesh_light.draw(render_pass);
     }
 }
-

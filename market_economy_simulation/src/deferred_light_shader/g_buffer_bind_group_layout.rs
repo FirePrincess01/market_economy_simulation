@@ -6,14 +6,12 @@ pub struct GBufferBindGroupLayout {
 }
 
 impl GBufferBindGroupLayout {
-
     pub fn new(device: &wgpu::Device) -> Self {
-
         // Texture
-        let bind_group_layout =
-        device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+        let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             entries: &[
-                wgpu::BindGroupLayoutEntry {    // positions
+                wgpu::BindGroupLayoutEntry {
+                    // positions
                     binding: 0,
                     visibility: wgpu::ShaderStages::FRAGMENT,
                     ty: wgpu::BindingType::Texture {
@@ -23,7 +21,8 @@ impl GBufferBindGroupLayout {
                     },
                     count: None,
                 },
-                wgpu::BindGroupLayoutEntry {    // normals
+                wgpu::BindGroupLayoutEntry {
+                    // normals
                     binding: 1,
                     visibility: wgpu::ShaderStages::FRAGMENT,
                     ty: wgpu::BindingType::Texture {
@@ -33,7 +32,8 @@ impl GBufferBindGroupLayout {
                     },
                     count: None,
                 },
-                wgpu::BindGroupLayoutEntry {    // albedo
+                wgpu::BindGroupLayoutEntry {
+                    // albedo
                     binding: 2,
                     visibility: wgpu::ShaderStages::FRAGMENT,
                     ty: wgpu::BindingType::Texture {
@@ -47,13 +47,10 @@ impl GBufferBindGroupLayout {
             label: Some("g_buffer bind_group_layout"),
         });
 
-        Self {
-            bind_group_layout,
-        }
+        Self { bind_group_layout }
     }
 
     pub fn get(&self) -> &wgpu::BindGroupLayout {
         &self.bind_group_layout
     }
-
 }

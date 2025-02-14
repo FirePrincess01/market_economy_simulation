@@ -7,12 +7,10 @@ use wgpu_renderer::renderer::WgpuRendererInterface;
 
 use super::entity_buffer_slice::EntityBufferSlice;
 
-
 pub struct EntityBuffer {
     pub texture: wgpu::Texture,
     pub view: wgpu::TextureView,
     // pub bind_group: wgpu::BindGroup,
-
     pub output_buffer: wgpu::Buffer,
 
     unpadded_bytes_per_row: u32,
@@ -21,15 +19,15 @@ pub struct EntityBuffer {
     size: wgpu::Extent3d,
 }
 
-
 impl EntityBuffer {
     pub const FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Rgba8Unorm;
 
-    pub fn new(wgpu_renderer: &mut dyn WgpuRendererInterface, 
+    pub fn new(
+        wgpu_renderer: &mut dyn WgpuRendererInterface,
         // entity_buffer_bind_group_layout: &EntityBufferBindGroupLayout,
-        surface_width: u32, surface_height: u32,
-    ) -> Self
-    {
+        surface_width: u32,
+        surface_height: u32,
+    ) -> Self {
         let size = wgpu::Extent3d {
             width: surface_width,
             height: surface_height,
@@ -54,7 +52,7 @@ impl EntityBuffer {
         // wgpu::COPY_BYTES_PER_ROW_ALIGNMENT. Because of this we'll
         // need to save both the padded_bytes_per_row as well as the
         // unpadded_bytes_per_row
-        let pixel_size = mem::size_of::<[u8;4]>() as u32;
+        let pixel_size = mem::size_of::<[u8; 4]>() as u32;
         let align = wgpu::COPY_BYTES_PER_ROW_ALIGNMENT;
         let unpadded_bytes_per_row = pixel_size * surface_width;
         let padding = (align - unpadded_bytes_per_row % align) % align;
@@ -73,7 +71,7 @@ impl EntityBuffer {
         Self {
             texture,
             view,
-            
+
             output_buffer,
 
             unpadded_bytes_per_row,
@@ -83,39 +81,38 @@ impl EntityBuffer {
         }
     }
 
-    pub fn copy_texture_to_buffer(&self, encoder: &mut wgpu::CommandEncoder)
-    {
+    pub fn copy_texture_to_buffer(&self, encoder: &mut wgpu::CommandEncoder) {
         encoder.copy_texture_to_buffer(
             wgpu::TexelCopyTextureInfo {
                 aspect: wgpu::TextureAspect::All,
                 texture: &self.texture,
                 mip_level: 0,
                 origin: wgpu::Origin3d::ZERO,
-            }, 
+            },
             wgpu::TexelCopyBufferInfo {
                 buffer: &self.output_buffer,
                 layout: wgpu::TexelCopyBufferLayout {
                     offset: 0,
                     bytes_per_row: Some(self.padded_bytes_per_row),
                     rows_per_image: Some(self.height),
-                }
+                },
             },
-            self.size
+            self.size,
         );
     }
 
-    pub fn map_buffer_async(&self) ->  EntityBufferSlice
-    {
+    pub fn map_buffer_async(&self) -> EntityBufferSlice {
         let buffer_slice = self.output_buffer.slice(..);
         buffer_slice.map_async(wgpu::MapMode::Read, move |_| ());
 
-        let entity_buffer_slice = 
-            EntityBufferSlice::new(&self.output_buffer,
-                buffer_slice, 
-                self.size, 
-                self.unpadded_bytes_per_row, 
-                self.padded_bytes_per_row);
+        let entity_buffer_slice = EntityBufferSlice::new(
+            &self.output_buffer,
+            buffer_slice,
+            self.size,
+            self.unpadded_bytes_per_row,
+            self.padded_bytes_per_row,
+        );
 
         entity_buffer_slice
-    }  
+    }
 }

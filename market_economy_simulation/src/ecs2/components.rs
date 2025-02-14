@@ -1,7 +1,6 @@
 //! Hodgepodge of various world components
 
-use crate::{ground_plane::GroundPlane, base_factory::BaseFactory};
-
+use crate::{base_factory::BaseFactory, ground_plane::GroundPlane};
 
 // struct ResourceRed {
 //     z: f32,
@@ -10,10 +9,10 @@ use crate::{ground_plane::GroundPlane, base_factory::BaseFactory};
 // }
 
 // impl ResourceRed {
-//     fn new(z: f32, y: f32, x: f32) 
-//     -> Self 
-//     { 
-//         Self { z, y, x, } 
+//     fn new(z: f32, y: f32, x: f32)
+//     -> Self
+//     {
+//         Self { z, y, x, }
 //     }
 // }
 
@@ -23,7 +22,7 @@ use crate::{ground_plane::GroundPlane, base_factory::BaseFactory};
 //     x: f32,
 // }
 
-pub struct ResourceBlue{
+pub struct ResourceBlue {
     pub z: f32,
     pub y: f32,
     pub x: f32,
@@ -38,7 +37,6 @@ pub struct ResourceBlue{
 //     fn new(index: usize) -> Self { Self { index } }
 // }
 
-
 // struct GreenToken {
 //     index: usize, // index into the reds vector
 // }
@@ -52,9 +50,13 @@ pub struct BlueToken {
 }
 
 impl BlueToken {
-    fn new(index: usize) -> Self { Self { index } }
+    fn new(index: usize) -> Self {
+        Self { index }
+    }
 
-    fn get_index(&self) -> usize { self.index }
+    fn get_index(&self) -> usize {
+        self.index
+    }
 }
 
 pub struct Blues {
@@ -62,26 +64,23 @@ pub struct Blues {
 }
 
 impl Blues {
-    pub fn new() -> Self 
-    {
+    pub fn new() -> Self {
         Self {
             elements: Vec::new(),
         }
     }
 
-    pub fn _get(&self, blue_token: &BlueToken) -> &ResourceBlue
-    {
+    pub fn _get(&self, blue_token: &BlueToken) -> &ResourceBlue {
         &self.elements[blue_token.get_index()]
     }
 
-    pub fn get_mut(&mut self, blue_token: &BlueToken) -> &mut ResourceBlue
-    {
+    pub fn get_mut(&mut self, blue_token: &BlueToken) -> &mut ResourceBlue {
         &mut self.elements[blue_token.get_index()]
     }
 
     pub fn create(&mut self, z: f32, y: f32, x: f32) -> BlueToken {
         let token = BlueToken::new(self.elements.len());
-        let resource = ResourceBlue{ z, y, x };
+        let resource = ResourceBlue { z, y, x };
         self.elements.push(resource);
 
         token
@@ -102,7 +101,9 @@ pub struct AgentBlueToken {
 
 #[allow(dead_code)]
 impl AgentBlueToken {
-    pub fn new(index: usize) -> Self { Self { index } }
+    pub fn new(index: usize) -> Self {
+        Self { index }
+    }
 }
 
 #[allow(dead_code)]
@@ -111,7 +112,11 @@ pub struct AgentsBlue {
 }
 
 impl AgentsBlue {
-    pub fn new() -> Self { Self { elements: Vec::new() } }
+    pub fn new() -> Self {
+        Self {
+            elements: Vec::new(),
+        }
+    }
 }
 
 pub struct Components {
@@ -119,7 +124,7 @@ pub struct Components {
     pub base_factory: BaseFactory,
     // pub reds: Vec<ResourceRed>,
     // pub greens: Vec<ResourceGreen>,
-    
+
     // pub agents: Vec<Agent>,
 }
 
@@ -129,10 +134,12 @@ pub struct Resources2 {
 
 #[allow(dead_code)]
 impl Resources2 {
-    pub fn new(blues2: Blues) -> Self { Self { blues2 } }
+    pub fn new(blues2: Blues) -> Self {
+        Self { blues2 }
+    }
 }
 
 #[allow(unused)]
 pub struct Agents {
-    pub agent_blue: AgentsBlue, 
+    pub agent_blue: AgentsBlue,
 }

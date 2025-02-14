@@ -1,5 +1,3 @@
-
-
 use super::Component;
 
 #[allow(dead_code)]
@@ -12,8 +10,7 @@ pub struct FarmStates {
 
 #[allow(dead_code)]
 impl FarmStates {
-    pub fn new() -> Self 
-    {
+    pub fn new() -> Self {
         Self {
             entity_index: 0,
 
@@ -24,7 +21,6 @@ impl FarmStates {
 }
 
 impl Component for FarmStates {
-
     fn get_entity_index(&self) -> usize {
         self.entity_index
     }
@@ -32,7 +28,6 @@ impl Component for FarmStates {
     fn set_entity_index(&mut self, entity_index: usize) {
         self.entity_index = entity_index;
     }
-
 
     fn get_value_index(entity: &crate::ecs::Entity) -> Option<usize> {
         entity.farm_stat
