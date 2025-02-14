@@ -12,7 +12,7 @@ pub struct WorldMesh {
 }
 
 impl WorldMesh {
-    pub fn new(wgpu_renderer: &mut impl WgpuRendererInterface, 
+    pub fn new(wgpu_renderer: &mut dyn WgpuRendererInterface, 
         world: &World,
     ) -> Self
     {

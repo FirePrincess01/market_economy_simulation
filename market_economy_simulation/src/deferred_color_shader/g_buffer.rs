@@ -57,7 +57,7 @@ impl GBuffer {
     pub const G_BUFFER_FORMAT_NORMAL: wgpu::TextureFormat = wgpu::TextureFormat::Rgba16Float;
     pub const G_BUFFER_FORMAT_ALBEDO: wgpu::TextureFormat = wgpu::TextureFormat::Rgba8UnormSrgb;
 
-    pub fn new(wgpu_renderer: &mut impl WgpuRendererInterface,
+    pub fn new(wgpu_renderer: &mut dyn WgpuRendererInterface,
          g_buffer_bind_group_layout: &GBufferBindGroupLayout,
          surface_width: u32, 
          surface_height: u32) -> Self 

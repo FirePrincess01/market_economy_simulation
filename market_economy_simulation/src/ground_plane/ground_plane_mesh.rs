@@ -14,7 +14,7 @@ pub struct GroundPlaneMesh {
 }
 
 impl GroundPlaneMesh {
-    pub fn new(wgpu_renderer: &mut impl WgpuRendererInterface, 
+    pub fn new(wgpu_renderer: &mut dyn WgpuRendererInterface, 
         ground_plane: &GroundPlane, scale: f32) -> Self 
     {
         // ground plane mesh

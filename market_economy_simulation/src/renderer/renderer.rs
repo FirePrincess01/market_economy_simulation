@@ -4,18 +4,15 @@
 use crate::deferred_color_shader::{DeferredShaderDraw, self, GBuffer, EntityBuffer};
 use crate::deferred_light_shader::DeferredLightShaderDraw;
 use crate::performance_monitor::PerformanceMonitor;
-use wgpu_renderer::renderer::{WgpuRenderer, self};
+use wgpu_renderer::renderer::{self, WgpuRendererInterface};
 use wgpu_renderer::vertex_color_shader::{self, VertexColorShaderDraw};
 use wgpu_renderer::vertex_texture_shader::{self, VertexTextureShaderDraw};
-use winit::event::{VirtualKeyCode, ElementState, MouseScrollDelta};
+use winit::event::{ElementState, MouseScrollDelta};
 
 use crate::deferred_light_shader;
 
-pub struct Renderer 
+pub struct Renderer
 {   
-    // wgpu_renderer
-    pub wgpu_renderer: WgpuRenderer,
-
     _pipeline_color: vertex_color_shader::Pipeline,
     pipeline_lines: vertex_color_shader::Pipeline,
 
@@ -41,14 +38,12 @@ pub struct Renderer
 }
 
 impl Renderer {
-    pub async fn new(window: &winit::window::Window) -> Self 
+    pub fn new(wgpu_renderer: &mut dyn WgpuRendererInterface) -> Self 
     {   
         // wgpu renderer
-        let mut wgpu_renderer = WgpuRenderer::new(window).await; 
-        let _surface_format = wgpu_renderer.config().format;
-        let surface_width = wgpu_renderer.config().width;
-        let surface_height = wgpu_renderer.config().height;
-        let surface_format = wgpu_renderer.config().format;
+        let surface_width = wgpu_renderer.surface_width();
+        let surface_height = wgpu_renderer.surface_height();
+        let surface_format: wgpu::TextureFormat = wgpu_renderer.surface_format();
         
         // pipeline color
         let camera_bind_group_layout = vertex_color_shader::CameraBindGroupLayout::new(wgpu_renderer.device());
@@ -76,13 +71,13 @@ impl Renderer {
 
         // g_buffer
         let g_buffer_bind_group_layout = deferred_light_shader::GBufferBindGroupLayout::new(wgpu_renderer.device());
-        let g_buffer = deferred_color_shader::GBuffer::new(&mut wgpu_renderer, 
+        let g_buffer = deferred_color_shader::GBuffer::new(wgpu_renderer, 
             &g_buffer_bind_group_layout,
             surface_width, 
             surface_height);
 
         // entity_buffer
-        let entity_buffer = deferred_color_shader::EntityBuffer::new(&mut wgpu_renderer, 
+        let entity_buffer = deferred_color_shader::EntityBuffer::new(wgpu_renderer, 
             surface_width, 
             surface_height);
 
@@ -114,8 +109,8 @@ impl Renderer {
         let sensitivity_scroll = 1.0;
         let camera_controller = super::camera_controller::CameraController::new(speed, sensitivity, sensitivity_scroll);
 
-        let width = wgpu_renderer.config().width;
-        let height = wgpu_renderer.config().height;
+        let width = wgpu_renderer.surface_width();
+        let height = wgpu_renderer.surface_height();
         let fovy = cgmath::Deg(45.0);
         let znear = 0.1;
         let zfar = 100.0;
@@ -135,8 +130,6 @@ impl Renderer {
         camera_uniform_orthographic_buffer.update(wgpu_renderer.queue(), camera_uniform_orthographic);   // add uniform identity matrix
         
         Self {
-            wgpu_renderer,
-
             _pipeline_color: pipeline_color,
             pipeline_lines,
 
@@ -181,32 +174,32 @@ impl Renderer {
         camera.pitch = pitch;
     }
 
-    pub fn resize(&mut self, new_size: winit::dpi::PhysicalSize<u32>) {
+    pub fn resize(&mut self, renderer_interface: &mut dyn WgpuRendererInterface, new_size: winit::dpi::PhysicalSize<u32>) {
         // self.size = new_size;
         
         self.projection.resize(new_size.width, new_size.height);
-        self.wgpu_renderer.resize(new_size);
-        self.g_buffer = GBuffer::new(&mut self.wgpu_renderer,
+        // self.wgpu_renderer.resize(new_size);
+        self.g_buffer = GBuffer::new(renderer_interface,
             &self.g_buffer_bind_group_layout,
             new_size.width,
             new_size.height);
-        self.entity_buffer = EntityBuffer::new(&mut self.wgpu_renderer, 
+        self.entity_buffer = EntityBuffer::new(renderer_interface, 
             new_size.width, 
             new_size.height);
     
         self.camera_uniform_orthographic.resize_orthographic(new_size.width, new_size.height);
-        self.camera_uniform_orthographic_buffer.update(self.wgpu_renderer.queue(), self.camera_uniform_orthographic);
+        self.camera_uniform_orthographic_buffer.update(renderer_interface.queue(), self.camera_uniform_orthographic);
     }
 
-    pub fn update(&mut self, dt: instant::Duration) {
+    pub fn update(&mut self, renderer_interface: &mut dyn WgpuRendererInterface, dt: instant::Duration) {
 
         // camera
         self.camera_controller.update_camera(&mut self.camera, dt);
         self.camera_uniform.update_view_proj(&self.camera, &self.projection);
-        self.camera_uniform_buffer.update(self.wgpu_renderer.queue(), self.camera_uniform);
+        self.camera_uniform_buffer.update(renderer_interface.queue(), self.camera_uniform);
     }
 
-    pub fn process_keyboard(&mut self, key: VirtualKeyCode, state: ElementState) -> bool 
+    pub fn process_keyboard(&mut self, key: winit::keyboard::KeyCode, state: ElementState) -> bool 
     {
         self.camera_controller.process_keyboard(key, state)
     }
@@ -218,6 +211,7 @@ impl Renderer {
 
 
     fn render_deferred(&self, 
+        renderer_interface: &mut dyn WgpuRendererInterface,
         view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
         meshes: & [&dyn DeferredShaderDraw],
@@ -236,7 +230,7 @@ impl Renderer {
                         b: 0.03,
                         a: 1.0,
                     }),
-                    store: true,
+                    store: wgpu::StoreOp::default(),
                 }
             }),
             Some(wgpu::RenderPassColorAttachment {
@@ -249,7 +243,7 @@ impl Renderer {
                         b: 1.0,
                         a: 1.0,
                     }),
-                    store: true,
+                    store: wgpu::StoreOp::default(),
                 }
             }),
             Some(wgpu::RenderPassColorAttachment {
@@ -262,7 +256,7 @@ impl Renderer {
                         b: 1.0,
                         a: 1.0,
                     }),
-                    store: true,
+                    store: wgpu::StoreOp::default(),
                 }
             }),
             Some(wgpu::RenderPassColorAttachment {
@@ -275,7 +269,7 @@ impl Renderer {
                         b: 1.0,
                         a: 1.0,
                     }),
-                    store: true,
+                    store: wgpu::StoreOp::default(),
                 }
             }),
             Some(wgpu::RenderPassColorAttachment {
@@ -288,18 +282,20 @@ impl Renderer {
                         b: 1.0,
                         a: 1.0,
                     }),
-                    store: true,
+                    store: wgpu::StoreOp::default(),
                 }
             }),
             ], 
             depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
-                view: self.wgpu_renderer.get_depth_texture_view(),
+                view: renderer_interface.get_depth_texture_view(),
                 depth_ops: Some(wgpu::Operations {
                     load: wgpu::LoadOp::Clear(1.0),
-                    store: true,
+                    store: wgpu::StoreOp::default(),
                 }),
                 stencil_ops: None,
-            }) 
+            }),
+            timestamp_writes: None,
+            occlusion_query_set: None, 
         });
 
         self.pipeline_deferred_color.bind(&mut render_pass);
@@ -312,6 +308,7 @@ impl Renderer {
     }
 
     fn render_light(&self, 
+        renderer_interface: &mut dyn WgpuRendererInterface,
         view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
         meshes: & [&dyn DeferredLightShaderDraw],
@@ -330,18 +327,20 @@ impl Renderer {
                         b: 0.03,
                         a: 1.0,
                     }),
-                    store: true,
+                    store: wgpu::StoreOp::default(),
                 }
             })], 
             depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
-                view: self.wgpu_renderer.get_depth_texture_view(),
+                view: renderer_interface.get_depth_texture_view(),
                 depth_ops: Some(wgpu::Operations {
                     // load: wgpu::LoadOp::Load,
                     load: wgpu::LoadOp::Clear(1.0),
-                    store: true,
+                    store: wgpu::StoreOp::default(),
                 }),
                 stencil_ops: None,
-            }) 
+            }),
+            timestamp_writes: None,
+            occlusion_query_set: None, 
         });
 
         // lights
@@ -355,6 +354,7 @@ impl Renderer {
     }
 
     fn render_forward(&self, 
+        renderer_interface: &mut dyn WgpuRendererInterface,
         view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
         textured_meshes: & impl VertexTextureShaderDraw,
@@ -368,17 +368,19 @@ impl Renderer {
                 resolve_target: None,
                 ops: wgpu::Operations {
                     load: wgpu::LoadOp::Load,
-                    store: true,
+                    store: wgpu::StoreOp::default(),
                 }
             })], 
             depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
-                view: self.wgpu_renderer.get_depth_texture_view(),
+                view: renderer_interface.get_depth_texture_view(),
                 depth_ops: Some(wgpu::Operations {
                     load: wgpu::LoadOp::Load,
-                    store: true,
+                    store: wgpu::StoreOp::default(),
                 }),
                 stencil_ops: None,
-            }) 
+            }),
+            timestamp_writes: None,
+            occlusion_query_set: None, 
         });
 
         // performance monitor
@@ -393,19 +395,20 @@ impl Renderer {
     }
 
 
-    pub fn read_entity_index(&mut self, y: u32, x: u32) -> u32 
+    pub fn read_entity_index(&mut self, renderer_interface: &mut dyn WgpuRendererInterface, y: u32, x: u32) -> u32 
     {
         {
             let buffer_slice = self.entity_buffer.map_buffer_async();
 
             // must wait for the device to finish before the data can be used
-            self.wgpu_renderer.device().poll(wgpu::Maintain::Wait);
+            renderer_interface.device().poll(wgpu::Maintain::Wait);
 
             buffer_slice.get(y, x)
         }
     }
 
     pub fn render(&mut self, 
+        renderer_interface: &mut dyn WgpuRendererInterface,
         // deferred: & impl DeferredShaderDraw,
         // deferred_light: & impl DeferredLightShaderDraw, 
         deferred_combined: & (impl DeferredShaderDraw + DeferredLightShaderDraw), 
@@ -413,31 +416,31 @@ impl Renderer {
         performance_monitor: &mut PerformanceMonitor) -> Result<(), wgpu::SurfaceError>
     {
         performance_monitor.watch.start(0);
-        let output = self.wgpu_renderer.get_current_texture()?;
+        let output = renderer_interface.get_current_texture()?;
         performance_monitor.watch.stop(0);
 
         performance_monitor.watch.start(1);
 
         let view: wgpu::TextureView = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
 
-        let mut encoder: wgpu::CommandEncoder = self.wgpu_renderer.device().create_command_encoder(&wgpu::CommandEncoderDescriptor{
+        let mut encoder: wgpu::CommandEncoder = renderer_interface.device().create_command_encoder(&wgpu::CommandEncoderDescriptor{
             label: Some("Render Encoder"),
         });
 
         // draw
-        self.render_deferred(&view, &mut encoder, &[deferred_combined]);
-        self.render_light(&view, &mut encoder, &[deferred_combined]);
-        self.render_forward(&view, &mut encoder, mesh_textured_gui, performance_monitor);
+        self.render_deferred(renderer_interface, &view, &mut encoder, &[deferred_combined]);
+        self.render_light(renderer_interface, &view, &mut encoder, &[deferred_combined]);
+        self.render_forward(renderer_interface, &view, &mut encoder, mesh_textured_gui, performance_monitor);
 
         // copy entity texture
         self.entity_buffer.copy_texture_to_buffer(&mut encoder);
 
 
-        self.wgpu_renderer.queue().submit(std::iter::once(encoder.finish()));
+        renderer_interface.queue().submit(std::iter::once(encoder.finish()));
         output.present();
 
         // wait to see how high the gpu load is
-        self.wgpu_renderer.device().poll(wgpu::Maintain::Wait); 
+        renderer_interface.device().poll(wgpu::Maintain::Wait); 
 
         performance_monitor.watch.stop(1);
         

@@ -12,7 +12,7 @@ pub struct BaseFactoryMesh {
 }
 
 impl BaseFactoryMesh {
-    pub fn new(wgpu_renderer: &mut impl WgpuRendererInterface, 
+    pub fn new(wgpu_renderer: &mut dyn WgpuRendererInterface, 
         base_factory: &BaseFactory) -> Self 
     {
         let scale = 10.0;

@@ -12,7 +12,7 @@ pub struct PerformanceMonitor
 }
 
 impl PerformanceMonitor {
-    pub fn new(wgpu_renderer: &mut impl WgpuRendererInterface) -> Self 
+    pub fn new(wgpu_renderer: &mut dyn WgpuRendererInterface) -> Self 
     {
         
         let watch: performance_monitor::Watch<WATCHPOINTS_SIZE> = performance_monitor::Watch::new(); 
@@ -39,7 +39,7 @@ impl PerformanceMonitor {
         }
     }
 
-    pub fn update(&mut self, wgpu_renderer: &mut impl WgpuRendererInterface)
+    pub fn update(&mut self, wgpu_renderer: &mut dyn WgpuRendererInterface)
     {
         self.watch.update();
         self.watch.update_viewer(&mut self.graph_host);

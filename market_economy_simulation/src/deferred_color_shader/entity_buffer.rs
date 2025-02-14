@@ -25,7 +25,7 @@ pub struct EntityBuffer {
 impl EntityBuffer {
     pub const FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Rgba8Unorm;
 
-    pub fn new(wgpu_renderer: &mut impl WgpuRendererInterface, 
+    pub fn new(wgpu_renderer: &mut dyn WgpuRendererInterface, 
         // entity_buffer_bind_group_layout: &EntityBufferBindGroupLayout,
         surface_width: u32, surface_height: u32,
     ) -> Self
