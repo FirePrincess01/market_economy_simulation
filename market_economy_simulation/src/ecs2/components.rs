@@ -132,6 +132,7 @@ impl Resources2 {
     pub fn new(blues2: Blues) -> Self { Self { blues2 } }
 }
 
+#[allow(unused)]
 pub struct Agents {
     pub agent_blue: AgentsBlue, 
 }

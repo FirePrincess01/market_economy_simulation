@@ -1,6 +1,7 @@
 
 use super::Component;
 
+#[allow(unused)]
 pub struct ColoredMesh {
     pub entity_index: usize,
 

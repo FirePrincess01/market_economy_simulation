@@ -6,7 +6,7 @@ use wgpu_renderer::vertex_color_shader::Color as Color;
 
 use crate::deferred_color_shader;
 
-
+#[allow(unused)]
 pub struct Quad {
     pub vertices: Vec<Vertex>,
     pub colors: Vec<Color>,

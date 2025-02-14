@@ -5,6 +5,7 @@ use wgpu_renderer::renderer::WgpuRendererInterface;
 
 use crate::deferred_light_shader::GBufferBindGroupLayout;
 
+#[allow(unused)]
 pub struct GBufferTexture {
     pub texture: wgpu::Texture,
     pub view: wgpu::TextureView,

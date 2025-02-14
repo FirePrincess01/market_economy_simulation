@@ -4,7 +4,7 @@ use crate::{ground_plane::{GroundPlane, GroundResource, Location}, base_factory:
 
 use super::{entity::Entity, components::Agents, Blues, Resources2, AgentsBlue, };
 
-
+#[allow(unused)]
 pub struct World {
     pub entities: Vec<Entity>,
 
