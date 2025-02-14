@@ -2,9 +2,10 @@
 
 use wgpu_renderer::renderer::WgpuRendererInterface;
 
-use crate::{ground_plane::GroundPlaneMesh, ecs2::World, deferred_color_shader::DeferredShaderDraw, deferred_light_shader::DeferredLightShaderDraw, base_factory::BaseFactoryMesh};
-
-
+use crate::{
+    base_factory::BaseFactoryMesh, deferred_color_shader::DeferredShaderDraw,
+    deferred_light_shader::DeferredLightShaderDraw, ecs2::World, ground_plane::GroundPlaneMesh,
+};
 
 pub struct WorldMesh {
     ground_plane_mesh: GroundPlaneMesh,
@@ -12,22 +13,14 @@ pub struct WorldMesh {
 }
 
 impl WorldMesh {
-    pub fn new(wgpu_renderer: &mut impl WgpuRendererInterface, 
-        world: &World,
-    ) -> Self
-    {
+    pub fn new(wgpu_renderer: &mut dyn WgpuRendererInterface, world: &World) -> Self {
         let scale = 10.0;
 
         // ground plane mesh
-        let ground_plane_mesh = GroundPlaneMesh::new(
-            wgpu_renderer, 
-            &world.ground_plane,
-            scale);
-        
+        let ground_plane_mesh = GroundPlaneMesh::new(wgpu_renderer, &world.ground_plane, scale);
+
         // base factory mesh
-        let base_factory_mesh = BaseFactoryMesh::new(
-            wgpu_renderer, 
-            &world.base_factory);
+        let base_factory_mesh = BaseFactoryMesh::new(wgpu_renderer, &world.base_factory);
 
         Self {
             ground_plane_mesh,
@@ -35,7 +28,6 @@ impl WorldMesh {
         }
     }
 }
-
 
 impl DeferredShaderDraw for WorldMesh {
     fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {

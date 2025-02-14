@@ -2,16 +2,15 @@
 //!
 
 use super::DeferredShaderDraw;
-use super::Vertex;
 use super::Instance;
+use super::Vertex;
 
-use super::VertexBuffer;
 use super::IndexBuffer;
 use super::InstanceBuffer;
+use super::VertexBuffer;
 
 /// A general purpose shader using vertices, colors and an instance matrix
-pub struct Mesh
-{
+pub struct Mesh {
     vertex_buffer: VertexBuffer,
     index_buffer: IndexBuffer,
     instance_buffer: InstanceBuffer,
@@ -20,13 +19,13 @@ pub struct Mesh
 }
 
 #[allow(dead_code)]
-impl Mesh
-{
-    pub fn new(device: &wgpu::Device, 
+impl Mesh {
+    pub fn new(
+        device: &wgpu::Device,
         vertices: &[Vertex],
         indices: &[u32],
-        instances: &[Instance]) -> Self
-    {
+        instances: &[Instance],
+    ) -> Self {
         let vertex_buffer = VertexBuffer::new(device, vertices);
         let index_buffer = IndexBuffer::new(device, indices);
 
@@ -44,18 +43,15 @@ impl Mesh
         }
     }
 
-    pub fn update_vertex_buffer(&mut self, queue: &wgpu::Queue, vertices: &[Vertex])
-    {   
+    pub fn update_vertex_buffer(&mut self, queue: &wgpu::Queue, vertices: &[Vertex]) {
         self.vertex_buffer.update(queue, vertices);
     }
 
-    pub fn update_instance_buffer(&mut self, queue: &wgpu::Queue, instances: &[Instance])
-    {
+    pub fn update_instance_buffer(&mut self, queue: &wgpu::Queue, instances: &[Instance]) {
         self.instance_buffer.update(queue, instances);
         self.nr_instances = u32::min(instances.len() as u32, self.max_instances);
     }
 }
-
 
 impl DeferredShaderDraw for Mesh {
     fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {

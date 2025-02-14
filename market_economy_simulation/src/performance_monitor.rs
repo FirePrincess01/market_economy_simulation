@@ -1,9 +1,12 @@
-use wgpu_renderer::{performance_monitor, vertex_color_shader::{self, VertexColorShaderDraw}, renderer::WgpuRendererInterface};
+use wgpu_renderer::{
+    performance_monitor,
+    renderer::WgpuRendererInterface,
+    vertex_color_shader::{self, VertexColorShaderDraw},
+};
 
-const WATCHPOINTS_SIZE: usize  = 5;
+const WATCHPOINTS_SIZE: usize = 5;
 
-pub struct PerformanceMonitor 
-{
+pub struct PerformanceMonitor {
     pub watch: performance_monitor::Watch<5>,
     graph_host: performance_monitor::Graph,
     graph_device: vertex_color_shader::Mesh,
@@ -12,12 +15,10 @@ pub struct PerformanceMonitor
 }
 
 impl PerformanceMonitor {
-    pub fn new(wgpu_renderer: &mut impl WgpuRendererInterface) -> Self 
-    {
-        
-        let watch: performance_monitor::Watch<WATCHPOINTS_SIZE> = performance_monitor::Watch::new(); 
+    pub fn new(wgpu_renderer: &mut dyn WgpuRendererInterface) -> Self {
+        let watch: performance_monitor::Watch<WATCHPOINTS_SIZE> = performance_monitor::Watch::new();
         let graph_host = performance_monitor::Graph::new(WATCHPOINTS_SIZE);
-        let graph_instance = vertex_color_shader::Instance{
+        let graph_instance = vertex_color_shader::Instance {
             position: glam::Vec3::ZERO,
             rotation: glam::Quat::IDENTITY,
         };
@@ -39,17 +40,17 @@ impl PerformanceMonitor {
         }
     }
 
-    pub fn update(&mut self, wgpu_renderer: &mut impl WgpuRendererInterface)
-    {
+    pub fn update(&mut self, wgpu_renderer: &mut dyn WgpuRendererInterface) {
         self.watch.update();
         self.watch.update_viewer(&mut self.graph_host);
-        self.graph_device.update_vertex_buffer(wgpu_renderer.queue(), self.graph_host.vertices.as_slice());
+        self.graph_device
+            .update_vertex_buffer(wgpu_renderer.queue(), self.graph_host.vertices.as_slice());
     }
 }
 
 impl VertexColorShaderDraw for PerformanceMonitor {
     fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
-        if self.show{
+        if self.show {
             self.graph_device.draw(render_pass);
         }
     }

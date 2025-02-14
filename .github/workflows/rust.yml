@@ -27,10 +27,10 @@ jobs:
     - name: Build Release
       run: cargo build --release --verbose
 
-    - uses: actions/upload-artifact@v3
-      with:
-        name: market_economy_simulation_ubuntu
-        path: target/release/app # or path/to/artifact
+    # - uses: actions/upload-artifact@v3
+    #   with:
+    #     name: market_economy_simulation_ubuntu
+    #     path: target/release/app # or path/to/artifact
 
 
   build_windows:
@@ -50,7 +50,7 @@ jobs:
     - name: Build Release
       run: cargo build --release --verbose
 
-    - uses: actions/upload-artifact@v3
-      with:
-        name: market_economy_simulation_windows
-        path: target/release/app.exe # or path/to/artifact
+    # - uses: actions/upload-artifact@v3
+    #   with:
+    #     name: market_economy_simulation_windows
+    #     path: target/release/app.exe # or path/to/artifact

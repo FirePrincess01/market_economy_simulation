@@ -11,7 +11,6 @@ pub struct Instance {
 
 impl Instance {
     pub fn new() -> Self {
-
         Self {
             position: [0.0, 0.0, 0.0],
             color: [0.0, 0.0, 0.0],

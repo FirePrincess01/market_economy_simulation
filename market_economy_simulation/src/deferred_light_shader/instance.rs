@@ -1,8 +1,6 @@
 //! Contains the position and the of an object
 //!
 
-
-
 #[repr(C)]
 #[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct Instance {
@@ -12,7 +10,6 @@ pub struct Instance {
 
 impl Instance {
     pub fn new() -> Self {
-
         Self {
             position: [0.0, 0.0, 0.0],
             intensity: [0.0, 0.0, 0.0],

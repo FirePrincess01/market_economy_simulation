@@ -1,16 +1,7 @@
-
-
-
 use super::ecs::{
-    World,
-    Entity,
-    component::LiveStates,
-    component::FarmStates,
-    component::HouseStates,
-    component::ColoredMesh,
-    component::Position,
+    component::ColoredMesh, component::FarmStates, component::HouseStates, component::LiveStates,
+    component::Position, Entity, World,
 };
-
 
 pub fn _create_agent(world: &mut World) {
     let entity_index = world.add_entity(Entity::new());

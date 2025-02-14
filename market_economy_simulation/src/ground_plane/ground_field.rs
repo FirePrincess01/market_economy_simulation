@@ -2,7 +2,6 @@
 
 use crate::ecs2::EntityInterface;
 
-
 #[derive(Copy, Clone, PartialEq)]
 pub enum GroundResource {
     None,

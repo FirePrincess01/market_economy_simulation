@@ -15,8 +15,7 @@ pub struct Mesh {
 }
 
 impl Mesh {
-    pub fn new() -> Self 
-    {
+    pub fn new() -> Self {
         Self {
             vertices: Vec::new(),
             normals: Vec::new(),
@@ -24,8 +23,7 @@ impl Mesh {
         }
     }
 
-    pub fn add(&mut self, other: &impl MeshInterface) 
-    {
+    pub fn add(&mut self, other: &impl MeshInterface) {
         let indices_base = self.vertices.len() as u32;
 
         for elem in other.vertices() {

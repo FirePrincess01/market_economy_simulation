@@ -1,6 +1,5 @@
 //! Unit tests
 
-
 use super::*;
 
 pub fn create_position(world: &mut World) {
@@ -9,17 +8,13 @@ pub fn create_position(world: &mut World) {
     world.add(entity_index, Position::new());
 }
 
-
 #[test]
-fn simple() -> Result<(), String> 
-{
+fn simple() -> Result<(), String> {
     let mut world = super::World::new();
 
     create_position(&mut world);
 
-    let iter = World::filter(&world.entities, 
-        &mut world.positions, 
-        &world.meshes);
+    let iter = World::filter(&world.entities, &mut world.positions, &world.meshes);
 
     for (pos, _mesh) in iter {
         pos.pos[0] = 1.0;

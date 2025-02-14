@@ -1,18 +1,16 @@
-
 use super::Component;
 
+#[allow(unused)]
 pub struct ColoredMesh {
     pub entity_index: usize,
 
     pub mesh_index: usize,
-
     // mesh: vertex_color_shader::Mesh,
 }
 
 #[allow(dead_code)]
 impl ColoredMesh {
-    pub fn new(mesh_index: usize) -> Self 
-    {
+    pub fn new(mesh_index: usize) -> Self {
         Self {
             entity_index: 0,
             mesh_index,
@@ -21,7 +19,6 @@ impl ColoredMesh {
 }
 
 impl Component for ColoredMesh {
-
     fn get_entity_index(&self) -> usize {
         self.entity_index
     }
@@ -30,7 +27,6 @@ impl Component for ColoredMesh {
         self.entity_index = entity_index;
     }
 
-
     fn get_value_index(entity: &crate::ecs::Entity) -> Option<usize> {
         entity.mesh
     }
@@ -38,7 +34,6 @@ impl Component for ColoredMesh {
     fn set_value_index(entity: &mut crate::ecs::Entity, value_index: Option<usize>) {
         entity.mesh = value_index;
     }
-
 
     fn move_to_world(self, world: &mut crate::ecs::World) -> usize {
         let index = world.meshes.len();
