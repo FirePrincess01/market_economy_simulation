@@ -9,7 +9,9 @@ mod ground_plane;
 mod performance_monitor;
 mod renderer;
 mod world_mesh;
+mod animated_object;
 
+use animated_object::{animated_object_renderer::AnimatedObjectRenderer, wgpu_animated_object_renderer::{WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage}};
 use rusttype;
 use wgpu_renderer::{
     default_application::{DefaultApplication, DefaultApplicationInterface},
@@ -28,6 +30,9 @@ struct MarketEconomySimulation {
     renderer: renderer::Renderer,
     _world: ecs2::World,
     world_mesh: world_mesh::WorldMesh,
+
+    // spider: deferred_color_shader::Mesh,
+    animated_object_storage: WgpuAnimatedObjectStorage,
 
     // performance monitor
     performance_monitor: performance_monitor::PerformanceMonitor,
@@ -67,6 +72,8 @@ impl MarketEconomySimulation {
         // world mesh
         let world_mesh = world_mesh::WorldMesh::new(renderer_interface, &world);
 
+        let mut animated_object_storage = WgpuAnimatedObjectStorage::new();
+
         // performance monitor
         let performance_monitor = performance_monitor::PerformanceMonitor::new(renderer_interface);
 
@@ -79,12 +86,22 @@ impl MarketEconomySimulation {
         let mut entity_index_instance = vertex_texture_shader::Instance::zero();
         entity_index_instance.position.x = 20.0;
         entity_index_instance.position.y = 120.0;
+        
         let entity_index_mesh = wgpu_renderer::label::LabelMesh::new(
             renderer_interface,
             entity_index_label.get_image(),
             &renderer.texture_bind_group_layout,
             &entity_index_instance,
         );
+
+        // create spider
+        let mut animated_object_renderer = WgpuAnimatedObjectRenderer {
+            storage: &mut animated_object_storage,
+            wgpu_renderer: renderer_interface,
+        };
+
+        let spider_xml = include_str!("../res/spider_0_1.dae");
+        animated_object_renderer.from_collada(spider_xml);
 
         Self {
             size,
@@ -94,6 +111,8 @@ impl MarketEconomySimulation {
 
             _world: world,
             world_mesh,
+
+            animated_object_storage,
 
             performance_monitor,
 
@@ -237,6 +256,7 @@ impl<'a> DefaultApplicationInterface for MarketEconomySimulation {
         self.renderer.render(
             renderer_interface,
             &self.world_mesh,
+            &self.animated_object_storage,
             &self.entity_index_mesh,
             &mut self.performance_monitor,
         )

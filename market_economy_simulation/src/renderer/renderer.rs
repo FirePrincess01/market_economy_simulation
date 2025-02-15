@@ -1,6 +1,7 @@
 //! Renders everything
 //!
 
+use crate::animated_object::wgpu_animated_object_renderer::WgpuAnimatedObjectStorage;
 use crate::deferred_color_shader::{self, DeferredShaderDraw, EntityBuffer, GBuffer};
 use crate::deferred_light_shader::DeferredLightShaderDraw;
 use crate::performance_monitor::PerformanceMonitor;
@@ -231,6 +232,7 @@ impl Renderer {
         view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
         meshes: &[&dyn DeferredShaderDraw],
+        animated_object_storage: &WgpuAnimatedObjectStorage,
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Deferred Render Pass"),
@@ -320,6 +322,11 @@ impl Renderer {
         for mesh in meshes {
             mesh.draw(&mut render_pass);
         }
+
+        for object in &animated_object_storage.elements {
+            object.mesh.draw(&mut render_pass);
+        }
+
     }
 
     fn render_light(
@@ -433,6 +440,8 @@ impl Renderer {
         // deferred: & impl DeferredShaderDraw,
         // deferred_light: & impl DeferredLightShaderDraw,
         deferred_combined: &(impl DeferredShaderDraw + DeferredLightShaderDraw),
+        animated_object_storage: &WgpuAnimatedObjectStorage,
+
         mesh_textured_gui: &impl VertexTextureShaderDraw,
         performance_monitor: &mut PerformanceMonitor,
     ) -> Result<(), wgpu::SurfaceError> {
@@ -459,6 +468,7 @@ impl Renderer {
             &view,
             &mut encoder,
             &[deferred_combined],
+            animated_object_storage
         );
         self.render_light(
             renderer_interface,
