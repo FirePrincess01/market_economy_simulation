@@ -2,6 +2,7 @@ mod base_factory;
 mod create_entities;
 mod deferred_color_shader;
 mod deferred_light_shader;
+mod deferred_animation_shader;
 mod ecs;
 mod ecs2;
 mod geometry;
