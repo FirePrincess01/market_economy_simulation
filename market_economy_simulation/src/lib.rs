@@ -100,7 +100,8 @@ impl MarketEconomySimulation {
             wgpu_renderer: renderer_interface,
         };
 
-        let spider_xml = include_str!("../res/spider_0_1.dae");
+        // let spider_xml = include_str!("../res/spider_0_1.dae");
+        let spider_xml = include_str!("../res/test_blender_3_0_1.dae");
         animated_object_renderer.from_collada(spider_xml);
 
         Self {

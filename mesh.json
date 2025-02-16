@@ -1,0 +1,242 @@
+BoxyWorm
+
+vertices len: 16
+
+tex_vertices len: 84
+
+normals len: 19
+
+indices len: 28
+
+tex_indices len: 28
+normal_indices len: 28
+
+material: Some("Material-material")
+
+joint_weights len: 16
+joint_weights: [
+    JointWeights {
+        joints: [
+            0,
+            1,
+            3,
+            0,
+        ],
+        weights: [
+            0.000485241,
+            0.000485241,
+            0.9990295,
+            0.0,
+        ],
+    },
+    JointWeights {
+        joints: [
+            3,
+            0,
+            0,
+            0,
+        ],
+        weights: [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+        ],
+    },
+    JointWeights {
+        joints: [
+            0,
+            1,
+            3,
+            0,
+        ],
+        weights: [
+            7.05123e-5,
+            7.05123e-5,
+            0.999859,
+            0.0,
+        ],
+    },
+    JointWeights {
+        joints: [
+            3,
+            0,
+            0,
+            0,
+        ],
+        weights: [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+        ],
+    },
+    JointWeights {
+        joints: [
+            0,
+            1,
+            3,
+            0,
+        ],
+        weights: [
+            1.37985e-5,
+            1.37985e-5,
+            0.9999724,
+            0.0,
+        ],
+    },
+    JointWeights {
+        joints: [
+            0,
+            1,
+            3,
+            0,
+        ],
+        weights: [
+            0.003690063,
+            0.003690063,
+            0.9926198,
+            0.0,
+        ],
+    },
+    JointWeights {
+        joints: [
+            1,
+            3,
+            0,
+            0,
+        ],
+        weights: [
+            0.000457287,
+            0.9995427,
+            0.0,
+            0.0,
+        ],
+    },
+    JointWeights {
+        joints: [
+            3,
+            0,
+            0,
+            0,
+        ],
+        weights: [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+        ],
+    },
+    JointWeights {
+        joints: [
+            1,
+            0,
+            0,
+            0,
+        ],
+        weights: [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+        ],
+    },
+    JointWeights {
+        joints: [
+            1,
+            0,
+            0,
+            0,
+        ],
+        weights: [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+        ],
+    },
+    JointWeights {
+        joints: [
+            1,
+            0,
+            0,
+            0,
+        ],
+        weights: [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+        ],
+    },
+    JointWeights {
+        joints: [
+            1,
+            0,
+            0,
+            0,
+        ],
+        weights: [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+        ],
+    },
+    JointWeights {
+        joints: [
+            1,
+            0,
+            0,
+            0,
+        ],
+        weights: [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+        ],
+    },
+    JointWeights {
+        joints: [
+            1,
+            0,
+            0,
+            0,
+        ],
+        weights: [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+        ],
+    },
+    JointWeights {
+        joints: [
+            1,
+            0,
+            0,
+            0,
+        ],
+        weights: [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+        ],
+    },
+    JointWeights {
+        joints: [
+            1,
+            0,
+            0,
+            0,
+        ],
+        weights: [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+        ],
+    },
+]

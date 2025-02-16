@@ -433,8 +433,6 @@ dependencies = [
 [[package]]
 name = "collada"
 version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0bfe6d0cf36d1c6f4573008242fce662102973f461d830a76b0b418355c09804"
 dependencies = [
  "RustyXML",
  "log",

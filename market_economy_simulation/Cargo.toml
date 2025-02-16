@@ -33,7 +33,8 @@ log = "0.4"
 bytemuck = { version = "1.12", features = [ "derive" ] }
 rusttype = "0.9"
 fastrand = "2.0"
-collada = "0.15.0"
+# collada = "0.15.0"
+collada = { path = "../piston_collada" }
 
 # [dependencies.image]
 # version = "0.24"

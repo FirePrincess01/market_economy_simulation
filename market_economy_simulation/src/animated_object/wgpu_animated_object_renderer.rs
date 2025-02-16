@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use collada::document::ColladaDocument;
 
 use crate::{
@@ -48,14 +50,11 @@ pub struct WgpuAnimatedObjectRenderer<'a> {
     // pub texture_bind_group_layout: &'a wgpu_renderer::vertex_texture_shader::TextureBindGroupLayout,
 }
 
-impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
-    fn from_collada(
+impl<'a> WgpuAnimatedObjectRenderer<'a> {
+    fn create_mesh(
         &mut self,
-        xml_string: &str,
-    ) -> super::animated_object_renderer::AnimatedObjectRendererResult {
-        let collada_document = ColladaDocument::from_str(xml_string).unwrap();
-
-        let obj_set = collada_document.get_obj_set().unwrap();
+        obj_set: &collada::ObjSet,
+    ) -> (deferred_color_shader::Instance, deferred_color_shader::Mesh) {
         let obj = &obj_set.objects[0];
 
         let id = &obj.id;
@@ -75,10 +74,14 @@ impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
         match mesh {
             collada::PrimitiveElement::Polylist(polylist) => todo!(),
             collada::PrimitiveElement::Triangles(triangles) => {
-                let indices = &triangles.vertices;
-                let tex_indices = triangles.tex_vertices.as_ref().unwrap();
-                let normal_indices = triangles.normals.as_ref().unwrap();
-                let material = &triangles.material;
+                let indices: &Vec<(usize, usize, usize)> = &triangles.vertices;
+                let tex_indices: &Vec<(usize, usize, usize)> = triangles.tex_vertices.as_ref().unwrap();
+                let normal_indices: &Vec<(usize, usize, usize)> = triangles.normals.as_ref().unwrap();
+                let material: &Option<String> = &triangles.material;
+
+                println!("********");
+                println!("mesh");
+                println!("********");
 
                 println!("");
                 println!("{}", name);
@@ -102,13 +105,18 @@ impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
                 println!("");
                 println!("tex_indices len: {:?}", tex_indices.len());
                 // println!("tex_indices: {:?}", tex_indices);
-                println!("");
 
                 println!("normal_indices len: {:?}", normal_indices.len());
                 // println!("normal_indices: {:?}", normal_indices);
-                println!("");
 
+                println!("");
                 println!("material: {:?}", material);
+
+                println!("");
+                println!("joint_weights len: {:?}", joint_weights.len());
+                println!("joint_weights: {:#?}", joint_weights);
+
+                println!("");
 
                 assert!(normal_indices.len() == indices.len());
                 assert!(tex_indices.len() == indices.len());
@@ -171,6 +179,69 @@ impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
             &[instance],
         );
 
+        (instance, mesh)
+    }
+
+    fn create_skeleton(&mut self, skeleton: &collada::Skeleton) {
+        let joints = &skeleton.joints;
+        let bind_poses = &skeleton.bind_poses;
+
+        println!("********");
+        println!("Skeleton");
+        println!("********");
+
+        println!("");
+        println!("joints len: {:?}", joints.len());
+        println!("joints: {:?}", joints);
+
+        println!("");
+        println!("bind_poses len: {:?}", bind_poses.len());
+        println!("bind_poses: {:?}", bind_poses);
+    }
+
+    fn create_animation(&mut self, animation: &collada::Animation) {
+
+        let target = &animation.target;
+        let sample_times = &animation.sample_times;
+        let sample_poses = &animation.sample_poses;
+
+        println!("********");
+        println!("Animation");
+        println!("********");
+
+        println!("");
+        println!("target {:}", target);
+
+        println!("");
+        println!("sample_times len: {:?}", sample_times.len());
+        println!("sample_times: {:?}", sample_times);
+
+        println!("");
+        println!("sample_poses len: {:?}", sample_poses.len());
+        println!("sample_poses: {:?}", sample_poses);
+    }
+
+}
+
+impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
+    fn from_collada(
+        &mut self,
+        xml_string: &str,
+    ) -> super::animated_object_renderer::AnimatedObjectRendererResult {
+        let collada_document: ColladaDocument = ColladaDocument::from_str(xml_string).unwrap();
+
+        let obj_set: collada::ObjSet = collada_document.get_obj_set().unwrap();
+        let skeletons: Vec<collada::Skeleton> = collada_document.get_skeletons().unwrap();
+        let animations: Vec<collada::Animation> = collada_document.get_animations().unwrap();
+
+        let skeleton0 = &skeletons[0];
+        self.create_skeleton(skeleton0);
+
+        let animation = &animations[0];
+        self.create_animation(animation);
+
+        let (instance, mesh) = self.create_mesh(&obj_set);
+
         let element = AnimatedObject {
             is_visible: true,
             x: 0.0,
@@ -183,7 +254,8 @@ impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
         let render_index = self.storage.elements.len();
         self.storage.elements.push(element);
 
-        AnimatedObjectRendererResult { index: render_index }
+
+        AnimatedObjectRendererResult { index: 0 }
     }
 
     fn set_object_position(&mut self, index: usize, x: f32, y: f32, z: f32) {
@@ -196,7 +268,7 @@ impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
         elem.instance.position[0] = elem.x as f32;
         elem.instance.position[1] = elem.y as f32;
         elem.instance.position[2] = elem.y as f32;
-        elem.mesh.update_instance_buffer(self.wgpu_renderer.queue(), &[elem.instance]);
+        elem.mesh
+            .update_instance_buffer(self.wgpu_renderer.queue(), &[elem.instance]);
     }
-
 }
