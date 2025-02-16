@@ -4,7 +4,7 @@
 // mod deferred_color_shader_draw;
 // mod g_buffer;
 mod mesh;
-// mod pipeline;
+mod pipeline;
 
 mod instance;
 // mod instance_buffer;
@@ -18,7 +18,7 @@ mod vertex;
 // pub use entity_buffer::EntityBuffer;
 // pub use g_buffer::GBuffer;
 pub use mesh::Mesh;
-// pub use pipeline::Pipeline;
+pub use pipeline::Pipeline;
 
 pub use instance::Instance;
 // pub use instance_buffer::InstanceBuffer;
