@@ -11,7 +11,7 @@ use super::VertexBuffer;
 
 /// A general purpose shader using vertices, colors and an instance matrix
 pub struct Mesh {
-    vertex_buffer: VertexBuffer,
+    vertex_buffer: VertexBuffer<Vertex>,
     index_buffer: IndexBuffer,
     instance_buffer: InstanceBuffer,
     max_instances: u32,

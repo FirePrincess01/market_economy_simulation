@@ -1,11 +1,7 @@
-use std::str::FromStr;
-
+use cgmath::Vector3;
 use collada::document::ColladaDocument;
 
-use crate::{
-    deferred_color_shader::{self, DeferredShaderDraw},
-    deferred_light_shader,
-};
+use crate::deferred_animation_shader::{self, DeferredAnimationShaderDraw};
 
 use super::animated_object_renderer::{AnimatedObjectRenderer, AnimatedObjectRendererResult};
 
@@ -17,9 +13,10 @@ pub struct AnimatedObject {
     pub y: f32,
     pub z: f32,
 
-    pub instance: deferred_color_shader::Instance,
+    pub instance: deferred_animation_shader::Instance,
+    pub animation: deferred_animation_shader::AnimationUniform,
 
-    pub mesh: deferred_color_shader::Mesh,
+    pub mesh: deferred_animation_shader::Mesh,
     // pub mes_light: deferred_light_shader::Mesh,
 }
 
@@ -47,6 +44,7 @@ pub struct WgpuAnimatedObjectRenderer<'a> {
     // wgpu renderer
     // pub font: &'a rusttype::Font<'static>,
     pub wgpu_renderer: &'a mut dyn wgpu_renderer::renderer::WgpuRendererInterface,
+    pub animation_bind_group_layout: &'a deferred_animation_shader::AnimationBindGroupLayout,
     // pub texture_bind_group_layout: &'a wgpu_renderer::vertex_texture_shader::TextureBindGroupLayout,
 }
 
@@ -54,7 +52,11 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
     fn create_mesh(
         &mut self,
         obj_set: &collada::ObjSet,
-    ) -> (deferred_color_shader::Instance, deferred_color_shader::Mesh) {
+        animation_uniform: &deferred_animation_shader::AnimationUniform,
+    ) -> (
+        deferred_animation_shader::Instance,
+        deferred_animation_shader::Mesh,
+    ) {
         let obj = &obj_set.objects[0];
 
         let id = &obj.id;
@@ -68,15 +70,17 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
         let smooth_shading = geometry.smooth_shading_group;
         let mesh = &geometry.mesh[0];
 
-        let mut deferred_vertices: Vec<deferred_color_shader::Vertex> = Vec::new();
+        let mut deferred_vertices: Vec<deferred_animation_shader::Vertex> = Vec::new();
         let mut deferred_indices: Vec<u32> = Vec::new();
 
         match mesh {
             collada::PrimitiveElement::Polylist(polylist) => todo!(),
             collada::PrimitiveElement::Triangles(triangles) => {
                 let indices: &Vec<(usize, usize, usize)> = &triangles.vertices;
-                let tex_indices: &Vec<(usize, usize, usize)> = triangles.tex_vertices.as_ref().unwrap();
-                let normal_indices: &Vec<(usize, usize, usize)> = triangles.normals.as_ref().unwrap();
+                let tex_indices: &Vec<(usize, usize, usize)> =
+                    triangles.tex_vertices.as_ref().unwrap();
+                let normal_indices: &Vec<(usize, usize, usize)> =
+                    triangles.normals.as_ref().unwrap();
                 let material: &Option<String> = &triangles.material;
 
                 println!("********");
@@ -114,7 +118,7 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
 
                 println!("");
                 println!("joint_weights len: {:?}", joint_weights.len());
-                println!("joint_weights: {:#?}", joint_weights);
+                println!("joint_weights: {:?}", joint_weights);
 
                 println!("");
 
@@ -130,6 +134,10 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
                     let vertex1 = vertices[indices.1];
                     let vertex2 = vertices[indices.2];
 
+                    let joint0 = joint_weights[indices.0];
+                    let joint1 = joint_weights[indices.1];
+                    let joint2 = joint_weights[indices.2];
+
                     let normal0 = normals[normal_indices.0];
                     let normal1 = normals[normal_indices.1];
                     let normal2 = normals[normal_indices.2];
@@ -142,17 +150,53 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
                     let indices_1 = i * 3 + 1;
                     let indices_2 = i * 3 + 2;
 
-                    let deferred_vertex0 = deferred_color_shader::Vertex {
+                    let deferred_vertex0 = deferred_animation_shader::Vertex {
                         position: [vertex0.x as f32, vertex0.y as f32, vertex0.z as f32],
                         normal: [normal0.x as f32, normal0.y as f32, normal0.z as f32],
+                        joint_indices: [
+                            joint0.joints[0] as u32,
+                            joint0.joints[1] as u32,
+                            joint0.joints[2] as u32,
+                            joint0.joints[3] as u32,
+                        ],
+                        joint_weights: [
+                            joint0.weights[0],
+                            joint0.weights[1],
+                            joint0.weights[2],
+                            joint0.weights[3],
+                        ],
                     };
-                    let deferred_vertex1 = deferred_color_shader::Vertex {
+                    let deferred_vertex1 = deferred_animation_shader::Vertex {
                         position: [vertex1.x as f32, vertex1.y as f32, vertex1.z as f32],
                         normal: [normal1.x as f32, normal1.y as f32, normal1.z as f32],
+                        joint_indices: [
+                            joint1.joints[0] as u32,
+                            joint1.joints[1] as u32,
+                            joint1.joints[2] as u32,
+                            joint1.joints[3] as u32,
+                        ],
+                        joint_weights: [
+                            joint1.weights[0],
+                            joint1.weights[1],
+                            joint1.weights[2],
+                            joint1.weights[3],
+                        ],
                     };
-                    let deferred_vertex2 = deferred_color_shader::Vertex {
+                    let deferred_vertex2 = deferred_animation_shader::Vertex {
                         position: [vertex2.x as f32, vertex2.y as f32, vertex2.z as f32],
                         normal: [normal2.x as f32, normal2.y as f32, normal2.z as f32],
+                        joint_indices: [
+                            joint2.joints[0] as u32,
+                            joint2.joints[1] as u32,
+                            joint2.joints[2] as u32,
+                            joint2.joints[3] as u32,
+                        ],
+                        joint_weights: [
+                            joint2.weights[0],
+                            joint2.weights[1],
+                            joint2.weights[2],
+                            joint2.weights[3],
+                        ],
                     };
 
                     deferred_vertices.push(deferred_vertex0);
@@ -166,15 +210,17 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
             }
         }
 
-        let instance = deferred_color_shader::Instance {
+        let instance = deferred_animation_shader::Instance {
             position: [100.0, 100.0, 10.0],
             color: [0.5, 0.5, 0.8],
             entity: [99, 0, 0],
         };
 
-        let mesh = deferred_color_shader::Mesh::new(
-            self.wgpu_renderer.device(),
+        let mesh = deferred_animation_shader::Mesh::new(
+            self.wgpu_renderer,
+            &self.animation_bind_group_layout,
             &deferred_vertices,
+            &*animation_uniform,
             &deferred_indices,
             &[instance],
         );
@@ -200,7 +246,6 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
     }
 
     fn create_animation(&mut self, animation: &collada::Animation) {
-
         let target = &animation.target;
         let sample_times = &animation.sample_times;
         let sample_poses = &animation.sample_poses;
@@ -220,7 +265,6 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
         println!("sample_poses len: {:?}", sample_poses.len());
         println!("sample_poses: {:?}", sample_poses);
     }
-
 }
 
 impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
@@ -240,7 +284,15 @@ impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
         let animation = &animations[0];
         self.create_animation(animation);
 
-        let (instance, mesh) = self.create_mesh(&obj_set);
+        let mut animation_uniform = deferred_animation_shader::AnimationUniform::zero();
+
+        animation_uniform.joint_transform[1] = cgmath::Matrix4::from_translation(Vector3{
+            x: 2.0,
+            y: 0.0,
+            z: 0.0,
+        }).into();
+
+        let (instance, mesh) = self.create_mesh(&obj_set, &animation_uniform);
 
         let element = AnimatedObject {
             is_visible: true,
@@ -248,12 +300,12 @@ impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
             y: 0.0,
             z: 0.0,
             instance,
+            animation: animation_uniform,
             mesh,
         };
 
         let render_index = self.storage.elements.len();
         self.storage.elements.push(element);
-
 
         AnimatedObjectRendererResult { index: 0 }
     }

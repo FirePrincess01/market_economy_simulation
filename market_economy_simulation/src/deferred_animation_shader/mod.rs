@@ -1,30 +1,25 @@
 //! Deferred shader drawing animated objects
 //!
 
-// mod deferred_color_shader_draw;
-// mod g_buffer;
+mod deferred_animation_shader_draw;
 mod mesh;
 mod pipeline;
 
-mod instance;
-// mod instance_buffer;
 mod vertex;
-// mod vertex_buffer;
+mod animation_bind_group_layout;
+mod animation_uniform_buffer;
+mod animation_uniform;
 
-// mod entity_buffer;
-// mod entity_buffer_slice;
-
-// pub use deferred_color_shader_draw::DeferredShaderDraw;
-// pub use entity_buffer::EntityBuffer;
-// pub use g_buffer::GBuffer;
 pub use mesh::Mesh;
 pub use pipeline::Pipeline;
-
-pub use instance::Instance;
-// pub use instance_buffer::InstanceBuffer;
 pub use vertex::Vertex;
-// pub use vertex_buffer::VertexBuffer;
+pub use animation_uniform::AnimationUniform;
+pub use animation_bind_group_layout::AnimationBindGroupLayout;
+pub use deferred_animation_shader_draw::DeferredAnimationShaderDraw;
+
+pub use super::deferred_color_shader::Instance;
+pub use super::deferred_color_shader::InstanceBuffer;
+pub use super::deferred_color_shader::VertexBuffer;
 
 pub use wgpu_renderer::vertex_color_shader::IndexBuffer;
 
-// pub use wgpu_renderer::vertex_color_shader::CameraBindGroupLayout;

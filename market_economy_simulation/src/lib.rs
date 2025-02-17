@@ -99,6 +99,7 @@ impl MarketEconomySimulation {
         let mut animated_object_renderer = WgpuAnimatedObjectRenderer {
             storage: &mut animated_object_storage,
             wgpu_renderer: renderer_interface,
+            animation_bind_group_layout: &renderer.animation_bind_group_layout,
         };
 
         // let spider_xml = include_str!("../res/spider_0_1.dae");

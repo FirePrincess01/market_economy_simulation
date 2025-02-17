@@ -1,15 +1,30 @@
+
+const MAX_JOINTS: u32 = 4;
+const MAX_JOINT_WEIGHTS: u32 = 4;
+
 // Vertex shader
 struct CameraUniform {
     view_pos: vec4<f32>,
     view_proj: mat4x4<f32>,
 };
 
+struct JointUniform {
+    joint_transform: array<mat4x4<f32>, MAX_JOINTS>,
+}
+
 @group(0) @binding(0)
 var<uniform> camera: CameraUniform;
+
+@group(1) @binding(0)
+var<uniform> joints: JointUniform;
 
 struct VertexInput {
     @location(0) position: vec3<f32>,
     @location(1) normal: vec3<f32>,
+
+    // animation data
+    @location(2) joint_indices: vec4<u32>,
+    @location(3) joint_weights: vec4<f32>,
 }
 
 struct InstanceInput {
@@ -32,13 +47,39 @@ fn vs_main(
     instance: InstanceInput,
 ) -> VertexOutput {
 
-    let position = instance.position + model.position;
+    // calculate the animation
+    var total_local_pos = vec4<f32>(0.0);
+    var total_local_normal = vec4<f32>(0.0);
 
+    for (var i: u32 = 0; i < MAX_JOINT_WEIGHTS; i++) {
+        // get vertex data
+        let joint_index = model.joint_indices[i];
+        let joint_weight = model.joint_weights[i];
+
+        // get transform matrix
+        let joint_transform = joints.joint_transform[joint_index];
+
+        // move position
+        let local_position = joint_transform * vec4<f32>(model.position, 1.0);
+        total_local_pos += local_position * joint_weight;
+
+        // move normal
+        let local_normal = joint_transform * vec4<f32>(model.normal, 0.0);
+        total_local_normal += local_normal * joint_weight;
+    }
+
+    // move to the instance position
+    let world_position = instance.position + total_local_pos.xyz;
+
+    // apply camera
+    let clip_position = camera.view_proj * vec4<f32>(world_position, 1.0);
+
+    // calculate output
     var out: VertexOutput;
-    out.clip_position = camera.view_proj * vec4<f32>(position, 1.0);
+    out.clip_position = clip_position;
     out.color = instance.color;
-    out.position = position;
-    out.normal = model.normal;
+    out.position = world_position;
+    out.normal = total_local_normal.xyz;
     out.entity = instance.entity;
 
     return out;

@@ -38,11 +38,11 @@ impl AnimationUniformBuffer {
         }
     }
 
-    pub fn update(&mut self, queue: &wgpu::Queue, animation_uniform: animation_uniform::AnimationUniform) {
+    pub fn update(&mut self, queue: &wgpu::Queue, animation_uniform: &animation_uniform::AnimationUniform) {
         queue.write_buffer(
             &self.animation_buffer,
             0,
-            bytemuck::cast_slice(&[animation_uniform]),
+            bytemuck::cast_slice(&[*animation_uniform]),
         );
     }
 

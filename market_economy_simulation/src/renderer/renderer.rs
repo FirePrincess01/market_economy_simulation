@@ -2,6 +2,7 @@
 //!
 
 use crate::animated_object::wgpu_animated_object_renderer::WgpuAnimatedObjectStorage;
+use crate::deferred_animation_shader::DeferredAnimationShaderDraw;
 use crate::deferred_color_shader::{self, DeferredShaderDraw, EntityBuffer, GBuffer};
 use crate::deferred_light_shader::DeferredLightShaderDraw;
 use crate::performance_monitor::PerformanceMonitor;
@@ -10,7 +11,7 @@ use wgpu_renderer::vertex_color_shader::{self, VertexColorShaderDraw};
 use wgpu_renderer::vertex_texture_shader::{self, VertexTextureShaderDraw};
 use winit::event::{ElementState, MouseScrollDelta};
 
-use crate::deferred_light_shader;
+use crate::{deferred_animation_shader, deferred_light_shader};
 
 pub struct Renderer {
     _pipeline_color: vertex_color_shader::Pipeline,
@@ -24,6 +25,9 @@ pub struct Renderer {
     entity_buffer: deferred_color_shader::EntityBuffer,
     pipeline_deferred_color: deferred_color_shader::Pipeline,
     pipeline_deferred_light: deferred_light_shader::Pipeline,
+
+    pub animation_bind_group_layout: deferred_animation_shader::AnimationBindGroupLayout,
+    pipeline_deferred_animated: deferred_animation_shader::Pipeline,
 
     // camera
     camera: renderer::camera::Camera,
@@ -99,6 +103,17 @@ impl Renderer {
             surface_format,
         );
 
+        let animation_bind_group_layout =
+            deferred_animation_shader::AnimationBindGroupLayout::new(wgpu_renderer.device());
+
+        // pipeline deferred animated
+        let pipeline_deferred_animated = deferred_animation_shader::Pipeline::new(
+            wgpu_renderer.device(),
+            &camera_bind_group_layout,
+            &animation_bind_group_layout,
+            surface_format,
+        );
+
         // camera
         let position = cgmath::Point3::new(0.0, 0.0, 0.0);
         let yaw = cgmath::Deg(0.0);
@@ -149,6 +164,9 @@ impl Renderer {
             entity_buffer,
             pipeline_deferred_color,
             pipeline_deferred_light,
+
+            animation_bind_group_layout,
+            pipeline_deferred_animated,
 
             camera,
             camera_controller,
@@ -323,10 +341,12 @@ impl Renderer {
             mesh.draw(&mut render_pass);
         }
 
+        self.pipeline_deferred_animated.bind(&mut render_pass);
+        self.camera_uniform_buffer.bind(&mut render_pass);
+
         for object in &animated_object_storage.elements {
             object.mesh.draw(&mut render_pass);
         }
-
     }
 
     fn render_light(
@@ -468,7 +488,7 @@ impl Renderer {
             &view,
             &mut encoder,
             &[deferred_combined],
-            animated_object_storage
+            animated_object_storage,
         );
         self.render_light(
             renderer_interface,

@@ -8,6 +8,7 @@ use super::super::deferred_color_shader::CameraBindGroupLayout;
 use super::super::deferred_color_shader::GBuffer;
 use super::Instance;
 use super::Vertex;
+use super::animation_bind_group_layout::AnimationBindGroupLayout;
 use wgpu_renderer::renderer::depth_texture;
 
 /// A general purpose shader using vertices, colors and an instance matrix
@@ -19,11 +20,13 @@ impl Pipeline {
     pub fn _new_lines(
         device: &wgpu::Device,
         camera_bind_group_layout: &CameraBindGroupLayout,
+        animation_bind_group_layout: &AnimationBindGroupLayout,
         surface_format: wgpu::TextureFormat,
     ) -> Self {
         Self::new_parameterized(
             device,
             camera_bind_group_layout,
+            animation_bind_group_layout,
             surface_format,
             wgpu::PrimitiveTopology::LineList,
         )
@@ -32,11 +35,13 @@ impl Pipeline {
     pub fn new(
         device: &wgpu::Device,
         camera_bind_group_layout: &CameraBindGroupLayout,
+        animation_bind_group_layout: &AnimationBindGroupLayout,
         surface_format: wgpu::TextureFormat,
     ) -> Self {
         Self::new_parameterized(
             device,
             camera_bind_group_layout,
+            animation_bind_group_layout,
             surface_format,
             wgpu::PrimitiveTopology::TriangleList,
         )
@@ -45,25 +50,26 @@ impl Pipeline {
     fn new_parameterized(
         device: &wgpu::Device,
         camera_bind_group_layout: &CameraBindGroupLayout,
+        animation_bind_group_layout: &AnimationBindGroupLayout,
         surface_format: wgpu::TextureFormat,
         topology: wgpu::PrimitiveTopology,
     ) -> Self {
         // Shader
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
-            label: Some("Shader"),
+            label: Some("Deferred Animated Shader"),
             source: wgpu::ShaderSource::Wgsl(include_str!("shader.wgsl").into()),
         });
 
         // Pipeline
         let render_pipeline_layout =
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-                label: Some("Render Pipeline Layout"),
-                bind_group_layouts: &[&camera_bind_group_layout.get()],
+                label: Some("Deferred Animated Render Pipeline Layout"),
+                bind_group_layouts: &[&camera_bind_group_layout.get(), &animation_bind_group_layout.get()],
                 push_constant_ranges: &[],
             });
 
         let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-            label: Some("Render Pipeline"),
+            label: Some("Deferred Animated Render Pipeline"),
             layout: Some(&render_pipeline_layout),
             vertex: wgpu::VertexState {
                 module: &shader,
