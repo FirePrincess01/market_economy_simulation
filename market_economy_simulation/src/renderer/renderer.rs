@@ -344,9 +344,7 @@ impl Renderer {
         self.pipeline_deferred_animated.bind(&mut render_pass);
         self.camera_uniform_buffer.bind(&mut render_pass);
 
-        for object in &animated_object_storage.elements {
-            object.mesh.draw(&mut render_pass);
-        }
+        animated_object_storage.draw(&mut render_pass);
     }
 
     fn render_light(

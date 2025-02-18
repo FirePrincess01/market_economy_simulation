@@ -192,6 +192,7 @@ impl<'a> DefaultApplicationInterface for MarketEconomySimulation {
         );
 
         self.performance_monitor.watch.start(3);
+        self.animated_object_storage.update(renderer_interface, &dt);
         // ecs::system::move_agents(&mut self.world);
         self.performance_monitor.watch.stop(3);
 

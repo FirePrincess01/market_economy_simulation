@@ -1,9 +1,10 @@
 use cgmath::Vector3;
 use collada::document::ColladaDocument;
+use wgpu_renderer::renderer::WgpuRendererInterface;
 
-use crate::deferred_animation_shader::{self, DeferredAnimationShaderDraw};
+use crate::{animated_object::animated_model::animation::Animation, deferred_animation_shader::{self, DeferredAnimationShaderDraw}};
 
-use super::animated_object_renderer::{AnimatedObjectRenderer, AnimatedObjectRendererResult};
+use super::{animated_model::skeleton::Skeleton, animated_object_renderer::{AnimatedObjectRenderer, AnimatedObjectRendererResult}};
 
 pub struct AnimatedObject {
     pub is_visible: bool,
@@ -13,10 +14,12 @@ pub struct AnimatedObject {
     pub y: f32,
     pub z: f32,
 
-    pub instance: deferred_animation_shader::Instance,
-    pub animation: deferred_animation_shader::AnimationUniform,
+    pub animation: Animation,
 
-    pub mesh: deferred_animation_shader::Mesh,
+    pub instance: deferred_animation_shader::Instance,
+    pub animation_uniform: deferred_animation_shader::AnimationUniform,
+
+    mesh: deferred_animation_shader::Mesh,
     // pub mes_light: deferred_light_shader::Mesh,
 }
 
@@ -29,6 +32,18 @@ impl WgpuAnimatedObjectStorage {
         let elements = Vec::new();
 
         Self { elements }
+    }
+
+    pub fn update(
+        &mut self,
+        renderer_interface: &mut dyn WgpuRendererInterface,
+        dt: &instant::Duration,
+    ) {
+        for elem in &mut self.elements {
+            elem.animation.increment_time(dt);
+            elem.animation.update_animation_uniform(&mut elem.animation_uniform);
+            elem.mesh.update_animation_buffer(renderer_interface.queue(), &elem.animation_uniform);
+        }
     }
 
     pub fn draw<'b>(&'b self, render_pass: &mut wgpu::RenderPass<'b>) {
@@ -228,9 +243,9 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
         (instance, mesh)
     }
 
-    fn create_skeleton(&mut self, skeleton: &collada::Skeleton) {
-        let joints = &skeleton.joints;
-        let bind_poses = &skeleton.bind_poses;
+    fn create_skeleton(&mut self, collada_skeleton: &collada::Skeleton) -> Skeleton {
+        let joints = &collada_skeleton.joints;
+        let bind_poses = &collada_skeleton.bind_poses;
 
         println!("********");
         println!("Skeleton");
@@ -243,12 +258,16 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
         println!("");
         println!("bind_poses len: {:?}", bind_poses.len());
         println!("bind_poses: {:?}", bind_poses);
+
+        let skeleton = Skeleton::new(collada_skeleton);
+
+        skeleton
     }
 
-    fn create_animation(&mut self, animation: &collada::Animation) {
-        let target = &animation.target;
-        let sample_times = &animation.sample_times;
-        let sample_poses = &animation.sample_poses;
+    fn create_animation(&mut self, skeleton: &Skeleton, collada_animation: &collada::Animation) -> Animation {
+        let target: &String = &collada_animation.target;
+        let sample_times: &Vec<f32> = &collada_animation.sample_times;
+        let sample_poses: &Vec<[[f32; 4]; 4]> = &collada_animation.sample_poses;
 
         println!("********");
         println!("Animation");
@@ -264,6 +283,10 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
         println!("");
         println!("sample_poses len: {:?}", sample_poses.len());
         println!("sample_poses: {:?}", sample_poses);
+
+        let animation = Animation::new(skeleton, target, sample_times, sample_poses);
+
+        animation
     }
 }
 
@@ -275,14 +298,14 @@ impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
         let collada_document: ColladaDocument = ColladaDocument::from_str(xml_string).unwrap();
 
         let obj_set: collada::ObjSet = collada_document.get_obj_set().unwrap();
-        let skeletons: Vec<collada::Skeleton> = collada_document.get_skeletons().unwrap();
-        let animations: Vec<collada::Animation> = collada_document.get_animations().unwrap();
+        let collada_skeletons: Vec<collada::Skeleton> = collada_document.get_skeletons().unwrap();
+        let collada_animations: Vec<collada::Animation> = collada_document.get_animations().unwrap();
 
-        let skeleton0 = &skeletons[0];
-        self.create_skeleton(skeleton0);
+        let collada_skeleton_0 = &collada_skeletons[0];
+        let skeleton = self.create_skeleton(collada_skeleton_0);
 
-        let animation = &animations[0];
-        self.create_animation(animation);
+        let collada_animation_0 = &collada_animations[0];
+        let animation = self.create_animation(&skeleton, collada_animation_0);
 
         let mut animation_uniform = deferred_animation_shader::AnimationUniform::zero();
 
@@ -300,14 +323,16 @@ impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
             y: 0.0,
             z: 0.0,
             instance,
-            animation: animation_uniform,
+            animation_uniform,
+            animation,
+
             mesh,
         };
 
         let render_index = self.storage.elements.len();
         self.storage.elements.push(element);
 
-        AnimatedObjectRendererResult { index: 0 }
+        AnimatedObjectRendererResult { index: render_index }
     }
 
     fn set_object_position(&mut self, index: usize, x: f32, y: f32, z: f32) {
