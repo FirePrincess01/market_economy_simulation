@@ -1,18 +1,21 @@
-use cgmath::{Matrix, VectorSpace, Zero};
+use cgmath::{Matrix, SquareMatrix, VectorSpace, Zero};
 
 #[derive(Clone, Debug)]
 pub struct JointTransform {
     translation: cgmath::Vector3<f32>,
     rotation: cgmath::Quaternion<f32>,
+
+    joint_transform: cgmath::Matrix4<f32>,
 }
 
 impl JointTransform {
-    pub fn new(translation: cgmath::Vector3<f32>, rotation: cgmath::Quaternion<f32>) -> Self {
-        Self {
-            translation,
-            rotation,
-        }
-    }
+    // pub fn new(translation: cgmath::Vector3<f32>, rotation: cgmath::Quaternion<f32>) -> Self {
+    //     Self {
+    //         translation,
+    //         rotation,
+    //         joint_transform: cgmath::Matrix4::identity(),
+    //     }
+    // }
 
     pub fn zero() -> Self {
         let translation: cgmath::Vector3<f32> = cgmath::Vector3::zero();
@@ -21,6 +24,7 @@ impl JointTransform {
         Self {
             translation,
             rotation,
+            joint_transform: cgmath::Matrix4::identity(),
         }
     }
 
@@ -58,30 +62,33 @@ impl JointTransform {
         Self {
             translation,
             rotation,
+            joint_transform: mat,
         }
     }
 
     pub fn to_mat4(&self) -> cgmath::Matrix4<f32> {
-        let mut res = cgmath::Matrix4::from(self.rotation);
-        let c3: cgmath::Vector4<f32> = cgmath::Vector4::new(
-            self.translation.x,
-            self.translation.y,
-            self.translation.z,
-            1.0,
-        );
-        res.replace_col(3, c3);
+        // let mut res = cgmath::Matrix4::from(self.rotation);
+        // let c3: cgmath::Vector4<f32> = cgmath::Vector4::new(
+        //     self.translation.x,
+        //     self.translation.y,
+        //     self.translation.z,
+        //     1.0,
+        // );
+        // res.replace_col(3, c3);
 
-        res
+        // res
+
+        self.joint_transform
     }
 
-    pub fn interpolate(&self, other: &Self, amount: f32) -> JointTransform {
-        let amount = amount.clamp(0.0, 1.0);
+    // pub fn interpolate(&self, other: &Self, amount: f32) -> JointTransform {
+    //     let amount = amount.clamp(0.0, 1.0);
 
-        let translation = self.translation.lerp(other.translation, amount);
-        let rotation = self.rotation.nlerp(other.rotation, amount);
+    //     let translation = self.translation.lerp(other.translation, amount);
+    //     let rotation = self.rotation.nlerp(other.rotation, amount);
 
-        let res = Self::new(translation, rotation);
+    //     let res = Self::new(translation, rotation);
 
-        res
-    }
+    //     res
+    // }
 }

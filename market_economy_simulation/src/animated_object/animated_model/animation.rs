@@ -82,8 +82,7 @@ impl Animation {
 
         for (i, elem) in &mut animation_uniform.joint_transform.iter_mut().enumerate() {
             
-            let joint_transform = key_frame.joint_transforms[2].to_mat4();
-            
+            let joint_transform = key_frame.joint_transforms[i];
             *elem = joint_transform.into();
         }
     }
