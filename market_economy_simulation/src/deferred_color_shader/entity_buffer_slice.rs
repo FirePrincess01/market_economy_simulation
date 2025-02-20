@@ -67,7 +67,7 @@ impl<'a> EntityBufferSlice<'a> {
     }
 }
 
-impl<'a> Drop for EntityBufferSlice<'a> {
+impl Drop for EntityBufferSlice<'_> {
     fn drop(&mut self) {
         self.unmap();
     }

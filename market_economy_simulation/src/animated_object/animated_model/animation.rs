@@ -24,13 +24,9 @@ impl Animation {
 
         let mut joint_names: Vec<String> = Vec::new();
         for animation_channel in animation_channels {
-            let name_split = animation_channel.target.split('/');
+            let mut name_split = animation_channel.target.split('/');
 
-            let mut joint_name: &str = "";
-            for elem in name_split {
-                joint_name = elem;
-                break;
-            }
+            let joint_name: &str = name_split.next().unwrap_or("");
 
             joint_names.push(joint_name.to_string());
         }
@@ -71,7 +67,7 @@ impl Animation {
             }
         }
 
-        return 0;
+        0
     }
 
     pub fn update_animation_uniform(
