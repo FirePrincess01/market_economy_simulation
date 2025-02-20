@@ -111,6 +111,10 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: market_economy_simulation_ubuntu
+          path: target/debug/app # or path/to/artifact
 
   build_wasm:
     name: Build wasm32
@@ -130,6 +134,21 @@ jobs:
           command: install
           args: wasm-pack
       - run: wasm-pack build market_economy_simulation --target web
+      
+      - shell: bash
+        run: |
+          mkdir public
+          mkdir public/market_economy_simulation
+          mkdir public/market_economy_simulation/pkg
+          cp market_economy_simulation/pkg/* public/market_economy_simulation/pkg
+          cp index.html public/index.html
+
+      - name: Upload binaries to Github Pages
+        uses: peaceiris/actions-gh-pages@v4
+        # if: ${{ github.event_name == 'push' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
 
         
 
