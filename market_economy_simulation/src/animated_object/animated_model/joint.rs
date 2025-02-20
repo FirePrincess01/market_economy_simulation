@@ -1,4 +1,3 @@
-use cgmath::SquareMatrix;
 
 pub struct Joint {
     pub id: String,

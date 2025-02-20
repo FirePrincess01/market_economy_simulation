@@ -1,8 +1,8 @@
-use std::{convert::identity, usize};
+use std::usize;
 
-use cgmath::{Matrix, Quaternion, SquareMatrix, Transform, Zero};
+use cgmath::{Matrix, SquareMatrix};
 
-use super::{joint::Joint, joint_transform::JointTransform, keyframe::Keyframe};
+use super::{joint::Joint, keyframe::Keyframe};
 
 pub struct Skeleton {
     joints: Vec<Joint>,

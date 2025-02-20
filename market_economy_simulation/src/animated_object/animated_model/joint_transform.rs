@@ -1,4 +1,4 @@
-use cgmath::{Matrix, SquareMatrix, VectorSpace, Zero};
+use cgmath::{Matrix, SquareMatrix, Zero};
 
 #[derive(Clone, Debug)]
 pub struct JointTransform {
