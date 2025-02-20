@@ -15,7 +15,7 @@ impl Animation {
     pub fn new(
         skeleton: &Skeleton,
         name: &String,
-        sample_times: &Vec<f32>,
+        sample_times:  &[f32],
         animation_channels: &Vec<collada::AnimationChannel>,
     ) -> Self {
         let key_times = sample_times.clone();
@@ -43,7 +43,7 @@ impl Animation {
 
         Self {
             _name: name.clone(),
-            key_times,
+            key_times: sample_times.to_owned(),
             key_frames,
             // last_index: 0,
             current_key_frame_time: instant::Duration::ZERO,
@@ -60,7 +60,7 @@ impl Animation {
         }
     }
 
-    fn find_key_frame(key_times: &Vec<f32>, time: instant::Duration) -> usize {
+    fn find_key_frame(key_times: &[f32], time: instant::Duration) -> usize {
         for (i, key_time) in key_times.iter().enumerate() {
             if time.as_secs_f32() <= *key_time {
                 return i;

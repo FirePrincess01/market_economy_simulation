@@ -1,5 +1,3 @@
-use std::usize;
-
 use cgmath::{Matrix, SquareMatrix};
 
 use super::{joint::Joint, keyframe::Keyframe};
@@ -98,8 +96,8 @@ impl Skeleton {
 
     pub fn create_key_frame(
         &self,
-        names: &Vec<String>,
-        sample_poses: &Vec<cgmath::Matrix4<f32>>,
+        names: &[String],
+        sample_poses: &[cgmath::Matrix4<f32>],
     ) -> Keyframe {
         let size = self.joints.len();
         let mut local_transforms: Vec<cgmath::Matrix4<f32>> =
@@ -108,6 +106,7 @@ impl Skeleton {
             vec![cgmath::Matrix4::identity(); size];
 
         // set local transforms
+        #[allow(clippy::needless_range_loop)]
         for i in 0..size {
             let local_transform = &mut local_transforms[i];
             let joint = &self.joints[i];

@@ -153,7 +153,7 @@ fn apply_scale_factor(
     }
 }
 
-impl<'a> DefaultApplicationInterface for MarketEconomySimulation {
+impl DefaultApplicationInterface for MarketEconomySimulation {
     fn create(
         renderer_interface: &mut dyn WgpuRendererInterface,
         size: winit::dpi::PhysicalSize<u32>,

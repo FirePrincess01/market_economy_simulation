@@ -17,18 +17,15 @@ use super::World;
 pub fn move_agents(world: &mut World) {
     let iter = World::filter(&world.entities, &mut world.positions, &world.live_stats);
 
-    let mut i = 0;
     // let max_y = 400;
     let max_y = 1000;
-    for (pos, _live) in iter {
+    for (i, (pos, _live)) in iter.enumerate() {
         let x = i % max_y;
         let y = i / max_y;
 
         pos.pos[0] = x as f32 * 0.4 * 2.0;
         pos.pos[1] = y as f32 * 0.4 * 2.0;
         pos.pos[2] = 0.0;
-
-        i += 1;
     }
 }
 
