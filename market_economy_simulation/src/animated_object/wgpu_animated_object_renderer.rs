@@ -71,7 +71,7 @@ pub struct WgpuAnimatedObjectRenderer<'a> {
     // pub texture_bind_group_layout: &'a wgpu_renderer::vertex_texture_shader::TextureBindGroupLayout,
 }
 
-impl<'a> WgpuAnimatedObjectRenderer<'a> {
+impl WgpuAnimatedObjectRenderer<'_> {
     fn create_mesh(
         &mut self,
         obj_set: &collada::ObjSet,
@@ -169,7 +169,7 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
                     let _tex_coordinate_1 = tex_vertices[tex_indices.1];
                     let _tex_coordinate_2 = tex_vertices[tex_indices.2];
 
-                    let indices_0 = i * 3 + 0;
+                    let indices_0 = i * 3;
                     let indices_1 = i * 3 + 1;
                     let indices_2 = i * 3 + 2;
 
@@ -241,9 +241,9 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
 
         let mesh = deferred_animation_shader::Mesh::new(
             self.wgpu_renderer,
-            &self.animation_bind_group_layout,
+            self.animation_bind_group_layout,
             &deferred_vertices,
-            &*animation_uniform,
+            animation_uniform,
             &deferred_indices,
             &[instance],
         );
@@ -267,9 +267,9 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
         // println!("bind_poses len: {:?}", bind_poses.len());
         // println!("bind_poses: {:?}", bind_poses);
 
-        let skeleton = Skeleton::new(collada_skeleton);
+        
 
-        skeleton
+        Skeleton::new(collada_skeleton)
     }
 
     fn create_animation(
@@ -310,13 +310,13 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
         // println!("sample_poses len: {:?}", sample_poses.len());
         // println!("sample_poses: {:?}", sample_poses);
 
-        let animation = Animation::new(skeleton, name, sample_times, collada_animation_channels);
+        
 
-        animation
+        Animation::new(skeleton, name, sample_times, collada_animation_channels)
     }
 }
 
-impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
+impl AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'_> {
     fn from_collada(
         &mut self,
         xml_string: &str,
@@ -372,9 +372,9 @@ impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
         elem.y = y;
         elem.z = z;
 
-        elem.instance.position[0] = elem.x as f32;
-        elem.instance.position[1] = elem.y as f32;
-        elem.instance.position[2] = elem.z as f32;
+        elem.instance.position[0] = elem.x;
+        elem.instance.position[1] = elem.y;
+        elem.instance.position[2] = elem.z;
         elem.mesh
             .update_instance_buffer(self.wgpu_renderer.queue(), &[elem.instance]);
     }

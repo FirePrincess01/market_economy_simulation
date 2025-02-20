@@ -33,19 +33,16 @@ impl<'a, T1: Component, T2: Component> Iterator for EntityIterator<'a, T1, T2> {
 
             let filter1_index = T1::get_value_index(entity);
 
-            match filter1_index {
-                Some(filter1_index) => {
-                    // https://stackoverflow.com/questions/27118398/simple-as-possible-example-of-returning-a-mutable-reference-from-your-own-iterat
-                    // I copied this code from Stack Overflow without paying attention to
-                    // the prose which described why this code is actually safe.
-                    let data1 = unsafe { &mut *(data1 as *mut T1) };
+            if let Some(filter1_index) = filter1_index {
+                // https://stackoverflow.com/questions/27118398/simple-as-possible-example-of-returning-a-mutable-reference-from-your-own-iterat
+                // I copied this code from Stack Overflow without paying attention to
+                // the prose which described why this code is actually safe.
+                let data1 = unsafe { &mut *(data1 as *mut T1) };
 
-                    let data2 = &self.filter1[filter1_index];
+                let data2 = &self.filter1[filter1_index];
 
-                    self.index += 1;
-                    return Some((data1, data2));
-                }
-                None => {}
+                self.index += 1;
+                return Some((data1, data2));
             }
         }
 

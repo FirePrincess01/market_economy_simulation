@@ -1,7 +1,6 @@
 //! Deferred shader drawing colored objects
 //!
 
-use wgpu_renderer;
 
 use super::super::deferred_color_shader::CameraBindGroupLayout;
 use super::super::deferred_color_shader::EntityBuffer;
@@ -65,8 +64,8 @@ impl Pipeline {
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
                 label: Some("Deferred Animated Render Pipeline Layout"),
                 bind_group_layouts: &[
-                    &camera_bind_group_layout.get(),
-                    &animation_bind_group_layout.get(),
+                    camera_bind_group_layout.get(),
+                    animation_bind_group_layout.get(),
                 ],
                 push_constant_ranges: &[],
             });

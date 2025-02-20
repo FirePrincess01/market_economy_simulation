@@ -1,7 +1,6 @@
 //! The ground field
 
 // use rand::Rng;
-use fastrand;
 
 use super::{ground_field::GroundField, GroundResource};
 

@@ -16,7 +16,6 @@ use animated_object::{
     animated_object_renderer::AnimatedObjectRenderer,
     wgpu_animated_object_renderer::{WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage},
 };
-use rusttype;
 use wgpu_renderer::{
     default_application::{DefaultApplication, DefaultApplicationInterface},
     renderer::WgpuRendererInterface,
@@ -160,9 +159,9 @@ impl<'a> DefaultApplicationInterface for MarketEconomySimulation {
         size: winit::dpi::PhysicalSize<u32>,
         scale_factor: f32,
     ) -> Self {
-        let application = Self::new(renderer_interface, size, scale_factor);
+        
 
-        application
+        Self::new(renderer_interface, size, scale_factor)
     }
 
     fn get_size(&self) -> winit::dpi::PhysicalSize<u32> {

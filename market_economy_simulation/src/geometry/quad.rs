@@ -48,19 +48,19 @@ impl Quad {
         let deferred_vertices = vec![
             deferred_color_shader::Vertex {
                 position: [0.0, 0.0, 0.0],
-                normal: normal,
+                normal,
             }, // A
             deferred_color_shader::Vertex {
                 position: [size, 0.0, 0.0],
-                normal: normal,
+                normal,
             }, // B
             deferred_color_shader::Vertex {
                 position: [size, size, 0.0],
-                normal: normal,
+                normal,
             }, // C
             deferred_color_shader::Vertex {
                 position: [0.0, size, 0.0],
-                normal: normal,
+                normal,
             }, // D
         ];
 

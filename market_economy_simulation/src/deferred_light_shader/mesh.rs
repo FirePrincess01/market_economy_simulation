@@ -29,7 +29,7 @@ impl Mesh {
         let vertex_buffer = VertexBuffer::new(device, vertices);
         let index_buffer = IndexBuffer::new(device, indices);
 
-        let instance_buffer = InstanceBuffer::new(device, &instances);
+        let instance_buffer = InstanceBuffer::new(device, instances);
 
         let max_instances = instances.len() as u32;
         let nr_instances = instances.len() as u32;

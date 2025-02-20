@@ -58,13 +58,13 @@ impl Circle {
 
         indices.push(0);
         indices.push((n) as u32);
-        indices.push(1 as u32);
+        indices.push(1_u32);
 
         let normal = [0.0, 0.0, 1.0];
         for vertex in &vertices {
             deferred_vertices.push(deferred_color_shader::Vertex {
                 position: vertex.position,
-                normal: normal,
+                normal,
             })
         }
 

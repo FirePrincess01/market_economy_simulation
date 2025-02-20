@@ -25,8 +25,8 @@ pub struct Mesh {
 
 #[allow(dead_code)]
 impl Mesh {
-    pub fn new<'a>(
-        wgpu_renderer: &'a mut dyn wgpu_renderer::renderer::WgpuRendererInterface,
+    pub fn new(
+        wgpu_renderer: &mut dyn wgpu_renderer::renderer::WgpuRendererInterface,
         animation_bind_group_layout: &AnimationBindGroupLayout,
         vertices: &[Vertex],
         animation: &AnimationUniform,
@@ -37,11 +37,11 @@ impl Mesh {
 
         let mut animation_buffer =
             AnimationUniformBuffer::new(wgpu_renderer.device(), animation_bind_group_layout);
-        animation_buffer.update(wgpu_renderer.queue(), &animation);
+        animation_buffer.update(wgpu_renderer.queue(), animation);
 
         let index_buffer = IndexBuffer::new(wgpu_renderer.device(), indices);
 
-        let instance_buffer = InstanceBuffer::new(wgpu_renderer.device(), &instances);
+        let instance_buffer = InstanceBuffer::new(wgpu_renderer.device(), instances);
 
         let max_instances = instances.len() as u32;
         let nr_instances = instances.len() as u32;

@@ -27,7 +27,7 @@ impl<'a> EntityBufferSlice<'a> {
     }
 
     fn as_u32_le(array: &[u8; 4]) -> u32 {
-        ((array[0] as u32) << 0)
+        ((array[0] as u32))
             + ((array[1] as u32) << 8)
             + ((array[2] as u32) << 16)
             + ((array[3] as u32) << 24)
@@ -38,20 +38,19 @@ impl<'a> EntityBufferSlice<'a> {
 
         let mut data = padded_data
             .chunks(self.padded_bytes_per_row as _)
-            .map(|chunk| &chunk[..self.unpadded_bytes_per_row as _])
-            .flatten();
+            .flat_map(|chunk| &chunk[..self.unpadded_bytes_per_row as _]);
 
         let index = y * self.width() * 4 + x * 4;
 
         let default: u8 = 0;
         let elem0 = data.nth(index as usize).unwrap_or(&default);
-        let elem1 = data.nth((0) as usize).unwrap_or(&default);
-        let elem2 = data.nth((0) as usize).unwrap_or(&default);
-        let elem3 = data.nth((0) as usize).unwrap_or(&default);
+        let elem1 = data.nth(0_usize).unwrap_or(&default);
+        let elem2 = data.nth(0_usize).unwrap_or(&default);
+        let elem3 = data.nth(0_usize).unwrap_or(&default);
 
-        let elem = Self::as_u32_le(&[*elem0, *elem1, *elem2, *elem3]);
+        
 
-        elem
+        Self::as_u32_le(&[*elem0, *elem1, *elem2, *elem3])
     }
 
     pub fn width(&self) -> u32 {

@@ -33,8 +33,8 @@ impl Pipeline {
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
                 label: Some("Deferred Light Render Pipeline Layout"),
                 bind_group_layouts: &[
-                    &camera_bind_group_layout.get(),
-                    &g_buffer_bind_group_layout.get(),
+                    camera_bind_group_layout.get(),
+                    g_buffer_bind_group_layout.get(),
                 ],
                 push_constant_ranges: &[],
             });
