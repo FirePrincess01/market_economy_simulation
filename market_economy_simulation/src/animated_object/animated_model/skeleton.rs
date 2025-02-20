@@ -79,10 +79,10 @@ impl Skeleton {
         let joint = &self.joints[joint_index];
 
         // calculate current transformation
-        let current_transform = parent_transform * local_transforms[joint_index];
+        let current_transform = parent_transform * local_transforms[joint_index].transpose();
 
         // calculate current transformation applicable to a vertex
-        let current_joint_transform = current_transform * joint.inverse_bind_transform;
+        let current_joint_transform =  current_transform * joint.inverse_bind_transform.transpose();
         joint_transforms[joint_index] = current_joint_transform;
 
         let children = self.get_children(joint_index);
@@ -96,7 +96,7 @@ impl Skeleton {
         }
     }
 
-    pub fn create_key_frame(&self, name: &str, sample_pose: cgmath::Matrix4<f32>) -> Keyframe {
+    pub fn create_key_frame(&self, names: &Vec<String>, sample_poses: &Vec<cgmath::Matrix4<f32>>) -> Keyframe {
         let size = self.joints.len();
         let mut local_transforms: Vec<cgmath::Matrix4<f32>> =
             vec![cgmath::Matrix4::identity(); size];
@@ -112,12 +112,13 @@ impl Skeleton {
         }
 
         // apply animation poses
-        let joint_index = self.find_joint(name).expect("Joint not found");
-        local_transforms[joint_index] = sample_pose;
+        for i in 0..names.len() {
+            let id = &names[i];
+            let sample_pose = &sample_poses[i];
 
-        // test
-        local_transforms[1] = cgmath::Matrix4::from_angle_y(cgmath::Deg(90.0));
-
+            let joint_index = self.find_joint(id).expect("Joint not found");
+            local_transforms[joint_index] = *sample_pose;
+        }
 
         // calculate joint transforms
         let root_joint_index = self.get_root_joint().expect("Root Joint not found");

@@ -98,44 +98,44 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
                     triangles.normals.as_ref().unwrap();
                 let material: &Option<String> = &triangles.material;
 
-                println!("********");
-                println!("mesh");
-                println!("********");
+                // println!("********");
+                // println!("mesh");
+                // println!("********");
 
-                println!("");
-                println!("{}", name);
+                // println!("");
+                // println!("{}", name);
 
-                println!("");
-                println!("vertices len: {:?}", vertices.len());
-                // println!("vertices: {:?}", vertices);
+                // println!("");
+                // println!("vertices len: {:?}", vertices.len());
+                // // println!("vertices: {:?}", vertices);
 
-                println!("");
-                println!("tex_vertices len: {:?}", tex_vertices.len());
-                // println!("tex_vertices: {:?}", tex_vertices);
+                // println!("");
+                // println!("tex_vertices len: {:?}", tex_vertices.len());
+                // // println!("tex_vertices: {:?}", tex_vertices);
 
-                println!("");
-                println!("normals len: {:?}", normals.len());
-                // println!("normals: {:?}", normals);
+                // println!("");
+                // println!("normals len: {:?}", normals.len());
+                // // println!("normals: {:?}", normals);
 
-                println!("");
-                println!("indices len: {:?}", indices.len());
-                // println!("indices: {:?}", indices);
+                // println!("");
+                // println!("indices len: {:?}", indices.len());
+                // // println!("indices: {:?}", indices);
 
-                println!("");
-                println!("tex_indices len: {:?}", tex_indices.len());
-                // println!("tex_indices: {:?}", tex_indices);
+                // println!("");
+                // println!("tex_indices len: {:?}", tex_indices.len());
+                // // println!("tex_indices: {:?}", tex_indices);
 
-                println!("normal_indices len: {:?}", normal_indices.len());
-                // println!("normal_indices: {:?}", normal_indices);
+                // println!("normal_indices len: {:?}", normal_indices.len());
+                // // println!("normal_indices: {:?}", normal_indices);
 
-                println!("");
-                println!("material: {:?}", material);
+                // println!("");
+                // println!("material: {:?}", material);
 
-                println!("");
-                println!("joint_weights len: {:?}", joint_weights.len());
-                println!("joint_weights: {:?}", joint_weights);
+                // println!("");
+                // println!("joint_weights len: {:?}", joint_weights.len());
+                // println!("joint_weights: {:?}", joint_weights);
 
-                println!("");
+                // println!("");
 
                 assert!(normal_indices.len() == indices.len());
                 assert!(tex_indices.len() == indices.len());
@@ -226,7 +226,7 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
         }
 
         let instance = deferred_animation_shader::Instance {
-            position: [100.0, 100.0, 10.0],
+            position: [20.0, 20.0, 5.0],
             color: [0.5, 0.5, 0.8],
             entity: [99, 0, 0],
         };
@@ -247,17 +247,17 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
         let joints = &collada_skeleton.joints;
         let bind_poses = &collada_skeleton.bind_poses;
 
-        println!("********");
-        println!("Skeleton");
-        println!("********");
+        // println!("********");
+        // println!("Skeleton");
+        // println!("********");
 
-        println!("");
-        println!("joints len: {:?}", joints.len());
-        println!("joints: {:?}", joints);
+        // println!("");
+        // println!("joints len: {:?}", joints.len());
+        // println!("joints: {:?}", joints);
 
-        println!("");
-        println!("bind_poses len: {:?}", bind_poses.len());
-        println!("bind_poses: {:?}", bind_poses);
+        // println!("");
+        // println!("bind_poses len: {:?}", bind_poses.len());
+        // println!("bind_poses: {:?}", bind_poses);
 
         let skeleton = Skeleton::new(collada_skeleton);
 
@@ -265,26 +265,38 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
     }
 
     fn create_animation(&mut self, skeleton: &Skeleton, collada_animation: &collada::Animation) -> Animation {
-        let target: &String = &collada_animation.target;
-        let sample_times: &Vec<f32> = &collada_animation.sample_times;
-        let sample_poses: &Vec<[[f32; 4]; 4]> = &collada_animation.sample_poses;
+        let collada_animation = &collada_animation;
+        let collada_animation_channels: &Vec<collada::AnimationChannel> = &collada_animation.animation_channels;
 
-        println!("********");
-        println!("Animation");
-        println!("********");
+        let name = &collada_animation.name;
+        let sample_times = &collada_animation_channels[0].sample_times;
 
-        println!("");
-        println!("target {:}", target);
+        for collada_animation_channel in collada_animation_channels {
+            assert_eq!(collada_animation_channel.sample_times.len(), sample_times.len());
+        }
 
-        println!("");
-        println!("sample_times len: {:?}", sample_times.len());
-        println!("sample_times: {:?}", sample_times);
+        
 
-        println!("");
-        println!("sample_poses len: {:?}", sample_poses.len());
-        println!("sample_poses: {:?}", sample_poses);
+        // let target: &String = &collada_animation.target;
+        // let sample_times: &Vec<f32> = &collada_animation.sample_times;
+        // let sample_poses: &Vec<[[f32; 4]; 4]> = &collada_animation.sample_poses;
 
-        let animation = Animation::new(skeleton, target, sample_times, sample_poses);
+        // println!("********");
+        // println!("Animation");
+        // println!("********");
+
+        // println!("");
+        // println!("target {:}", target);
+
+        // println!("");
+        // println!("sample_times len: {:?}", sample_times.len());
+        // println!("sample_times: {:?}", sample_times);
+
+        // println!("");
+        // println!("sample_poses len: {:?}", sample_poses.len());
+        // println!("sample_poses: {:?}", sample_poses);
+
+        let animation = Animation::new(skeleton, name, sample_times, collada_animation_channels);
 
         animation
     }

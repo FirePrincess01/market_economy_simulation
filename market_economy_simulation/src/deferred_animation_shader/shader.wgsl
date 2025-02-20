@@ -71,13 +71,20 @@ fn vs_main(
     // move to the instance position
     let world_position = instance.position + total_local_pos.xyz;
 
+    // calculate lighting
+    let light_intensity = 0.8;
+    let light_direction = normalize(vec3<f32>(1.0, -0.1, 1.0));
+
+    let diffuse_lighting = clamp(dot(total_local_normal.xyz, light_direction) * light_intensity, 0.0, 1.0);
+    let color = instance.color * diffuse_lighting;
+
     // apply camera
     let clip_position = camera.view_proj * vec4<f32>(world_position, 1.0);
 
     // calculate output
     var out: VertexOutput;
     out.clip_position = clip_position;
-    out.color = instance.color;
+    out.color = color;
     out.position = world_position;
     out.normal = total_local_normal.xyz;
     out.entity = instance.entity;

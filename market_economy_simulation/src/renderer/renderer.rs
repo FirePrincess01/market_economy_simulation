@@ -191,9 +191,9 @@ impl Renderer {
     }
 
     fn side_view_point(camera: &mut renderer::camera::Camera) {
-        let position = cgmath::Point3::new(100.0, 90.0, 20.0);
+        let position = cgmath::Point3::new(20.0, 10.0, 15.0);
         let yaw = cgmath::Deg(-90.0).into();
-        let pitch = cgmath::Deg(30.0).into();
+        let pitch = cgmath::Deg(60.0).into();
 
         camera.position = position;
         camera.yaw = yaw;
