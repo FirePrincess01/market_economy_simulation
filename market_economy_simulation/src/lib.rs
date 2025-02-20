@@ -109,7 +109,7 @@ impl MarketEconomySimulation {
         // let spider_xml = include_str!("../res/test.dae");
         // let spider_xml = include_str!("../res/test2.dae");
         let spider_xml = include_str!("../res/wiggle_tower2.dae");
-        animated_object_renderer.from_collada(spider_xml);
+        animated_object_renderer.create_from_collada(spider_xml);
 
         Self {
             size,

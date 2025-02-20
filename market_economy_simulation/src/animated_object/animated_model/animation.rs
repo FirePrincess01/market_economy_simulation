@@ -14,12 +14,10 @@ pub struct Animation {
 impl Animation {
     pub fn new(
         skeleton: &Skeleton,
-        name: &String,
-        sample_times:  &[f32],
+        name: &str,
+        sample_times: &[f32],
         animation_channels: &Vec<collada::AnimationChannel>,
     ) -> Self {
-        let key_times = sample_times.clone();
-
         let mut key_frames = Vec::new();
 
         let mut joint_names: Vec<String> = Vec::new();
@@ -42,7 +40,7 @@ impl Animation {
         }
 
         Self {
-            _name: name.clone(),
+            _name: name.to_string(),
             key_times: sample_times.to_owned(),
             key_frames,
             // last_index: 0,

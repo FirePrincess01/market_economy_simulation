@@ -317,7 +317,7 @@ impl WgpuAnimatedObjectRenderer<'_> {
 }
 
 impl AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'_> {
-    fn from_collada(
+    fn create_from_collada(
         &mut self,
         xml_string: &str,
     ) -> super::animated_object_renderer::AnimatedObjectRendererResult {
