@@ -96,8 +96,8 @@ jobs:
           command: clippy
           args: -- -D warnings
 
-  build:
-    name: Test Suite
+  build_ubuntu:
+    name: Build Ubuntu latest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -112,6 +112,24 @@ jobs:
         with:
           command: build
 
+
+  build_wasm:
+    name: Build wasm32
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: wasm32-unknown-unknown
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+        
 
   # trunk:
   #   name: trunk
