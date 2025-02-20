@@ -321,7 +321,7 @@ impl AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'_> {
         &mut self,
         xml_string: &str,
     ) -> super::animated_object_renderer::AnimatedObjectRendererResult {
-        let collada_document: ColladaDocument = ColladaDocument::from_str(xml_string).unwrap();
+        let collada_document: ColladaDocument = ColladaDocument::from_string(xml_string).unwrap();
 
         let obj_set: collada::ObjSet = collada_document.get_obj_set().unwrap();
         let collada_skeletons: Vec<collada::Skeleton> = collada_document.get_skeletons().unwrap();
