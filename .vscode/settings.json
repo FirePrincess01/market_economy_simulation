@@ -3,6 +3,6 @@
         "cgmath",
         "collada",
         "heightmap",
-        "wgpu"
+        "wgpu",
     ]
 }
