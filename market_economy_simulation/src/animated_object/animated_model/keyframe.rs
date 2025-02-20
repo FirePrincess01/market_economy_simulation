@@ -1,5 +1,3 @@
-
-
 pub struct Keyframe {
     // pub joint_transforms: Vec<JointTransform>,
     pub joint_transforms: Vec<cgmath::Matrix4<f32>>,

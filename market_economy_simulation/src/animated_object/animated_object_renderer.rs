@@ -1,9 +1,8 @@
-
 pub struct AnimatedObjectRendererResult {
     pub _index: usize,
 }
 
-pub trait AnimatedObjectRenderer  {
+pub trait AnimatedObjectRenderer {
     // fn set_visible(&mut self, index: usize, is_visible: bool);
     fn from_collada(&mut self, source: &str) -> AnimatedObjectRendererResult;
     fn _set_object_position(&mut self, index: usize, x: f32, y: f32, z: f32);

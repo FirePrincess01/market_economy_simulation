@@ -1,14 +1,13 @@
-
 pub struct Joint {
     pub id: String,
     pub _name: String,
-    pub _index: usize,  // ID of the joint (exported value from blender)
+    pub _index: usize, // ID of the joint (exported value from blender)
     pub parent: usize, // ID of the parent joint
 
     pub bind_transform: cgmath::Matrix4<f32>, // Parent-relative transforms for the joint (at time of vertex binding)
     pub inverse_bind_transform: cgmath::Matrix4<f32>, // Matrix transforming vertex coordinates from model-space to joint-space
 
-    // pub joint_transform: cgmath::Matrix4<f32>, // Joint transform used to upload to the GPU
+                                                      // pub joint_transform: cgmath::Matrix4<f32>, // Joint transform used to upload to the GPU
 }
 
 impl Joint {
@@ -20,7 +19,6 @@ impl Joint {
         bind_transform: cgmath::Matrix4<f32>,
         inverse_bind_transform: cgmath::Matrix4<f32>,
     ) -> Self {
-
         // let joint_transform = cgmath::Matrix4::identity();
 
         Self {

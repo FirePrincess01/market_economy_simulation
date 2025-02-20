@@ -3,12 +3,12 @@
 
 use wgpu_renderer;
 
-use super::super::deferred_color_shader::EntityBuffer;
 use super::super::deferred_color_shader::CameraBindGroupLayout;
+use super::super::deferred_color_shader::EntityBuffer;
 use super::super::deferred_color_shader::GBuffer;
+use super::animation_bind_group_layout::AnimationBindGroupLayout;
 use super::Instance;
 use super::Vertex;
-use super::animation_bind_group_layout::AnimationBindGroupLayout;
 use wgpu_renderer::renderer::depth_texture;
 
 /// A general purpose shader using vertices, colors and an instance matrix
@@ -64,7 +64,10 @@ impl Pipeline {
         let render_pipeline_layout =
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
                 label: Some("Deferred Animated Render Pipeline Layout"),
-                bind_group_layouts: &[&camera_bind_group_layout.get(), &animation_bind_group_layout.get()],
+                bind_group_layouts: &[
+                    &camera_bind_group_layout.get(),
+                    &animation_bind_group_layout.get(),
+                ],
                 push_constant_ranges: &[],
             });
 

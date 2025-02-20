@@ -35,7 +35,8 @@ impl Mesh {
     ) -> Self {
         let vertex_buffer = VertexBuffer::new(wgpu_renderer.device(), vertices);
 
-        let mut animation_buffer = AnimationUniformBuffer::new(wgpu_renderer.device(), animation_bind_group_layout);
+        let mut animation_buffer =
+            AnimationUniformBuffer::new(wgpu_renderer.device(), animation_bind_group_layout);
         animation_buffer.update(wgpu_renderer.queue(), &animation);
 
         let index_buffer = IndexBuffer::new(wgpu_renderer.device(), indices);
@@ -59,8 +60,12 @@ impl Mesh {
         self.vertex_buffer.update(queue, vertices);
     }
 
-    pub fn update_animation_buffer(&mut self, queue: &wgpu::Queue, animation_uniform: &AnimationUniform) {
-        self. animation_buffer.update(queue, animation_uniform);
+    pub fn update_animation_buffer(
+        &mut self,
+        queue: &wgpu::Queue,
+        animation_uniform: &AnimationUniform,
+    ) {
+        self.animation_buffer.update(queue, animation_uniform);
     }
 
     pub fn update_instance_buffer(&mut self, queue: &wgpu::Queue, instances: &[Instance]) {

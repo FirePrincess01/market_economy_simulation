@@ -1,8 +1,9 @@
+mod animated_object;
 mod base_factory;
 mod create_entities;
+mod deferred_animation_shader;
 mod deferred_color_shader;
 mod deferred_light_shader;
-mod deferred_animation_shader;
 mod ecs;
 mod ecs2;
 mod geometry;
@@ -10,9 +11,11 @@ mod ground_plane;
 mod performance_monitor;
 mod renderer;
 mod world_mesh;
-mod animated_object;
 
-use animated_object::{animated_object_renderer::AnimatedObjectRenderer, wgpu_animated_object_renderer::{WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage}};
+use animated_object::{
+    animated_object_renderer::AnimatedObjectRenderer,
+    wgpu_animated_object_renderer::{WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage},
+};
 use rusttype;
 use wgpu_renderer::{
     default_application::{DefaultApplication, DefaultApplicationInterface},
@@ -87,7 +90,7 @@ impl MarketEconomySimulation {
         let mut entity_index_instance = vertex_texture_shader::Instance::zero();
         entity_index_instance.position.x = 20.0;
         entity_index_instance.position.y = 120.0;
-        
+
         let entity_index_mesh = wgpu_renderer::label::LabelMesh::new(
             renderer_interface,
             entity_index_label.get_image(),

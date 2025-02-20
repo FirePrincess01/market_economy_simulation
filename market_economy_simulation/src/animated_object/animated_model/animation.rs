@@ -1,4 +1,3 @@
-
 use crate::deferred_animation_shader;
 
 use super::{keyframe::Keyframe, skeleton::Skeleton};
@@ -19,7 +18,6 @@ impl Animation {
         sample_times: &Vec<f32>,
         animation_channels: &Vec<collada::AnimationChannel>,
     ) -> Self {
-
         let key_times = sample_times.clone();
 
         let mut key_frames = Vec::new();
@@ -32,7 +30,7 @@ impl Animation {
             for elem in name_split {
                 joint_name = elem;
                 break;
-            };
+            }
 
             joint_names.push(joint_name.to_string());
         }
@@ -76,8 +74,10 @@ impl Animation {
         return 0;
     }
 
-    pub fn update_animation_uniform(&self, animation_uniform: &mut deferred_animation_shader::AnimationUniform) {
-        
+    pub fn update_animation_uniform(
+        &self,
+        animation_uniform: &mut deferred_animation_shader::AnimationUniform,
+    ) {
         let index = Self::find_key_frame(&self.key_times, self.current_key_frame_time);
         let key_frame = &self.key_frames[index];
 
@@ -85,11 +85,10 @@ impl Animation {
 
         let len = key_frame.joint_transforms.len();
         for i in 0..len {
-            let joint_transform =  key_frame.joint_transforms[i];
+            let joint_transform = key_frame.joint_transforms[i];
             let uniform_element = &mut animation_uniform.joint_transform[i];
 
             *uniform_element = joint_transform.into();
         }
     }
-
 }

@@ -21,9 +21,7 @@ impl AnimationUniform {
 
         let joint_transform: [[[f32; 4]; 4]; MAX_JOINTS] = [uniform_mat; MAX_JOINTS];
 
-        Self {
-            joint_transform,
-        }
+        Self { joint_transform }
     }
 
     // fn update_view_proj(&mut self, camera: &Camera) {

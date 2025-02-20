@@ -82,7 +82,7 @@ impl Skeleton {
         let current_transform = parent_transform * local_transforms[joint_index].transpose();
 
         // calculate current transformation applicable to a vertex
-        let current_joint_transform =  current_transform * joint.inverse_bind_transform.transpose();
+        let current_joint_transform = current_transform * joint.inverse_bind_transform.transpose();
         joint_transforms[joint_index] = current_joint_transform;
 
         let children = self.get_children(joint_index);
@@ -96,7 +96,11 @@ impl Skeleton {
         }
     }
 
-    pub fn create_key_frame(&self, names: &Vec<String>, sample_poses: &Vec<cgmath::Matrix4<f32>>) -> Keyframe {
+    pub fn create_key_frame(
+        &self,
+        names: &Vec<String>,
+        sample_poses: &Vec<cgmath::Matrix4<f32>>,
+    ) -> Keyframe {
         let size = self.joints.len();
         let mut local_transforms: Vec<cgmath::Matrix4<f32>> =
             vec![cgmath::Matrix4::identity(); size];

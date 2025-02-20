@@ -2,9 +2,15 @@ use cgmath::Vector3;
 use collada::document::ColladaDocument;
 use wgpu_renderer::renderer::WgpuRendererInterface;
 
-use crate::{animated_object::animated_model::animation::Animation, deferred_animation_shader::{self, DeferredAnimationShaderDraw}};
+use crate::{
+    animated_object::animated_model::animation::Animation,
+    deferred_animation_shader::{self, DeferredAnimationShaderDraw},
+};
 
-use super::{animated_model::skeleton::Skeleton, animated_object_renderer::{AnimatedObjectRenderer, AnimatedObjectRendererResult}};
+use super::{
+    animated_model::skeleton::Skeleton,
+    animated_object_renderer::{AnimatedObjectRenderer, AnimatedObjectRendererResult},
+};
 
 pub struct AnimatedObject {
     pub _is_visible: bool,
@@ -41,8 +47,10 @@ impl WgpuAnimatedObjectStorage {
     ) {
         for elem in &mut self.elements {
             elem.animation.increment_time(dt);
-            elem.animation.update_animation_uniform(&mut elem.animation_uniform);
-            elem.mesh.update_animation_buffer(renderer_interface.queue(), &elem.animation_uniform);
+            elem.animation
+                .update_animation_uniform(&mut elem.animation_uniform);
+            elem.mesh
+                .update_animation_buffer(renderer_interface.queue(), &elem.animation_uniform);
         }
     }
 
@@ -264,18 +272,24 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
         skeleton
     }
 
-    fn create_animation(&mut self, skeleton: &Skeleton, collada_animation: &collada::Animation) -> Animation {
+    fn create_animation(
+        &mut self,
+        skeleton: &Skeleton,
+        collada_animation: &collada::Animation,
+    ) -> Animation {
         let collada_animation = &collada_animation;
-        let collada_animation_channels: &Vec<collada::AnimationChannel> = &collada_animation.animation_channels;
+        let collada_animation_channels: &Vec<collada::AnimationChannel> =
+            &collada_animation.animation_channels;
 
         let name = &collada_animation.name;
         let sample_times = &collada_animation_channels[0].sample_times;
 
         for collada_animation_channel in collada_animation_channels {
-            assert_eq!(collada_animation_channel.sample_times.len(), sample_times.len());
+            assert_eq!(
+                collada_animation_channel.sample_times.len(),
+                sample_times.len()
+            );
         }
-
-        
 
         // let target: &String = &collada_animation.target;
         // let sample_times: &Vec<f32> = &collada_animation.sample_times;
@@ -311,7 +325,8 @@ impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
 
         let obj_set: collada::ObjSet = collada_document.get_obj_set().unwrap();
         let collada_skeletons: Vec<collada::Skeleton> = collada_document.get_skeletons().unwrap();
-        let collada_animations: Vec<collada::Animation> = collada_document.get_animations().unwrap();
+        let collada_animations: Vec<collada::Animation> =
+            collada_document.get_animations().unwrap();
 
         let collada_skeleton_0 = &collada_skeletons[0];
         let skeleton = self.create_skeleton(collada_skeleton_0);
@@ -321,11 +336,12 @@ impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
 
         let mut animation_uniform = deferred_animation_shader::AnimationUniform::zero();
 
-        animation_uniform.joint_transform[1] = cgmath::Matrix4::from_translation(Vector3{
+        animation_uniform.joint_transform[1] = cgmath::Matrix4::from_translation(Vector3 {
             x: 2.0,
             y: 0.0,
             z: 0.0,
-        }).into();
+        })
+        .into();
 
         let (instance, mesh) = self.create_mesh(&obj_set, &animation_uniform);
 
@@ -344,7 +360,9 @@ impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
         let render_index = self.storage.elements.len();
         self.storage.elements.push(element);
 
-        AnimatedObjectRendererResult { _index: render_index }
+        AnimatedObjectRendererResult {
+            _index: render_index,
+        }
     }
 
     fn _set_object_position(&mut self, index: usize, x: f32, y: f32, z: f32) {
