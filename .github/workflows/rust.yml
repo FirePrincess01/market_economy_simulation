@@ -157,6 +157,7 @@ jobs:
           path: public/
 
   deploy:
+    if: ${{ github.event_name == 'push' }}
     permissions:
       id-token: write
       pages: write
