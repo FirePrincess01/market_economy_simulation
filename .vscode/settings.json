@@ -1,5 +1,8 @@
 {
     "cSpell.words": [
-        "heightmap"
+        "cgmath",
+        "collada",
+        "heightmap",
+        "wgpu",
     ]
 }

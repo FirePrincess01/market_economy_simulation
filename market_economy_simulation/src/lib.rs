@@ -1,5 +1,7 @@
+mod animated_object;
 mod base_factory;
 mod create_entities;
+mod deferred_animation_shader;
 mod deferred_color_shader;
 mod deferred_light_shader;
 mod ecs;
@@ -10,7 +12,10 @@ mod performance_monitor;
 mod renderer;
 mod world_mesh;
 
-use rusttype;
+use animated_object::{
+    animated_object_renderer::AnimatedObjectRenderer,
+    wgpu_animated_object_renderer::{WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage},
+};
 use wgpu_renderer::{
     default_application::{DefaultApplication, DefaultApplicationInterface},
     renderer::WgpuRendererInterface,
@@ -28,6 +33,9 @@ struct MarketEconomySimulation {
     renderer: renderer::Renderer,
     _world: ecs2::World,
     world_mesh: world_mesh::WorldMesh,
+
+    // ant: deferred_color_shader::Mesh,
+    animated_object_storage: WgpuAnimatedObjectStorage,
 
     // performance monitor
     performance_monitor: performance_monitor::PerformanceMonitor,
@@ -67,6 +75,8 @@ impl MarketEconomySimulation {
         // world mesh
         let world_mesh = world_mesh::WorldMesh::new(renderer_interface, &world);
 
+        let mut animated_object_storage = WgpuAnimatedObjectStorage::new();
+
         // performance monitor
         let performance_monitor = performance_monitor::PerformanceMonitor::new(renderer_interface);
 
@@ -79,12 +89,23 @@ impl MarketEconomySimulation {
         let mut entity_index_instance = vertex_texture_shader::Instance::zero();
         entity_index_instance.position.x = 20.0;
         entity_index_instance.position.y = 120.0;
+
         let entity_index_mesh = wgpu_renderer::label::LabelMesh::new(
             renderer_interface,
             entity_index_label.get_image(),
             &renderer.texture_bind_group_layout,
             &entity_index_instance,
         );
+
+        // create ant
+        let mut animated_object_renderer = WgpuAnimatedObjectRenderer {
+            storage: &mut animated_object_storage,
+            wgpu_renderer: renderer_interface,
+            animation_bind_group_layout: &renderer.animation_bind_group_layout,
+        };
+
+        let ant_xml = include_str!("../res/wiggle_tower2.dae");
+        animated_object_renderer.create_from_collada(ant_xml);
 
         Self {
             size,
@@ -94,6 +115,8 @@ impl MarketEconomySimulation {
 
             _world: world,
             world_mesh,
+
+            animated_object_storage,
 
             performance_monitor,
 
@@ -126,15 +149,13 @@ fn apply_scale_factor(
     }
 }
 
-impl<'a> DefaultApplicationInterface for MarketEconomySimulation {
+impl DefaultApplicationInterface for MarketEconomySimulation {
     fn create(
         renderer_interface: &mut dyn WgpuRendererInterface,
         size: winit::dpi::PhysicalSize<u32>,
         scale_factor: f32,
     ) -> Self {
-        let application = Self::new(renderer_interface, size, scale_factor);
-
-        application
+        Self::new(renderer_interface, size, scale_factor)
     }
 
     fn get_size(&self) -> winit::dpi::PhysicalSize<u32> {
@@ -170,6 +191,7 @@ impl<'a> DefaultApplicationInterface for MarketEconomySimulation {
         );
 
         self.performance_monitor.watch.start(3);
+        self.animated_object_storage.update(renderer_interface, &dt);
         // ecs::system::move_agents(&mut self.world);
         self.performance_monitor.watch.stop(3);
 
@@ -237,6 +259,7 @@ impl<'a> DefaultApplicationInterface for MarketEconomySimulation {
         self.renderer.render(
             renderer_interface,
             &self.world_mesh,
+            &self.animated_object_storage,
             &self.entity_index_mesh,
             &mut self.performance_monitor,
         )

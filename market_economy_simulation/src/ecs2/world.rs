@@ -35,7 +35,7 @@ impl World {
             for x in 0..ground_plane_width {
                 let field = ground_plane.get_mut(y, x);
                 field.entity_index = entities.len();
-                entities.push(Entity::GroundPlane { y: y, x: x });
+                entities.push(Entity::GroundPlane { y, x });
             }
         }
 

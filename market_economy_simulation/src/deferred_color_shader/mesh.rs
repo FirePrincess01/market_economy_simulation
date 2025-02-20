@@ -11,7 +11,7 @@ use super::VertexBuffer;
 
 /// A general purpose shader using vertices, colors and an instance matrix
 pub struct Mesh {
-    vertex_buffer: VertexBuffer,
+    vertex_buffer: VertexBuffer<Vertex>,
     index_buffer: IndexBuffer,
     instance_buffer: InstanceBuffer,
     max_instances: u32,
@@ -29,7 +29,7 @@ impl Mesh {
         let vertex_buffer = VertexBuffer::new(device, vertices);
         let index_buffer = IndexBuffer::new(device, indices);
 
-        let instance_buffer = InstanceBuffer::new(device, &instances);
+        let instance_buffer = InstanceBuffer::new(device, instances);
 
         let max_instances = instances.len() as u32;
         let nr_instances = instances.len() as u32;

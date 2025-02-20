@@ -26,8 +26,8 @@ impl GroundPlaneMesh {
         let quad_size = 1.0 * scale;
         let quad = geometry::Quad::new(quad_size);
 
-        let mut instances: Vec<deferred_color_shader::Instance> = Vec::new();
-        instances.reserve(ground_plane.size());
+        let mut instances: Vec<deferred_color_shader::Instance> =
+            Vec::with_capacity(ground_plane.size());
 
         for y in 0..ground_plane.height() {
             for x in 0..ground_plane.width() {
@@ -42,7 +42,7 @@ impl GroundPlaneMesh {
 
                 let instance = deferred_color_shader::Instance {
                     position: [quad_size * x as f32, quad_size * y as f32, 0.0],
-                    color: color,
+                    color,
                     entity: [field.entity_index as u32, 0, 0],
                 };
                 instances.push(instance);
@@ -68,7 +68,7 @@ impl GroundPlaneMesh {
             wgpu_renderer.device(),
             &ground_plane_light_quad.vertices,
             &ground_plane_light_quad.indices,
-            &INSTANCES,
+            INSTANCES,
         );
 
         Self { mesh, mesh_light }
