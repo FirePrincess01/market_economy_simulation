@@ -15,7 +15,6 @@ use super::{
 pub struct AnimatedObject {
     pub _is_visible: bool,
     // pub update_position: bool,
-    // pub update_text: bool,
     pub x: f32,
     pub y: f32,
     pub z: f32,
@@ -26,7 +25,6 @@ pub struct AnimatedObject {
     pub animation_uniform: deferred_animation_shader::AnimationUniform,
 
     mesh: deferred_animation_shader::Mesh,
-    // pub mes_light: deferred_light_shader::Mesh,
 }
 
 pub struct WgpuAnimatedObjectStorage {
@@ -65,10 +63,8 @@ pub struct WgpuAnimatedObjectRenderer<'a> {
     pub storage: &'a mut WgpuAnimatedObjectStorage,
 
     // wgpu renderer
-    // pub font: &'a rusttype::Font<'static>,
     pub wgpu_renderer: &'a mut dyn wgpu_renderer::renderer::WgpuRendererInterface,
     pub animation_bind_group_layout: &'a deferred_animation_shader::AnimationBindGroupLayout,
-    // pub texture_bind_group_layout: &'a wgpu_renderer::vertex_texture_shader::TextureBindGroupLayout,
 }
 
 impl WgpuAnimatedObjectRenderer<'_> {

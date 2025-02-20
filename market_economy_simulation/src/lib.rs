@@ -34,7 +34,7 @@ struct MarketEconomySimulation {
     _world: ecs2::World,
     world_mesh: world_mesh::WorldMesh,
 
-    // spider: deferred_color_shader::Mesh,
+    // ant: deferred_color_shader::Mesh,
     animated_object_storage: WgpuAnimatedObjectStorage,
 
     // performance monitor
@@ -97,15 +97,15 @@ impl MarketEconomySimulation {
             &entity_index_instance,
         );
 
-        // create spider
+        // create ant
         let mut animated_object_renderer = WgpuAnimatedObjectRenderer {
             storage: &mut animated_object_storage,
             wgpu_renderer: renderer_interface,
             animation_bind_group_layout: &renderer.animation_bind_group_layout,
         };
 
-        let spider_xml = include_str!("../res/wiggle_tower2.dae");
-        animated_object_renderer.create_from_collada(spider_xml);
+        let ant_xml = include_str!("../res/wiggle_tower2.dae");
+        animated_object_renderer.create_from_collada(ant_xml);
 
         Self {
             size,
