@@ -2,7 +2,6 @@
 //!
 
 use crate::animated_object::wgpu_animated_object_renderer::WgpuAnimatedObjectStorage;
-use crate::deferred_animation_shader::DeferredAnimationShaderDraw;
 use crate::deferred_color_shader::{self, DeferredShaderDraw, EntityBuffer, GBuffer};
 use crate::deferred_light_shader::DeferredLightShaderDraw;
 use crate::performance_monitor::PerformanceMonitor;

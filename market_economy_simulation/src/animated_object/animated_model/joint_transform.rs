@@ -1,5 +1,6 @@
 use cgmath::{Matrix, SquareMatrix, Zero};
 
+#[allow(unused)]
 #[derive(Clone, Debug)]
 pub struct JointTransform {
     translation: cgmath::Vector3<f32>,
@@ -8,6 +9,7 @@ pub struct JointTransform {
     joint_transform: cgmath::Matrix4<f32>,
 }
 
+#[allow(unused)]
 impl JointTransform {
     // pub fn new(translation: cgmath::Vector3<f32>, rotation: cgmath::Quaternion<f32>) -> Self {
     //     Self {

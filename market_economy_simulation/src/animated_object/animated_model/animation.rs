@@ -4,13 +4,10 @@ use crate::deferred_animation_shader;
 use super::{keyframe::Keyframe, skeleton::Skeleton};
 
 pub struct Animation {
-    name: String,
+    _name: String,
 
     key_times: Vec<f32>,
     key_frames: Vec<Keyframe>,
-
-    // caching for faster iterations
-    // last_index: usize,
 
     current_key_frame_time: instant::Duration,
 }
@@ -51,7 +48,7 @@ impl Animation {
         }
 
         Self {
-            name: name.clone(),
+            _name: name.clone(),
             key_times,
             key_frames,
             // last_index: 0,
@@ -63,8 +60,6 @@ impl Animation {
         let max_time = self.key_times.last().unwrap_or(&0.0);
 
         self.current_key_frame_time += *dt;
-
-        let time_passed = self.current_key_frame_time.as_secs_f32();
 
         if self.current_key_frame_time.as_secs_f32() > *max_time {
             self.current_key_frame_time = instant::Duration::ZERO;

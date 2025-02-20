@@ -1,8 +1,8 @@
 
 pub struct Joint {
     pub id: String,
-    pub name: String,
-    pub index: usize,  // ID of the joint (exported value from blender)
+    pub _name: String,
+    pub _index: usize,  // ID of the joint (exported value from blender)
     pub parent: usize, // ID of the parent joint
 
     pub bind_transform: cgmath::Matrix4<f32>, // Parent-relative transforms for the joint (at time of vertex binding)
@@ -25,8 +25,8 @@ impl Joint {
 
         Self {
             id,
-            name,
-            index,
+            _name: name,
+            _index: index,
             parent,
             bind_transform,
             inverse_bind_transform,

@@ -7,7 +7,7 @@ use crate::{animated_object::animated_model::animation::Animation, deferred_anim
 use super::{animated_model::skeleton::Skeleton, animated_object_renderer::{AnimatedObjectRenderer, AnimatedObjectRendererResult}};
 
 pub struct AnimatedObject {
-    pub is_visible: bool,
+    pub _is_visible: bool,
     // pub update_position: bool,
     // pub update_text: bool,
     pub x: f32,
@@ -74,29 +74,29 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
     ) {
         let obj = &obj_set.objects[0];
 
-        let id = &obj.id;
-        let name = &obj.name;
+        let _id = &obj.id;
+        let _name = &obj.name;
         let vertices = &obj.vertices;
         let joint_weights = &obj.joint_weights;
         let tex_vertices = &obj.tex_vertices;
         let normals = &obj.normals;
 
         let geometry = &obj.geometry[0];
-        let smooth_shading = geometry.smooth_shading_group;
+        let _smooth_shading = geometry.smooth_shading_group;
         let mesh = &geometry.mesh[0];
 
         let mut deferred_vertices: Vec<deferred_animation_shader::Vertex> = Vec::new();
         let mut deferred_indices: Vec<u32> = Vec::new();
 
         match mesh {
-            collada::PrimitiveElement::Polylist(polylist) => todo!(),
+            collada::PrimitiveElement::Polylist(_polylist) => todo!(),
             collada::PrimitiveElement::Triangles(triangles) => {
                 let indices: &Vec<(usize, usize, usize)> = &triangles.vertices;
                 let tex_indices: &Vec<(usize, usize, usize)> =
                     triangles.tex_vertices.as_ref().unwrap();
                 let normal_indices: &Vec<(usize, usize, usize)> =
                     triangles.normals.as_ref().unwrap();
-                let material: &Option<String> = &triangles.material;
+                let _material: &Option<String> = &triangles.material;
 
                 // println!("********");
                 // println!("mesh");
@@ -157,9 +157,9 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
                     let normal1 = normals[normal_indices.1];
                     let normal2 = normals[normal_indices.2];
 
-                    let tex_coordinate_0 = tex_vertices[tex_indices.0];
-                    let tex_coordinate_1 = tex_vertices[tex_indices.1];
-                    let tex_coordinate_2 = tex_vertices[tex_indices.2];
+                    let _tex_coordinate_0 = tex_vertices[tex_indices.0];
+                    let _tex_coordinate_1 = tex_vertices[tex_indices.1];
+                    let _tex_coordinate_2 = tex_vertices[tex_indices.2];
 
                     let indices_0 = i * 3 + 0;
                     let indices_1 = i * 3 + 1;
@@ -244,8 +244,8 @@ impl<'a> WgpuAnimatedObjectRenderer<'a> {
     }
 
     fn create_skeleton(&mut self, collada_skeleton: &collada::Skeleton) -> Skeleton {
-        let joints = &collada_skeleton.joints;
-        let bind_poses = &collada_skeleton.bind_poses;
+        let _joints = &collada_skeleton.joints;
+        let _bind_poses = &collada_skeleton.bind_poses;
 
         // println!("********");
         // println!("Skeleton");
@@ -330,7 +330,7 @@ impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
         let (instance, mesh) = self.create_mesh(&obj_set, &animation_uniform);
 
         let element = AnimatedObject {
-            is_visible: true,
+            _is_visible: true,
             x: 0.0,
             y: 0.0,
             z: 0.0,
@@ -344,19 +344,19 @@ impl<'a> AnimatedObjectRenderer for WgpuAnimatedObjectRenderer<'a> {
         let render_index = self.storage.elements.len();
         self.storage.elements.push(element);
 
-        AnimatedObjectRendererResult { index: render_index }
+        AnimatedObjectRendererResult { _index: render_index }
     }
 
-    fn set_object_position(&mut self, index: usize, x: f32, y: f32, z: f32) {
+    fn _set_object_position(&mut self, index: usize, x: f32, y: f32, z: f32) {
         let elem = &mut self.storage.elements[index];
 
         elem.x = x;
         elem.y = y;
-        elem.z = y;
+        elem.z = z;
 
         elem.instance.position[0] = elem.x as f32;
         elem.instance.position[1] = elem.y as f32;
-        elem.instance.position[2] = elem.y as f32;
+        elem.instance.position[2] = elem.z as f32;
         elem.mesh
             .update_instance_buffer(self.wgpu_renderer.queue(), &[elem.instance]);
     }
