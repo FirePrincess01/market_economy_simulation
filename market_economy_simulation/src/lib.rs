@@ -104,10 +104,6 @@ impl MarketEconomySimulation {
             animation_bind_group_layout: &renderer.animation_bind_group_layout,
         };
 
-        // let spider_xml = include_str!("../res/spider_0_1.dae");
-        // let spider_xml = include_str!("../res/test_blender_3_0_1.dae");
-        // let spider_xml = include_str!("../res/test.dae");
-        // let spider_xml = include_str!("../res/test2.dae");
         let spider_xml = include_str!("../res/wiggle_tower2.dae");
         animated_object_renderer.create_from_collada(spider_xml);
 
