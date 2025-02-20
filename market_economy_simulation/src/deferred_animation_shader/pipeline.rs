@@ -1,7 +1,6 @@
 //! Deferred shader drawing colored objects
 //!
 
-
 use super::super::deferred_color_shader::CameraBindGroupLayout;
 use super::super::deferred_color_shader::EntityBuffer;
 use super::super::deferred_color_shader::GBuffer;

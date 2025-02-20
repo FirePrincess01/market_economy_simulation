@@ -26,7 +26,8 @@ impl GroundPlaneMesh {
         let quad_size = 1.0 * scale;
         let quad = geometry::Quad::new(quad_size);
 
-        let mut instances: Vec<deferred_color_shader::Instance> = Vec::with_capacity(ground_plane.size());
+        let mut instances: Vec<deferred_color_shader::Instance> =
+            Vec::with_capacity(ground_plane.size());
 
         for y in 0..ground_plane.height() {
             for x in 0..ground_plane.width() {

@@ -128,8 +128,7 @@ impl Renderer {
         let speed = 40.0;
         let sensitivity = 1.0;
         let sensitivity_scroll = 1.0;
-        let camera_controller =
-            CameraController::new(speed, sensitivity, sensitivity_scroll);
+        let camera_controller = CameraController::new(speed, sensitivity, sensitivity_scroll);
 
         let width = wgpu_renderer.surface_width();
         let height = wgpu_renderer.surface_height();
@@ -521,4 +520,3 @@ impl Renderer {
         Ok(())
     }
 }
-

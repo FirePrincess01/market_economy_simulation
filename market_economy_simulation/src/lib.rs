@@ -159,8 +159,6 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         size: winit::dpi::PhysicalSize<u32>,
         scale_factor: f32,
     ) -> Self {
-        
-
         Self::new(renderer_interface, size, scale_factor)
     }
 

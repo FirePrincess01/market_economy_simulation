@@ -267,8 +267,6 @@ impl WgpuAnimatedObjectRenderer<'_> {
         // println!("bind_poses len: {:?}", bind_poses.len());
         // println!("bind_poses: {:?}", bind_poses);
 
-        
-
         Skeleton::new(collada_skeleton)
     }
 
@@ -309,8 +307,6 @@ impl WgpuAnimatedObjectRenderer<'_> {
         // println!("");
         // println!("sample_poses len: {:?}", sample_poses.len());
         // println!("sample_poses: {:?}", sample_poses);
-
-        
 
         Animation::new(skeleton, name, sample_times, collada_animation_channels)
     }

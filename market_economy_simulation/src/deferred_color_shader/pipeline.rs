@@ -1,7 +1,6 @@
 //! Deferred shader drawing colored objects
 //!
 
-
 use super::entity_buffer::EntityBuffer;
 use super::CameraBindGroupLayout;
 use super::GBuffer;

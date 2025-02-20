@@ -86,4 +86,3 @@ impl EntityInterface for BaseFactory {
         1.0
     }
 }
-
