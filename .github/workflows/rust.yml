@@ -143,13 +143,29 @@ jobs:
           cp market_economy_simulation/pkg/* public/market_economy_simulation/pkg
           cp index.html public/index.html
 
-      - name: Upload binaries to Github Pages
-        uses: peaceiris/actions-gh-pages@v4
-        # if: ${{ github.event_name == 'push' }}
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+      # - name: Upload binaries to Github Pages
+      #   uses: peaceiris/actions-gh-pages@v4
+      #   # if: ${{ github.event_name == 'push' }}
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     publish_dir: ./public
 
+      - name: Upload static files as artifact
+        id: deployment
+        uses: actions/upload-pages-artifact@v3 # or specific "vX.X.X" version tag for this action
+        with:
+          path: public/
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build_wasm
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
         
 
   # trunk:
