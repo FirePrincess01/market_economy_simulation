@@ -4,8 +4,8 @@
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct Vertex {
-    pub position: [f32; 3],
-    pub normal: [f32; 3],
+    pub position: [f32; 4],
+    pub normal: [f32; 4],
 
     // animation data
     pub joint_indices: [u32; 4],
@@ -15,8 +15,8 @@ pub struct Vertex {
 impl Vertex {
     pub fn _zero() -> Self {
         Self {
-            position: [0.0, 0.0, 0.0],
-            normal: [0.0, 0.0, 0.0],
+            position: [0.0, 0.0, 0.0, 0.0],
+            normal: [0.0, 0.0, 0.0, 0.0],
 
             joint_indices: [0, 0, 0, 0],
             joint_weights: [0.0, 0.0, 0.0, 0.0],
@@ -31,20 +31,20 @@ impl Vertex {
                 wgpu::VertexAttribute {
                     offset: 0,
                     shader_location: 0,
-                    format: wgpu::VertexFormat::Float32x3,
+                    format: wgpu::VertexFormat::Float32x4,
                 },
                 wgpu::VertexAttribute {
-                    offset: std::mem::size_of::<[f32; 3]>() as wgpu::BufferAddress,
+                    offset: std::mem::size_of::<[f32; 4]>() as wgpu::BufferAddress,
                     shader_location: 1,
-                    format: wgpu::VertexFormat::Float32x3,
+                    format: wgpu::VertexFormat::Float32x4,
                 },
                 wgpu::VertexAttribute {
-                    offset: std::mem::size_of::<[f32; 3 * 2]>() as wgpu::BufferAddress,
+                    offset: std::mem::size_of::<[f32; 4 * 2]>() as wgpu::BufferAddress,
                     shader_location: 2,
                     format: wgpu::VertexFormat::Uint32x4,
                 },
                 wgpu::VertexAttribute {
-                    offset: std::mem::size_of::<[u32; 3 * 2 + 4]>() as wgpu::BufferAddress,
+                    offset: std::mem::size_of::<[u32; 4 * 3]>() as wgpu::BufferAddress,
                     shader_location: 3,
                     format: wgpu::VertexFormat::Float32x4,
                 },

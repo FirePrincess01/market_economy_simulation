@@ -21,6 +21,7 @@ pub struct Mesh {
     instance_buffer: InstanceBuffer,
     max_instances: u32,
     nr_instances: u32,
+    nr_vertices: u32,
 }
 
 #[allow(dead_code)]
@@ -45,6 +46,7 @@ impl Mesh {
 
         let max_instances = instances.len() as u32;
         let nr_instances = instances.len() as u32;
+        let nr_vertices = vertices.len() as u32;
 
         Self {
             vertex_buffer,
@@ -53,6 +55,7 @@ impl Mesh {
             instance_buffer,
             max_instances,
             nr_instances,
+            nr_vertices,
         }
     }
 
@@ -81,6 +84,7 @@ impl DeferredAnimationShaderDraw for Mesh {
         self.index_buffer.bind(render_pass);
         self.instance_buffer.bind(render_pass);
 
-        render_pass.draw_indexed(0..self.index_buffer.size(), 0, 0..self.nr_instances);
+        // render_pass.draw_indexed(0..self.index_buffer.size()-1374 +200, 0, 0..self.nr_instances);
+        render_pass.draw(0..self.nr_vertices, 0..self.nr_instances);
     }
 }

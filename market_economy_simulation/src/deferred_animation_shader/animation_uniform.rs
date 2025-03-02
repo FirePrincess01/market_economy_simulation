@@ -3,7 +3,7 @@
 
 use cgmath::prelude::*;
 
-const MAX_JOINTS: usize = 4;
+const MAX_JOINTS: usize = 16;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
@@ -17,7 +17,7 @@ impl AnimationUniform {
     pub fn zero() -> Self {
         // use cgmath::SquareMatrix;
 
-        let uniform_mat: [[f32; 4]; MAX_JOINTS] = cgmath::Matrix4::identity().into();
+        let uniform_mat: [[f32; 4]; 4] = cgmath::Matrix4::identity().into();
 
         let joint_transform: [[[f32; 4]; 4]; MAX_JOINTS] = [uniform_mat; MAX_JOINTS];
 

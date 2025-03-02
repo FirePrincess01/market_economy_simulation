@@ -81,6 +81,7 @@ impl Skeleton {
 
         // calculate current transformation applicable to a vertex
         let current_joint_transform = current_transform * joint.inverse_bind_transform.transpose();
+        // let current_joint_transform = cgmath::Matrix4::identity();
         joint_transforms[joint_index] = current_joint_transform;
 
         let children = self.get_children(joint_index);
@@ -119,8 +120,13 @@ impl Skeleton {
             let id = &names[i];
             let sample_pose = &sample_poses[i];
 
-            let joint_index = self.find_joint(id).expect("Joint not found");
-            local_transforms[joint_index] = *sample_pose;
+            let joint_index = self.find_joint(id);
+            match joint_index {
+                Some(joint_index) => {
+                    local_transforms[joint_index] = *sample_pose;
+                },
+                None => {},
+            }
         }
 
         // calculate joint transforms

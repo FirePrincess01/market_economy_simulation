@@ -104,7 +104,8 @@ impl MarketEconomySimulation {
             animation_bind_group_layout: &renderer.animation_bind_group_layout,
         };
 
-        let ant_xml = include_str!("../res/wiggle_tower2.dae");
+        // let ant_xml = include_str!("../res/wiggle_tower2.dae");
+        let ant_xml = include_str!("../res/ant_0_8.dae");
         animated_object_renderer.create_from_collada(ant_xml);
 
         Self {

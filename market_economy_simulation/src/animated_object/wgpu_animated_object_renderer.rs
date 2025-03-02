@@ -107,7 +107,7 @@ impl WgpuAnimatedObjectRenderer<'_> {
                 // println!("********");
 
                 // println!("");
-                // println!("{}", name);
+                // println!("{}", _name);
 
                 // println!("");
                 // println!("vertices len: {:?}", vertices.len());
@@ -170,8 +170,8 @@ impl WgpuAnimatedObjectRenderer<'_> {
                     let indices_2 = i * 3 + 2;
 
                     let deferred_vertex0 = deferred_animation_shader::Vertex {
-                        position: [vertex0.x as f32, vertex0.y as f32, vertex0.z as f32],
-                        normal: [normal0.x as f32, normal0.y as f32, normal0.z as f32],
+                        position: [vertex0.x as f32, vertex0.y as f32, vertex0.z as f32, 1.0],
+                        normal: [normal0.x as f32, normal0.y as f32, normal0.z as f32, 0.0],
                         joint_indices: [
                             joint0.joints[0] as u32,
                             joint0.joints[1] as u32,
@@ -186,8 +186,8 @@ impl WgpuAnimatedObjectRenderer<'_> {
                         ],
                     };
                     let deferred_vertex1 = deferred_animation_shader::Vertex {
-                        position: [vertex1.x as f32, vertex1.y as f32, vertex1.z as f32],
-                        normal: [normal1.x as f32, normal1.y as f32, normal1.z as f32],
+                        position: [vertex1.x as f32, vertex1.y as f32, vertex1.z as f32, 1.0],
+                        normal: [normal1.x as f32, normal1.y as f32, normal1.z as f32, 0.0],
                         joint_indices: [
                             joint1.joints[0] as u32,
                             joint1.joints[1] as u32,
@@ -202,8 +202,8 @@ impl WgpuAnimatedObjectRenderer<'_> {
                         ],
                     };
                     let deferred_vertex2 = deferred_animation_shader::Vertex {
-                        position: [vertex2.x as f32, vertex2.y as f32, vertex2.z as f32],
-                        normal: [normal2.x as f32, normal2.y as f32, normal2.z as f32],
+                        position: [vertex2.x as f32, vertex2.y as f32, vertex2.z as f32, 1.0],
+                        normal: [normal2.x as f32, normal2.y as f32, normal2.z as f32, 0.0],
                         joint_indices: [
                             joint2.joints[0] as u32,
                             joint2.joints[1] as u32,
@@ -243,7 +243,7 @@ impl WgpuAnimatedObjectRenderer<'_> {
             &deferred_indices,
             &[instance],
         );
-
+        
         (instance, mesh)
     }
 
