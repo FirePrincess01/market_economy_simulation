@@ -1,6 +1,8 @@
 //! Contains the device buffers to render an object with this shader
 //!
 
+use gltf::mesh::util::weights;
+
 use super::animation_uniform_buffer::AnimationUniformBuffer;
 use super::AnimationBindGroupLayout;
 use super::AnimationUniform;
@@ -17,7 +19,6 @@ use super::VertexBuffer;
 pub struct Mesh {
     vertex_buffer: VertexBuffer<Vertex>,
     animation_buffer: AnimationUniformBuffer,
-    index_buffer: IndexBuffer,
     instance_buffer: InstanceBuffer,
     max_instances: u32,
     nr_instances: u32,
@@ -31,7 +32,6 @@ impl Mesh {
         animation_bind_group_layout: &AnimationBindGroupLayout,
         vertices: &[Vertex],
         animation: &AnimationUniform,
-        indices: &[u32],
         instances: &[Instance],
     ) -> Self {
         let vertex_buffer = VertexBuffer::new(wgpu_renderer.device(), vertices);
@@ -39,8 +39,6 @@ impl Mesh {
         let mut animation_buffer =
             AnimationUniformBuffer::new(wgpu_renderer.device(), animation_bind_group_layout);
         animation_buffer.update(wgpu_renderer.queue(), animation);
-
-        let index_buffer = IndexBuffer::new(wgpu_renderer.device(), indices);
 
         let instance_buffer = InstanceBuffer::new(wgpu_renderer.device(), instances);
 
@@ -51,12 +49,45 @@ impl Mesh {
         Self {
             vertex_buffer,
             animation_buffer,
-            index_buffer,
             instance_buffer,
             max_instances,
             nr_instances,
             nr_vertices,
         }
+    }
+
+    pub fn from_animation_data(
+        wgpu_renderer: &mut dyn wgpu_renderer::renderer::WgpuRendererInterface,
+        animation_bind_group_layout: &AnimationBindGroupLayout,
+        animation_data: &crate::animated_object::animated_object_data::AnimatedObjectData,
+        instances: &[Instance],
+    ) -> Self
+    {
+        let positions = &animation_data.positions;
+        let normals = &animation_data.normals;
+        let joints = &animation_data.joints;
+        let weights = &animation_data.weights;
+
+        let len = positions.len();
+        assert_eq!(normals.len(), len);
+        assert_eq!(joints.len(), len);
+        assert_eq!(weights.len(), len);
+
+        let mut vertices = Vec::new();
+        for i in 0..len {
+            let vertex = Vertex {
+                position: [positions[i][0], positions[i][1], positions[i][2], 1.0],
+                normal: [normals[i][0], normals[i][1], normals[i][2], 0.0],
+                joint_indices: [joints[i][0] as u32, joints[i][1] as u32, joints[i][2] as u32, joints[i][3] as u32],
+                joint_weights: weights[i],
+            };
+
+            vertices.push(vertex);
+        }
+
+        let animation_uniform = AnimationUniform::zero();
+
+        Self::new(wgpu_renderer, animation_bind_group_layout, &vertices, &animation_uniform, instances)
     }
 
     pub fn update_vertex_buffer(&mut self, queue: &wgpu::Queue, vertices: &[Vertex]) {
@@ -81,7 +112,6 @@ impl DeferredAnimationShaderDraw for Mesh {
     fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         self.vertex_buffer.bind(render_pass);
         self.animation_buffer.bind(render_pass);
-        self.index_buffer.bind(render_pass);
         self.instance_buffer.bind(render_pass);
 
         // render_pass.draw_indexed(0..self.index_buffer.size()-1374 +200, 0, 0..self.nr_instances);

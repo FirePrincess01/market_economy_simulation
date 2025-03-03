@@ -13,8 +13,7 @@ mod renderer;
 mod world_mesh;
 
 use animated_object::{
-    animated_object_renderer::AnimatedObjectRenderer,
-    wgpu_animated_object_renderer::{WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage},
+    animated_object_renderer::AnimatedObjectRenderer, gltf_importer::GltfImporter, wgpu_animated_object_renderer::{WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage}
 };
 use wgpu_renderer::{
     default_application::{DefaultApplication, DefaultApplicationInterface},
@@ -105,8 +104,13 @@ impl MarketEconomySimulation {
         };
 
         // let ant_xml = include_str!("../res/wiggle_tower2.dae");
-        let ant_xml = include_str!("../res/ant_0_8.dae");
-        animated_object_renderer.create_from_collada(ant_xml);
+        // let ant_xml = include_str!("../res/ant_0_8.dae");
+        // animated_object_renderer.create_from_collada(ant_xml);
+
+        // let glb_bin = include_bytes!("../res/ant_0_8.glb");
+        let glb_bin = include_bytes!("../res/wiggle_tower2.glb");
+        
+        animated_object_renderer.create_from_glb(glb_bin);
 
         Self {
             size,

@@ -1,0 +1,263 @@
+use core::error;
+
+use cgmath::Zero;
+
+use crate::animated_object::animated_object_data::{AnimationRotation, AnimationTranslation};
+
+use super::animated_object_data::{AnimatedObjectData, AnimationData};
+
+pub struct GltfImporter {}
+
+impl GltfImporter {
+    pub fn create(glb_bin: &[u8]) -> AnimatedObjectData {
+        let (document, buffer_data, image_data) = gltf::import_slice(glb_bin).unwrap();
+        let scene = document.scenes().next().expect("No scene found!");
+        let node = scene.nodes().next().expect("No Node in scene found!");
+        let mesh_node = node.children().next().expect("No children found in node!");
+        let mesh: gltf::Mesh<'_> = mesh_node.mesh().expect("Mesh not found in node!");
+        let skin = mesh_node.skin().expect("Skin not found in node!");
+        let animations = document.animations();
+
+        let (positions, normals, tex_coords, joints, weights) =
+            Self::get_mesh_data(&buffer_data, &mesh);
+        let (joint_name, joint_children, joint_translation, joint_rotation, inverse_bind_transform) =
+            Self::get_skin_data(&buffer_data, &skin);
+
+        let animation_data = Self::get_animation_data(&buffer_data, animations, &joint_name);
+
+        AnimatedObjectData {
+            positions,
+            normals,
+            tex_coords,
+            joints,
+            weights,
+
+            joint_name,
+            joint_children,
+            joint_translation,
+            joint_rotation,
+            inverse_bind_transform,
+
+            animations: animation_data,
+        }
+    }
+
+    fn get_mesh_data(
+        buffer_data: &Vec<gltf::buffer::Data>,
+        mesh: &gltf::Mesh<'_>,
+    ) -> (
+        Vec<[f32; 3]>,
+        Vec<[f32; 3]>,
+        Vec<[f32; 2]>,
+        Vec<[u8; 4]>,
+        Vec<[f32; 4]>,
+    ) {
+        let mut positions: Vec<[f32; 3]> = Vec::new();
+        let mut normals: Vec<[f32; 3]> = Vec::new();
+        let mut tex_coords: Vec<[f32; 2]> = Vec::new();
+        let mut joints: Vec<[u8; 4]> = Vec::new();
+        let mut weights: Vec<[f32; 4]> = Vec::new();
+
+        for primitive in mesh.primitives() {
+            let reader = primitive.reader(|buffer| Some(&buffer_data[buffer.index()]));
+
+            let position_iter = reader.read_positions().expect("No positions found");
+            for elem in position_iter {
+                positions.push(elem);
+            }
+
+            let normals_iter = reader.read_normals().expect("No normals found");
+            for elem in normals_iter {
+                normals.push(elem);
+            }
+
+            let tex_coords_iter = reader.read_tex_coords(0).expect("No tex_coords found");
+            match tex_coords_iter {
+                gltf::mesh::util::ReadTexCoords::U8(iter) => todo!(),
+                gltf::mesh::util::ReadTexCoords::U16(iter) => todo!(),
+                gltf::mesh::util::ReadTexCoords::F32(iter) => {
+                    for elem in iter {
+                        tex_coords.push(elem);
+                    }
+                }
+            }
+
+            let joints_iter = reader.read_joints(0).expect("No joints found");
+            match joints_iter {
+                gltf::mesh::util::ReadJoints::U8(iter) => {
+                    for elem in iter {
+                        joints.push(elem);
+                    }
+                }
+                gltf::mesh::util::ReadJoints::U16(iter) => todo!(),
+            }
+
+            let weights_iter = reader.read_weights(0).expect("No weights found");
+            match weights_iter {
+                gltf::mesh::util::ReadWeights::U8(iter) => todo!(),
+                gltf::mesh::util::ReadWeights::U16(iter) => todo!(),
+                gltf::mesh::util::ReadWeights::F32(iter) => {
+                    for elem in iter {
+                        weights.push(elem);
+                    }
+                }
+            }
+        }
+
+        (positions, normals, tex_coords, joints, weights)
+    }
+
+    fn get_skin_data(
+        buffer_data: &[gltf::buffer::Data],
+        skin: &gltf::Skin<'_>,
+    ) -> (
+        Vec<String>,
+        Vec<Vec<String>>,
+        Vec<cgmath::Vector3<f32>>,
+        Vec<cgmath::Quaternion<f32>>,
+        Vec<cgmath::Matrix4<f32>>,
+    ) {
+        let mut joint_name: Vec<String> = Vec::new();
+        let mut joint_children: Vec<Vec<String>> = Vec::new();
+        let mut joint_translation: Vec<cgmath::Vector3<f32>> = Vec::new();
+        let mut joint_rotation: Vec<cgmath::Quaternion<f32>> = Vec::new();
+        let mut inverse_bind_transform: Vec<cgmath::Matrix4<f32>> = Vec::new();
+
+        // inverse bind transform
+        let inverse_bind_matrices = skin.inverse_bind_matrices().unwrap();
+        let reader = skin.reader(|buffer| Some(&buffer_data[buffer.index()]));
+
+        let inverse_bind_matrices_iter = reader.read_inverse_bind_matrices().unwrap();
+        for elem in inverse_bind_matrices_iter {
+            let mat = cgmath::Matrix4::from(elem);
+            inverse_bind_transform.push(mat);
+        }
+
+        // name, translation, rotation
+        let joints_iter = skin.joints();
+        for joint in joints_iter {
+            let name = joint.name().unwrap();
+            let (translation, rotation, scale) = joint.transform().decomposed();
+            let bind_transform = joint.transform().matrix();
+
+            let children = joint.children();
+            println!("children: {}", children.clone().count());
+            let mut childrent_vec: Vec<String> = Vec::new();
+            for child in children {
+                let child_name = child.name().unwrap();
+                println!("child name: {}", child.name().unwrap());
+                childrent_vec.push(child_name.to_string());
+            }
+
+            joint_name.push(name.to_string());
+            joint_children.push(childrent_vec);
+            joint_translation.push(cgmath::Vector3::from(translation));
+            joint_rotation.push(cgmath::Quaternion::from(rotation));
+        }
+
+        (
+            joint_name,
+            joint_children,
+            joint_translation,
+            joint_rotation,
+            inverse_bind_transform,
+        )
+    }
+
+    fn get_animation_data(
+        buffer_data: &[gltf::buffer::Data],
+        animations: gltf::iter::Animations<'_>,
+        joint_name: &Vec<String>,
+    ) -> Vec<AnimationData> {
+        let mut animation_data: Vec<AnimationData> = Vec::new();
+
+        for animation in animations {
+            let mut name: String = String::new();
+            let mut joint_translations: Vec<AnimationTranslation> = Vec::new();
+            let mut joint_rotations: Vec<AnimationRotation> = Vec::new();
+
+            // gen name
+            let animation_name = animation.name().unwrap();
+            name = animation_name.to_string();
+            println!("animation name: {}", name);
+
+            let mut channesls_iter = animation.channels();
+            let channels_len = channesls_iter.clone().count();
+            let length = joint_name.len();
+            assert_eq!(channels_len, length * 3);
+
+            for i in 0..length {
+                let channel_translate = channesls_iter.next().unwrap();
+                let channel_rotate = channesls_iter.next().unwrap();
+                let channel_scale = channesls_iter.next().unwrap();
+
+                let name = &joint_name[i];
+                // println!("name: {}", name);
+                assert_eq!(name, channel_translate.target().node().name().unwrap());
+                assert_eq!(name, channel_rotate.target().node().name().unwrap());
+                assert_eq!(name, channel_scale.target().node().name().unwrap());
+
+                let reader_translate =
+                    channel_translate.reader(|buffer| Some(&buffer_data[buffer.index()]));
+                let reader_rotate =
+                    channel_rotate.reader(|buffer| Some(&buffer_data[buffer.index()]));
+
+                // get translation
+                let mut animation_translation = AnimationTranslation {
+                    key_times: Vec::new(),
+                    joint_translations: Vec::new(),
+                };
+                let output_translation = reader_translate.read_outputs().unwrap();
+                match output_translation {
+                    gltf::animation::util::ReadOutputs::Translations(iter) => {
+                        animation_translation
+                            .joint_translations
+                            .push(cgmath::Vector3::from(iter.clone().next().unwrap()));
+                    }
+                    _ => panic!("Expected Translation Element!"),
+                }
+                let input_transloation = reader_translate.read_inputs().unwrap();
+                for elem in input_transloation {
+                    animation_translation.key_times.push(elem);
+                }
+
+                // get rotations
+                let mut animation_rotation = AnimationRotation {
+                    key_times: Vec::new(),
+                    joint_rotations: Vec::new(),
+                };
+                let output_rotation = reader_rotate.read_outputs().unwrap();
+                match output_rotation {
+                    gltf::animation::util::ReadOutputs::Rotations(rotations) => match rotations {
+                        gltf::animation::util::Rotations::F32(iter) => {
+                            for elem in iter {
+                                animation_rotation
+                                    .joint_rotations
+                                    .push(cgmath::Quaternion::from(elem));
+                            }
+                        }
+                        _ => {
+                            panic!("Rotation is only implemented for Quaternion<f32>")
+                        }
+                    },
+                    _ => panic!("Expected Rotation Element!"),
+                }
+
+                let input_rotation = reader_rotate.read_inputs().unwrap();
+                for elem in input_rotation {
+                    animation_rotation.key_times.push(elem);
+                }
+            }
+
+            let animation_data_element = AnimationData {
+                name,
+                joint_translations,
+                joint_rotations,
+            };
+
+            animation_data.push(animation_data_element);
+        }
+
+        animation_data
+    }
+}
