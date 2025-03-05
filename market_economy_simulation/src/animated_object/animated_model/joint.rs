@@ -1,5 +1,3 @@
-
-
 pub struct Joint {
     _name: String,
     _child_names: Vec<String>,
@@ -30,7 +28,10 @@ impl Joint {
     }
 
     pub fn get_transform(&self) -> cgmath::Matrix4<f32> {
-        let transfrom_decomposed: cgmath::Decomposed<cgmath::Vector3<f32>, cgmath::Quaternion<f32>> = cgmath::Decomposed {
+        let transfrom_decomposed: cgmath::Decomposed<
+            cgmath::Vector3<f32>,
+            cgmath::Quaternion<f32>,
+        > = cgmath::Decomposed {
             scale: 1.0,
             rot: self.rotation,
             disp: self.translation,

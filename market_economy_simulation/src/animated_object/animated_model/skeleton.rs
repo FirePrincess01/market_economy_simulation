@@ -7,7 +7,6 @@ pub struct Skeleton {
 }
 
 impl Skeleton {
-
     pub(crate) fn new(
         animation_data: &crate::animated_object::animated_object_data::AnimatedObjectData,
     ) -> Self {
@@ -16,7 +15,7 @@ impl Skeleton {
         let joint_translations = &animation_data.skeleton.joint_translations;
         let joint_rotations = &animation_data.skeleton.joint_rotations;
         let inverse_bind_transforms = &animation_data.skeleton.inverse_bind_transforms;
-        
+
         let nr_joints = joint_names.len();
         assert_eq!(joint_children.len(), nr_joints);
         assert_eq!(joint_translations.len(), nr_joints);
@@ -33,13 +32,19 @@ impl Skeleton {
             let rotation = joint_rotations[i];
             let inverse_bind_transform = &inverse_bind_transforms[i];
 
-            let joint = Joint::new(name, child_names.clone(), child_indices, translation, rotation, inverse_bind_transform.clone());
+            let joint = Joint::new(
+                name,
+                child_names.clone(),
+                child_indices,
+                translation,
+                rotation,
+                inverse_bind_transform.clone(),
+            );
             joints.push(joint);
         }
 
         Self { joints }
     }
-
 
     fn calculate_joint_transforms(
         &self,

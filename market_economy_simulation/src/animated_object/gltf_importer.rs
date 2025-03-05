@@ -1,5 +1,3 @@
-
-
 use crate::animated_object::animated_object_data::{AnimationRotation, AnimationTranslation};
 
 use super::animated_object_data::{AnimatedObjectData, AnimationData, MeshData, SkeletonData};
@@ -18,7 +16,8 @@ impl GltfImporter {
 
         let mesh_data = Self::get_mesh_data(&buffer_data, &mesh);
         let skeleton_data = Self::get_skin_data(&buffer_data, &skin);
-        let animation_data = Self::get_animation_data(&buffer_data, animations, &skeleton_data.joint_names);
+        let animation_data =
+            Self::get_animation_data(&buffer_data, animations, &skeleton_data.joint_names);
 
         AnimatedObjectData {
             mesh: mesh_data,
@@ -56,8 +55,10 @@ impl GltfImporter {
                     for elem in iter {
                         tex_coords.push(elem);
                     }
-                },
-                _ => { panic!("Only f32 is supported so far!")}
+                }
+                _ => {
+                    panic!("Only f32 is supported so far!")
+                }
             }
 
             let joints_iter = reader.read_joints(0).expect("No joints found");
@@ -66,8 +67,10 @@ impl GltfImporter {
                     for elem in iter {
                         joints.push(elem);
                     }
-                },
-                _ => { panic!("Only u8 is supported so far!")}
+                }
+                _ => {
+                    panic!("Only u8 is supported so far!")
+                }
             }
 
             let weights_iter = reader.read_weights(0).expect("No weights found");
@@ -76,8 +79,10 @@ impl GltfImporter {
                     for elem in iter {
                         weights.push(elem);
                     }
-                },
-                _ => { panic!("Only f32 is supported so far!")}
+                }
+                _ => {
+                    panic!("Only f32 is supported so far!")
+                }
             }
 
             let indices_iter = reader.read_indices().expect("Nod indices found");
@@ -86,8 +91,10 @@ impl GltfImporter {
                     for elem in iter {
                         indices.push(elem);
                     }
-                },
-                _ => { panic!("Only u16 is supported so far!")}
+                }
+                _ => {
+                    panic!("Only u16 is supported so far!")
+                }
             }
         }
 

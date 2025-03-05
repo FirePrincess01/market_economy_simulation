@@ -6,8 +6,7 @@ use crate::{
 };
 
 use super::{
-    animated_model::skeleton::Skeleton,
-    animated_object_renderer::AnimatedObjectRendererResult,
+    animated_model::skeleton::Skeleton, animated_object_renderer::AnimatedObjectRendererResult,
     gltf_importer::GltfImporter,
 };
 
@@ -70,7 +69,6 @@ pub struct WgpuAnimatedObjectRenderer<'a> {
 }
 
 impl WgpuAnimatedObjectRenderer<'_> {
-    
     pub fn create_from_glb(
         &mut self,
         glb_bin: &[u8],
@@ -121,4 +119,3 @@ impl WgpuAnimatedObjectRenderer<'_> {
         // }
     }
 }
-

@@ -15,7 +15,6 @@ pub struct AnimationUniform {
 
 impl AnimationUniform {
     pub fn zero() -> Self {
-
         let uniform_mat: [[f32; 4]; 4] = cgmath::Matrix4::identity().into();
 
         let joint_transform: [[[f32; 4]; 4]; MAX_JOINTS] = [uniform_mat; MAX_JOINTS];

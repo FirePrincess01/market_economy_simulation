@@ -1,7 +1,6 @@
 //! Contains the device buffers to render an object with this shader
 //!
 
-
 use super::animation_uniform_buffer::AnimationUniformBuffer;
 use super::AnimationBindGroupLayout;
 use super::AnimationUniform;
