@@ -127,11 +127,11 @@ impl GltfImporter {
             let _bind_transform = joint.transform().matrix();
 
             let children = joint.children();
-            println!("children: {}", children.clone().count());
+            // println!("children: {}", children.clone().count());
             let mut childrent_vec: Vec<String> = Vec::new();
             for child in children {
                 let child_name = child.name().unwrap();
-                println!("child name: {}", child.name().unwrap());
+                // println!("child name: {}", child.name().unwrap());
                 childrent_vec.push(child_name.to_string());
             }
 
