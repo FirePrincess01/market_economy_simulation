@@ -113,9 +113,5 @@ impl WgpuAnimatedObjectRenderer<'_> {
         AnimatedObjectRendererResult {
             _index: render_index,
         }
-
-        // AnimatedObjectRendererResult {
-        //     _index: 0,
-        // }
     }
 }

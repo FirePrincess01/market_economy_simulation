@@ -39,8 +39,6 @@ impl GltfImporter {
 
             let position_iter = reader.read_positions().expect("No positions found");
             for elem in position_iter {
-                // let elem2 = [elem[0]*100.0, elem[1]*100.0, elem[2]*100.0];
-                // positions.push(elem2);
                 positions.push(elem);
             }
 

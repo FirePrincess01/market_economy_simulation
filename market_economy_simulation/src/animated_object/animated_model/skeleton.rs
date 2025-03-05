@@ -56,11 +56,9 @@ impl Skeleton {
         let joint = &self.joints[joint_index];
 
         // calculate current transformation
-        // let current_transform = parent_transform * local_transforms[joint_index].transpose();
         let current_transform = parent_transform * local_transforms[joint_index];
 
         // calculate current transformation applicable to a vertex
-        // let current_joint_transform = current_transform * joint.get_inverse_bind_transform().transpose();
         let current_joint_transform = current_transform * joint.get_inverse_bind_transform();
         // let current_joint_transform = cgmath::Matrix4::identity();
         joint_transforms[joint_index] = current_joint_transform;
