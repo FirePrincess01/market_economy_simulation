@@ -6,5 +6,4 @@ resolver = "2"
 members = [
     "wgpu_renderer",
     "market_economy_simulation",
-    "piston_collada",
 ]

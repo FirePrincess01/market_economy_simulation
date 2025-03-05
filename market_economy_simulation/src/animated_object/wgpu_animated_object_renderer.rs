@@ -1,5 +1,4 @@
 use cgmath::Vector3;
-use collada::document::ColladaDocument;
 use gltf::Gltf;
 use wgpu_renderer::renderer::WgpuRendererInterface;
 
