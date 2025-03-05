@@ -1,8 +1,9 @@
 mod animated_object;
 mod base_factory;
 mod create_entities;
-mod deferred_animation_shader;
 mod deferred_color_shader;
+mod deferred_animation_shader;
+mod deferred_terrain_shader;
 mod deferred_light_shader;
 mod ecs;
 mod ecs2;
@@ -11,6 +12,7 @@ mod ground_plane;
 mod performance_monitor;
 mod renderer;
 mod world_mesh;
+mod terrain;
 
 use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,
