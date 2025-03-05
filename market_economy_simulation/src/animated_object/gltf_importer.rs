@@ -98,8 +98,6 @@ impl GltfImporter {
             }
         }
 
-        
-
         MeshData {
             positions,
             normals,
@@ -147,8 +145,6 @@ impl GltfImporter {
             joint_translation.push(cgmath::Vector3::from(translation));
             joint_rotation.push(cgmath::Quaternion::from(rotation));
         }
-
-        
 
         SkeletonData {
             joint_names: joint_name,

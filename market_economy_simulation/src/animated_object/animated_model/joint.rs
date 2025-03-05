@@ -36,7 +36,6 @@ impl Joint {
             rot: self.rotation,
             disp: self.translation,
         };
-        
 
         cgmath::Matrix4::from(transfrom_decomposed)
     }
