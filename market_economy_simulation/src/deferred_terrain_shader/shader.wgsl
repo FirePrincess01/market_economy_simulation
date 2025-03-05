@@ -10,12 +10,14 @@ var<uniform> camera: CameraUniform;
 struct VertexInput {
     @location(0) position: vec3<f32>,
     @location(1) normal: vec3<f32>,
+    @location(2) barycentric_coordinate: vec3<f32>,
 }
 
 struct InstanceInput {
     @location(5) position: vec3<f32>,
     @location(6) color: vec3<f32>,
     @location(7) entity: vec3<u32>,
+    @location(8) color_heighlights: vec3<u32>,
 }
 
 struct VertexOutput {

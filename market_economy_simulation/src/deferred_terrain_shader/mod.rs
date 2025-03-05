@@ -5,6 +5,7 @@
 mod mesh;
 mod pipeline;
 mod vertex;
+mod instance;
 
 // mod animation_bind_group_layout;
 // mod animation_uniform;
@@ -16,8 +17,9 @@ mod vertex;
 pub use mesh::Mesh;
 pub use pipeline::Pipeline;
 pub use vertex::Vertex;
+pub use instance::Instance;
 
-pub use super::deferred_color_shader::Instance;
+// pub use super::deferred_color_shader::Instance;
 pub use super::deferred_color_shader::InstanceBuffer;
 pub use super::deferred_color_shader::VertexBuffer;
 

@@ -6,6 +6,7 @@
 pub struct Vertex {
     pub position: [f32; 3],
     pub normal: [f32; 3],
+    pub barycentric_coordinate: [f32; 3],
 }
 
 impl Vertex {
@@ -13,6 +14,7 @@ impl Vertex {
         Self {
             position: [0.0, 0.0, 0.0],
             normal: [0.0, 0.0, 0.0],
+            barycentric_coordinate: [0.0, 0.0, 0.0],
         }
     }
 
@@ -29,6 +31,11 @@ impl Vertex {
                 wgpu::VertexAttribute {
                     offset: std::mem::size_of::<[f32; 3]>() as wgpu::BufferAddress,
                     shader_location: 1,
+                    format: wgpu::VertexFormat::Float32x3,
+                },
+                wgpu::VertexAttribute {
+                    offset: std::mem::size_of::<[f32; 3*2]>() as wgpu::BufferAddress,
+                    shader_location: 2,
                     format: wgpu::VertexFormat::Float32x3,
                 },
             ],

@@ -13,7 +13,7 @@ use super::VertexBuffer;
 pub struct Mesh {
     vertex_buffer: VertexBuffer<Vertex>,
     index_buffer: IndexBuffer,
-    instance_buffer: InstanceBuffer,
+    instance_buffer: InstanceBuffer<Instance>,
     max_instances: u32,
     nr_instances: u32,
 }
