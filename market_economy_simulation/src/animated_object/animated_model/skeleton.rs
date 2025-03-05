@@ -38,7 +38,7 @@ impl Skeleton {
                 child_indices,
                 translation,
                 rotation,
-                inverse_bind_transform.clone(),
+                *inverse_bind_transform,
             );
             joints.push(joint);
         }

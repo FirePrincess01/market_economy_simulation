@@ -40,7 +40,7 @@ impl Mesh {
             AnimationUniformBuffer::new(wgpu_renderer.device(), animation_bind_group_layout);
         animation_buffer.update(wgpu_renderer.queue(), animation);
 
-        let index_buffer = IndexBuffer::new(wgpu_renderer.device(), &indices);
+        let index_buffer = IndexBuffer::new(wgpu_renderer.device(), indices);
 
         let mut instance_buffer = InstanceBuffer::new(wgpu_renderer.device(), instances);
         instance_buffer.update(wgpu_renderer.queue(), instances);

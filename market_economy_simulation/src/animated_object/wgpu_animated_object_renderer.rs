@@ -87,7 +87,7 @@ impl WgpuAnimatedObjectRenderer<'_> {
 
         let mesh = deferred_animation_shader::Mesh::from_animation_data(
             self.wgpu_renderer,
-            &self.animation_bind_group_layout,
+            self.animation_bind_group_layout,
             &animation_data,
             &[instance],
         );
@@ -98,7 +98,7 @@ impl WgpuAnimatedObjectRenderer<'_> {
             _y: 0.0,
             _z: 0.0,
 
-            skeleton: skeleton,
+            skeleton,
             animation: animation_0,
 
             _instance: instance,

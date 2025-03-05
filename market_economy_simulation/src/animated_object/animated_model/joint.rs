@@ -36,9 +36,9 @@ impl Joint {
             rot: self.rotation,
             disp: self.translation,
         };
-        let transfrom = cgmath::Matrix4::from(transfrom_decomposed);
+        
 
-        transfrom
+        cgmath::Matrix4::from(transfrom_decomposed)
     }
 
     pub fn get_inverse_bind_transform(&self) -> cgmath::Matrix4<f32> {

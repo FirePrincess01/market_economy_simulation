@@ -98,16 +98,16 @@ impl GltfImporter {
             }
         }
 
-        let mesh_data = MeshData {
+        
+
+        MeshData {
             positions,
             normals,
             _tex_coords: tex_coords,
             joints,
             weights,
             indices,
-        };
-
-        mesh_data
+        }
     }
 
     fn get_skin_data(buffer_data: &[gltf::buffer::Data], skin: &gltf::Skin<'_>) -> SkeletonData {
@@ -148,15 +148,15 @@ impl GltfImporter {
             joint_rotation.push(cgmath::Quaternion::from(rotation));
         }
 
-        let skeleton_data = SkeletonData {
+        
+
+        SkeletonData {
             joint_names: joint_name,
             joint_children,
             joint_translations: joint_translation,
             joint_rotations: joint_rotation,
             inverse_bind_transforms: inverse_bind_transform,
-        };
-
-        skeleton_data
+        }
     }
 
     fn get_animation_data(
