@@ -1,5 +1,3 @@
-use cgmath::Vector3;
-use gltf::Gltf;
 use wgpu_renderer::renderer::WgpuRendererInterface;
 
 use crate::{
@@ -8,8 +6,8 @@ use crate::{
 };
 
 use super::{
-    animated_model::skeleton::{self, Skeleton},
-    animated_object_renderer::{AnimatedObjectRenderer, AnimatedObjectRendererResult},
+    animated_model::skeleton::{Skeleton},
+    animated_object_renderer::AnimatedObjectRendererResult,
     gltf_importer::GltfImporter,
 };
 
@@ -81,7 +79,7 @@ impl WgpuAnimatedObjectRenderer<'_> {
 
         let skeleton = Skeleton::new(&animation_data);
         let animation_0 = Animation::new(animation_data.animations[0].clone());
-        let mut animation_uniform = deferred_animation_shader::AnimationUniform::zero();
+        let animation_uniform = deferred_animation_shader::AnimationUniform::zero();
 
         let instance = deferred_animation_shader::Instance {
             position: [20.0, 20.0, 5.0],

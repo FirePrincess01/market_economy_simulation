@@ -1,6 +1,6 @@
-use cgmath::{Matrix, SquareMatrix};
+use cgmath::SquareMatrix;
 
-use super::{joint::Joint, keyframe::Keyframe};
+use super::joint::Joint;
 
 pub struct Skeleton {
     joints: Vec<Joint>,

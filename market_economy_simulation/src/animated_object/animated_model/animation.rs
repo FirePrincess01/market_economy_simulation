@@ -1,6 +1,6 @@
 use crate::{animated_object::animated_object_data::AnimationData, deferred_animation_shader};
 
-use super::{keyframe::Keyframe, skeleton::Skeleton};
+use super::skeleton::Skeleton;
 
 type Decomposed = cgmath::Decomposed<cgmath::Vector3<f32>, cgmath::Quaternion<f32>>;
 

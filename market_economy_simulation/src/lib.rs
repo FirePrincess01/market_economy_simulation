@@ -12,9 +12,7 @@ mod performance_monitor;
 mod renderer;
 mod world_mesh;
 
-use animated_object::{
-    animated_object_renderer::AnimatedObjectRenderer, gltf_importer::GltfImporter, wgpu_animated_object_renderer::{WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage}
-};
+use animated_object::wgpu_animated_object_renderer::{WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage};
 use wgpu_renderer::{
     default_application::{DefaultApplication, DefaultApplicationInterface},
     renderer::WgpuRendererInterface,

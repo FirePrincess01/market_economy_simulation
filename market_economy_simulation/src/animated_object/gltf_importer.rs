@@ -1,7 +1,4 @@
-use core::error;
-use std::ptr::read;
 
-use cgmath::Zero;
 
 use crate::animated_object::animated_object_data::{AnimationRotation, AnimationTranslation};
 
@@ -109,7 +106,7 @@ impl GltfImporter {
         mesh_data
     }
 
-    fn get_skin_data(buffer_data: &[gltf::buffer::Data], skin: &gltf::Skin<'_>) -> (SkeletonData) {
+    fn get_skin_data(buffer_data: &[gltf::buffer::Data], skin: &gltf::Skin<'_>) -> SkeletonData {
         let mut joint_name: Vec<String> = Vec::new();
         let mut joint_children: Vec<Vec<String>> = Vec::new();
         let mut joint_translation: Vec<cgmath::Vector3<f32>> = Vec::new();
