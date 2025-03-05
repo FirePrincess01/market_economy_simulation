@@ -1,6 +1,6 @@
 
-const MAX_JOINTS: u32 = 4;
-const MAX_JOINT_WEIGHTS: u32 = 4;
+const MAX_JOINTS: u32 = 16u;
+const MAX_JOINT_WEIGHTS: u32 = 4u;
 
 // Vertex shader
 struct CameraUniform {
@@ -19,8 +19,8 @@ var<uniform> camera: CameraUniform;
 var<uniform> joints: JointUniform;
 
 struct VertexInput {
-    @location(0) position: vec3<f32>,
-    @location(1) normal: vec3<f32>,
+    @location(0) position: vec4<f32>,
+    @location(1) normal: vec4<f32>,
 
     // animation data
     @location(2) joint_indices: vec4<u32>,
@@ -51,7 +51,7 @@ fn vs_main(
     var total_local_pos = vec4<f32>(0.0);
     var total_local_normal = vec4<f32>(0.0);
 
-    for (var i: u32 = 0; i < MAX_JOINT_WEIGHTS; i++) {
+    for (var i: u32 = 0u; i < MAX_JOINT_WEIGHTS; i++) {
         // get vertex data
         let joint_index = model.joint_indices[i];
         let joint_weight = model.joint_weights[i];
@@ -60,11 +60,11 @@ fn vs_main(
         let joint_transform = joints.joint_transform[joint_index];
 
         // move position
-        let local_position = joint_transform * vec4<f32>(model.position, 1.0);
+        let local_position = joint_transform * model.position;
         total_local_pos += local_position * joint_weight;
 
         // move normal
-        let local_normal = joint_transform * vec4<f32>(model.normal, 0.0);
+        let local_normal = joint_transform * model.normal;
         total_local_normal += local_normal * joint_weight;
     }
 

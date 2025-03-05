@@ -21,6 +21,7 @@ pub struct Mesh {
     instance_buffer: InstanceBuffer,
     max_instances: u32,
     nr_instances: u32,
+    _nr_vertices: u32,
 }
 
 #[allow(dead_code)]
@@ -41,10 +42,12 @@ impl Mesh {
 
         let index_buffer = IndexBuffer::new(wgpu_renderer.device(), indices);
 
-        let instance_buffer = InstanceBuffer::new(wgpu_renderer.device(), instances);
+        let mut instance_buffer = InstanceBuffer::new(wgpu_renderer.device(), instances);
+        instance_buffer.update(wgpu_renderer.queue(), instances);
 
         let max_instances = instances.len() as u32;
         let nr_instances = instances.len() as u32;
+        let nr_vertices = vertices.len() as u32;
 
         Self {
             vertex_buffer,
@@ -53,7 +56,59 @@ impl Mesh {
             instance_buffer,
             max_instances,
             nr_instances,
+            _nr_vertices: nr_vertices,
         }
+    }
+
+    pub fn from_animation_data(
+        wgpu_renderer: &mut dyn wgpu_renderer::renderer::WgpuRendererInterface,
+        animation_bind_group_layout: &AnimationBindGroupLayout,
+        animation_data: &crate::animated_object::animated_object_data::AnimatedObjectData,
+        instances: &[Instance],
+    ) -> Self {
+        let positions = &animation_data.mesh.positions;
+        let normals = &animation_data.mesh.normals;
+        let joints = &animation_data.mesh.joints;
+        let weights = &animation_data.mesh.weights;
+        let indices_u16 = &animation_data.mesh.indices;
+
+        let len = positions.len();
+        assert_eq!(normals.len(), len);
+        assert_eq!(joints.len(), len);
+        assert_eq!(weights.len(), len);
+
+        let mut vertices = Vec::new();
+        for i in 0..len {
+            let vertex = Vertex {
+                position: [positions[i][0], positions[i][1], positions[i][2], 1.0],
+                normal: [normals[i][0], normals[i][1], normals[i][2], 0.0],
+                joint_indices: [
+                    joints[i][0] as u32,
+                    joints[i][1] as u32,
+                    joints[i][2] as u32,
+                    joints[i][3] as u32,
+                ],
+                joint_weights: weights[i],
+            };
+
+            vertices.push(vertex);
+        }
+
+        let mut indices = Vec::new();
+        for elem in indices_u16 {
+            indices.push(*elem as u32);
+        }
+
+        let animation_uniform = AnimationUniform::zero();
+
+        Self::new(
+            wgpu_renderer,
+            animation_bind_group_layout,
+            &vertices,
+            &animation_uniform,
+            &indices,
+            instances,
+        )
     }
 
     pub fn update_vertex_buffer(&mut self, queue: &wgpu::Queue, vertices: &[Vertex]) {
