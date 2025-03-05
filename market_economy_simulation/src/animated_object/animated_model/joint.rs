@@ -1,8 +1,6 @@
 use cgmath::Matrix;
 
 
-
-
 pub struct Joint {
     name: String,
     child_names: Vec<String>,
@@ -44,7 +42,7 @@ impl Joint {
     }
 
     pub fn get_inverse_bind_transform(&self) -> cgmath::Matrix4<f32> {
-        self.inverse_bind_transform.transpose()
+        self.inverse_bind_transform
     }
 
     pub fn get_name(&self) -> &str {

@@ -1,10 +1,11 @@
 use core::error;
+use std::ptr::read;
 
 use cgmath::Zero;
 
 use crate::animated_object::animated_object_data::{AnimationRotation, AnimationTranslation};
 
-use super::animated_object_data::{AnimatedObjectData, AnimationData};
+use super::animated_object_data::{AnimatedObjectData, AnimationData, MeshData, SkeletonData};
 
 pub struct GltfImporter {}
 
@@ -18,51 +19,32 @@ impl GltfImporter {
         let skin = mesh_node.skin().expect("Skin not found in node!");
         let animations = document.animations();
 
-        let (positions, normals, tex_coords, joints, weights) =
-            Self::get_mesh_data(&buffer_data, &mesh);
-        let (joint_name, joint_children, joint_translation, joint_rotation, inverse_bind_transform) =
-            Self::get_skin_data(&buffer_data, &skin);
-
-        let animation_data = Self::get_animation_data(&buffer_data, animations, &joint_name);
+        let mesh_data = Self::get_mesh_data(&buffer_data, &mesh);
+        let skeleton_data = Self::get_skin_data(&buffer_data, &skin);
+        let animation_data = Self::get_animation_data(&buffer_data, animations, &skeleton_data.joint_names);
 
         AnimatedObjectData {
-            positions,
-            normals,
-            tex_coords,
-            joints,
-            weights,
-
-            joint_name,
-            joint_children,
-            joint_translation,
-            joint_rotation,
-            inverse_bind_transform,
-
+            mesh: mesh_data,
+            skeleton: skeleton_data,
             animations: animation_data,
         }
     }
 
-    fn get_mesh_data(
-        buffer_data: &Vec<gltf::buffer::Data>,
-        mesh: &gltf::Mesh<'_>,
-    ) -> (
-        Vec<[f32; 3]>,
-        Vec<[f32; 3]>,
-        Vec<[f32; 2]>,
-        Vec<[u8; 4]>,
-        Vec<[f32; 4]>,
-    ) {
-        let mut positions: Vec<[f32; 3]> = Vec::new();
-        let mut normals: Vec<[f32; 3]> = Vec::new();
-        let mut tex_coords: Vec<[f32; 2]> = Vec::new();
-        let mut joints: Vec<[u8; 4]> = Vec::new();
-        let mut weights: Vec<[f32; 4]> = Vec::new();
+    fn get_mesh_data(buffer_data: &Vec<gltf::buffer::Data>, mesh: &gltf::Mesh<'_>) -> MeshData {
+        let mut positions = Vec::new();
+        let mut normals = Vec::new();
+        let mut tex_coords = Vec::new();
+        let mut joints = Vec::new();
+        let mut weights = Vec::new();
+        let mut indices = Vec::new();
 
         for primitive in mesh.primitives() {
             let reader = primitive.reader(|buffer| Some(&buffer_data[buffer.index()]));
 
             let position_iter = reader.read_positions().expect("No positions found");
             for elem in position_iter {
+                // let elem2 = [elem[0]*100.0, elem[1]*100.0, elem[2]*100.0];
+                // positions.push(elem2);
                 positions.push(elem);
             }
 
@@ -102,21 +84,32 @@ impl GltfImporter {
                     }
                 }
             }
+
+            let indices_iter = reader.read_indices().expect("Nod indices found");
+            match indices_iter {
+                gltf::mesh::util::ReadIndices::U8(iter) => todo!(),
+                gltf::mesh::util::ReadIndices::U16(iter) => {
+                    for elem in iter {
+                        indices.push(elem);
+                    }
+                }
+                gltf::mesh::util::ReadIndices::U32(iter) => todo!(),
+            }
         }
 
-        (positions, normals, tex_coords, joints, weights)
+        let mesh_data = MeshData {
+            positions,
+            normals,
+            tex_coords,
+            joints,
+            weights,
+            indices,
+        };
+
+        mesh_data
     }
 
-    fn get_skin_data(
-        buffer_data: &[gltf::buffer::Data],
-        skin: &gltf::Skin<'_>,
-    ) -> (
-        Vec<String>,
-        Vec<Vec<String>>,
-        Vec<cgmath::Vector3<f32>>,
-        Vec<cgmath::Quaternion<f32>>,
-        Vec<cgmath::Matrix4<f32>>,
-    ) {
+    fn get_skin_data(buffer_data: &[gltf::buffer::Data], skin: &gltf::Skin<'_>) -> (SkeletonData) {
         let mut joint_name: Vec<String> = Vec::new();
         let mut joint_children: Vec<Vec<String>> = Vec::new();
         let mut joint_translation: Vec<cgmath::Vector3<f32>> = Vec::new();
@@ -155,19 +148,21 @@ impl GltfImporter {
             joint_rotation.push(cgmath::Quaternion::from(rotation));
         }
 
-        (
-            joint_name,
+        let skeleton_data = SkeletonData {
+            joint_names: joint_name,
             joint_children,
-            joint_translation,
-            joint_rotation,
-            inverse_bind_transform,
-        )
+            joint_translations: joint_translation,
+            joint_rotations: joint_rotation,
+            inverse_bind_transforms: inverse_bind_transform,
+        };
+
+        skeleton_data
     }
 
     fn get_animation_data(
         buffer_data: &[gltf::buffer::Data],
         animations: gltf::iter::Animations<'_>,
-        joint_name: &Vec<String>,
+        joint_names: &Vec<String>,
     ) -> Vec<AnimationData> {
         let mut animation_data: Vec<AnimationData> = Vec::new();
 
@@ -183,15 +178,15 @@ impl GltfImporter {
 
             let mut channesls_iter = animation.channels();
             let channels_len = channesls_iter.clone().count();
-            let length = joint_name.len();
-            assert_eq!(channels_len, length * 3);
+            let length = joint_names.len();
+            // assert_eq!(channels_len, length * 3);
 
-            for i in 0..length {
+            for i in 0..channels_len / 3 {
                 let channel_translate = channesls_iter.next().unwrap();
                 let channel_rotate = channesls_iter.next().unwrap();
                 let channel_scale = channesls_iter.next().unwrap();
 
-                let name = &joint_name[i];
+                let name = &joint_names[i];
                 // println!("name: {}", name);
                 assert_eq!(name, channel_translate.target().node().name().unwrap());
                 assert_eq!(name, channel_rotate.target().node().name().unwrap());
@@ -247,6 +242,9 @@ impl GltfImporter {
                 for elem in input_rotation {
                     animation_rotation.key_times.push(elem);
                 }
+
+                joint_translations.push(animation_translation);
+                joint_rotations.push(animation_rotation);
             }
 
             let animation_data_element = AnimationData {

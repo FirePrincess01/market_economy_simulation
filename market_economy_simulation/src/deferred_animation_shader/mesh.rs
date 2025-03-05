@@ -19,6 +19,7 @@ use super::VertexBuffer;
 pub struct Mesh {
     vertex_buffer: VertexBuffer<Vertex>,
     animation_buffer: AnimationUniformBuffer,
+    index_buffer: IndexBuffer,
     instance_buffer: InstanceBuffer,
     max_instances: u32,
     nr_instances: u32,
@@ -32,6 +33,7 @@ impl Mesh {
         animation_bind_group_layout: &AnimationBindGroupLayout,
         vertices: &[Vertex],
         animation: &AnimationUniform,
+        indices: &[u32],
         instances: &[Instance],
     ) -> Self {
         let vertex_buffer = VertexBuffer::new(wgpu_renderer.device(), vertices);
@@ -40,7 +42,10 @@ impl Mesh {
             AnimationUniformBuffer::new(wgpu_renderer.device(), animation_bind_group_layout);
         animation_buffer.update(wgpu_renderer.queue(), animation);
 
-        let instance_buffer = InstanceBuffer::new(wgpu_renderer.device(), instances);
+        let index_buffer = IndexBuffer::new(wgpu_renderer.device(), &indices);
+
+        let mut instance_buffer = InstanceBuffer::new(wgpu_renderer.device(), instances);
+        instance_buffer.update(wgpu_renderer.queue(), instances);
 
         let max_instances = instances.len() as u32;
         let nr_instances = instances.len() as u32;
@@ -49,6 +54,7 @@ impl Mesh {
         Self {
             vertex_buffer,
             animation_buffer,
+            index_buffer,
             instance_buffer,
             max_instances,
             nr_instances,
@@ -61,12 +67,12 @@ impl Mesh {
         animation_bind_group_layout: &AnimationBindGroupLayout,
         animation_data: &crate::animated_object::animated_object_data::AnimatedObjectData,
         instances: &[Instance],
-    ) -> Self
-    {
-        let positions = &animation_data.positions;
-        let normals = &animation_data.normals;
-        let joints = &animation_data.joints;
-        let weights = &animation_data.weights;
+    ) -> Self {
+        let positions = &animation_data.mesh.positions;
+        let normals = &animation_data.mesh.normals;
+        let joints = &animation_data.mesh.joints;
+        let weights = &animation_data.mesh.weights;
+        let indices_u16 = &animation_data.mesh.indices;
 
         let len = positions.len();
         assert_eq!(normals.len(), len);
@@ -78,16 +84,33 @@ impl Mesh {
             let vertex = Vertex {
                 position: [positions[i][0], positions[i][1], positions[i][2], 1.0],
                 normal: [normals[i][0], normals[i][1], normals[i][2], 0.0],
-                joint_indices: [joints[i][0] as u32, joints[i][1] as u32, joints[i][2] as u32, joints[i][3] as u32],
+                joint_indices: [
+                    joints[i][0] as u32,
+                    joints[i][1] as u32,
+                    joints[i][2] as u32,
+                    joints[i][3] as u32,
+                ],
                 joint_weights: weights[i],
             };
 
             vertices.push(vertex);
         }
 
+        let mut indices = Vec::new();
+        for elem in indices_u16 {
+            indices.push(*elem as u32);
+        }
+
         let animation_uniform = AnimationUniform::zero();
 
-        Self::new(wgpu_renderer, animation_bind_group_layout, &vertices, &animation_uniform, instances)
+        Self::new(
+            wgpu_renderer,
+            animation_bind_group_layout,
+            &vertices,
+            &animation_uniform,
+            &indices,
+            instances,
+        )
     }
 
     pub fn update_vertex_buffer(&mut self, queue: &wgpu::Queue, vertices: &[Vertex]) {
@@ -112,9 +135,9 @@ impl DeferredAnimationShaderDraw for Mesh {
     fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         self.vertex_buffer.bind(render_pass);
         self.animation_buffer.bind(render_pass);
+        self.index_buffer.bind(render_pass);
         self.instance_buffer.bind(render_pass);
 
-        // render_pass.draw_indexed(0..self.index_buffer.size()-1374 +200, 0, 0..self.nr_instances);
-        render_pass.draw(0..self.nr_vertices, 0..self.nr_instances);
+        render_pass.draw_indexed(0..self.index_buffer.size(), 0, 0..self.nr_instances);
     }
 }

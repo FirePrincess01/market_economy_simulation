@@ -7,53 +7,31 @@ pub struct Skeleton {
 }
 
 impl Skeleton {
-    // pub fn new_old(collada_skeleton: &collada::Skeleton) -> Self {
-    //     let nr_joints: usize = collada_skeleton.joints.len();
-    //     let mut joints = Vec::new();
-
-    //     for i in 0..nr_joints {
-    //         let collada_joint = &collada_skeleton.joints[i];
-    //         let collada_bind_pose = collada_skeleton.bind_poses[i];
-
-    //         let id = collada_joint.id.clone();
-    //         let name = collada_joint.name.clone();
-    //         let parent_index = collada_joint.parent_index;
-    //         let inverse_bind_pose = collada_joint.inverse_bind_pose;
-
-    //         let joint = Joint::new(
-    //             id,
-    //             name,
-    //             i,
-    //             parent_index as usize,
-    //             collada_bind_pose.into(),
-    //             inverse_bind_pose.into(),
-    //         );
-
-    //         joints.push(joint);
-    //     }
-
-    //     Self { joints }
-    // }
 
     pub(crate) fn new(
         animation_data: &crate::animated_object::animated_object_data::AnimatedObjectData,
     ) -> Self {
-        let nr_joints = animation_data.joint_name.len();
-
-        assert_eq!(animation_data.joint_children.len(), nr_joints);
-        assert_eq!(animation_data.joint_translation.len(), nr_joints);
-        assert_eq!(animation_data.joint_rotation.len(), nr_joints);
-        assert_eq!(animation_data.inverse_bind_transform.len(), nr_joints);
+        let joint_names = &animation_data.skeleton.joint_names;
+        let joint_children = &animation_data.skeleton.joint_children;
+        let joint_translations = &animation_data.skeleton.joint_translations;
+        let joint_rotations = &animation_data.skeleton.joint_rotations;
+        let inverse_bind_transforms = &animation_data.skeleton.inverse_bind_transforms;
+        
+        let nr_joints = joint_names.len();
+        assert_eq!(joint_children.len(), nr_joints);
+        assert_eq!(joint_translations.len(), nr_joints);
+        assert_eq!(joint_rotations.len(), nr_joints);
+        assert_eq!(inverse_bind_transforms.len(), nr_joints);
 
         let mut joints = Vec::new();
 
         for i in 0..nr_joints {
-            let name = animation_data.joint_name[i].clone();
-            let child_names = &animation_data.joint_children[i];
+            let name = joint_names[i].clone();
+            let child_names = &joint_children[i];
             let child_indices = animation_data.joint_children_indices(i);
-            let translation = animation_data.joint_translation[i];
-            let rotation = animation_data.joint_rotation[i];
-            let inverse_bind_transform = &animation_data.inverse_bind_transform[i];
+            let translation = joint_translations[i];
+            let rotation = joint_rotations[i];
+            let inverse_bind_transform = &inverse_bind_transforms[i];
 
             let joint = Joint::new(name, child_names.clone(), child_indices, translation, rotation, inverse_bind_transform.clone());
             joints.push(joint);
@@ -62,37 +40,6 @@ impl Skeleton {
         Self { joints }
     }
 
-    // fn find_joint(&self, id: &str) -> Option<usize> {
-    //     for (i, joint) in self.joints.iter().enumerate() {
-    //         if joint.id == id {
-    //             return Some(i);
-    //         }
-    //     }
-
-    //     None
-    // }
-
-    // fn get_root_joint(&self) -> Option<usize> {
-    //     for (i, joint) in self.joints.iter().enumerate() {
-    //         if joint.parent == 255 {
-    //             return Some(i);
-    //         }
-    //     }
-
-    //     None
-    // }
-
-    // fn get_children(&self, joint_index: usize) -> Vec<usize> {
-    //     let mut res = Vec::new();
-
-    //     for (i, joint) in self.joints.iter().enumerate() {
-    //         if joint.parent == joint_index {
-    //             res.push(i);
-    //         }
-    //     }
-
-    //     res
-    // }
 
     fn calculate_joint_transforms(
         &self,

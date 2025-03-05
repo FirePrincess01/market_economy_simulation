@@ -10,7 +10,11 @@ impl AnimationTranslation {
         for (i, time) in self.key_times.iter().enumerate()
         {
             if key_time <= *time {
-                return &self.joint_translations[i];
+                let res = self.joint_translations.get(i);
+                match res {
+                    Some(res) => return res,
+                    None => return self.joint_translations.last().unwrap(),
+                }
             }
         }
         
@@ -30,7 +34,11 @@ impl AnimationRotation {
         for (i, time) in self.key_times.iter().enumerate()
         {
             if key_time <= *time {
-                return &self.joint_rotations[i];
+                let res = self.joint_rotations.get(i);
+                match res {
+                    Some(res) => return res,
+                    None => return self.joint_rotations.last().unwrap(),
+                }
             }
         }
         
@@ -45,7 +53,7 @@ pub struct AnimationData {
     pub joint_rotations: Vec<AnimationRotation>,
 }
 
-pub struct AnimatedObjectData {
+pub struct MeshData {
     // vertex data
     pub positions: Vec<[f32; 3]>,
     pub normals: Vec<[f32; 3]>,
@@ -53,24 +61,31 @@ pub struct AnimatedObjectData {
     pub joints: Vec<[u8; 4]>,
     pub weights: Vec<[f32; 4]>,
 
-    // skeleton data
-    pub joint_name: Vec<String>,
-    pub joint_children: Vec<Vec<String>>,
-    pub joint_translation: Vec<cgmath::Vector3<f32>>,
-    pub joint_rotation: Vec<cgmath::Quaternion<f32>>,
-    pub inverse_bind_transform: Vec<cgmath::Matrix4<f32>>,
+    // indices
+    pub indices: Vec<u16>,
+}
 
-    // animation data
-    pub animations: Vec<AnimationData>,
+pub struct SkeletonData {
+    pub joint_names: Vec<String>,
+    pub joint_children: Vec<Vec<String>>,
+    pub joint_translations: Vec<cgmath::Vector3<f32>>,
+    pub joint_rotations: Vec<cgmath::Quaternion<f32>>,
+    pub inverse_bind_transforms: Vec<cgmath::Matrix4<f32>>,
+}
+
+pub struct AnimatedObjectData {
+    pub mesh: MeshData,
+    pub skeleton: SkeletonData,
+    pub animations: Vec<AnimationData>,   
 }
 
 impl AnimatedObjectData {
     pub fn joint_children_indices(&self, index:usize) -> Vec<usize> {
         let mut res = Vec::new();
         
-        let children = &self.joint_children[index];
+        let children = &self.skeleton.joint_children[index];
         for child in children {
-            let joint_names = &self.joint_name;
+            let joint_names = &self.skeleton.joint_names;
             for (i, name) in joint_names.iter().enumerate() {
                 if child == name {
                     res.push(i);
