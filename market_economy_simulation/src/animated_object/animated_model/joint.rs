@@ -28,7 +28,7 @@ impl Joint {
     }
 
     pub fn get_transform(&self) -> cgmath::Matrix4<f32> {
-        let transfrom_decomposed: cgmath::Decomposed<
+        let transform_decomposed: cgmath::Decomposed<
             cgmath::Vector3<f32>,
             cgmath::Quaternion<f32>,
         > = cgmath::Decomposed {
@@ -37,7 +37,7 @@ impl Joint {
             disp: self.translation,
         };
 
-        cgmath::Matrix4::from(transfrom_decomposed)
+        cgmath::Matrix4::from(transform_decomposed)
     }
 
     pub fn get_inverse_bind_transform(&self) -> cgmath::Matrix4<f32> {
