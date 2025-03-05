@@ -87,7 +87,7 @@ impl Skeleton {
         }
 
         // apply sample poses
-        for i in 0..size {
+        for i in 0..sample_poses.len() {
             local_transforms[i] = cgmath::Matrix4::from(sample_poses[i]);
         }
 

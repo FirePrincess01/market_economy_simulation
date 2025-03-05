@@ -168,6 +168,7 @@ impl GltfImporter {
 
         for animation in animations {
             let mut name: String = String::new();
+            let mut joint_target_names: Vec<String> = Vec::new();
             let mut joint_translations: Vec<AnimationTranslation> = Vec::new();
             let mut joint_rotations: Vec<AnimationRotation> = Vec::new();
 
@@ -178,19 +179,19 @@ impl GltfImporter {
 
             let mut channesls_iter = animation.channels();
             let channels_len = channesls_iter.clone().count();
-            let length = joint_names.len();
-            // assert_eq!(channels_len, length * 3);
+            let _length = joint_names.len();
 
             for i in 0..channels_len / 3 {
                 let channel_translate = channesls_iter.next().unwrap();
                 let channel_rotate = channesls_iter.next().unwrap();
                 let channel_scale = channesls_iter.next().unwrap();
 
+                // make sure the bones are exactly in the right order
                 let name = &joint_names[i];
-                // println!("name: {}", name);
                 assert_eq!(name, channel_translate.target().node().name().unwrap());
                 assert_eq!(name, channel_rotate.target().node().name().unwrap());
                 assert_eq!(name, channel_scale.target().node().name().unwrap());
+                joint_target_names.push(name.to_string());
 
                 let reader_translate =
                     channel_translate.reader(|buffer| Some(&buffer_data[buffer.index()]));
@@ -249,6 +250,7 @@ impl GltfImporter {
 
             let animation_data_element = AnimationData {
                 name,
+                joint_target_names,
                 joint_translations,
                 joint_rotations,
             };

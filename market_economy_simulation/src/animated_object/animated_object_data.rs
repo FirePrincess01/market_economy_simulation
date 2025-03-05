@@ -49,6 +49,7 @@ impl AnimationRotation {
 #[derive(Clone)]
 pub struct AnimationData {
     pub name: String,
+    pub joint_target_names: Vec<String>,
     pub joint_translations: Vec<AnimationTranslation>,
     pub joint_rotations: Vec<AnimationRotation>,
 }
