@@ -87,11 +87,13 @@ impl Skeleton {
             vec![cgmath::Matrix4::identity(); size];
 
         // set local transforms
+        #[allow(clippy::needless_range_loop)]
         for i in 0..size {
             local_transforms[i] = self.joints[i].get_transform();
         }
 
         // apply sample poses
+        #[allow(clippy::needless_range_loop)]
         for i in 0..sample_poses.len() {
             local_transforms[i] = cgmath::Matrix4::from(sample_poses[i]);
         }

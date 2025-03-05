@@ -76,6 +76,7 @@ impl Animation {
         assert!(animation_uniform.joint_transform.len() >= joint_transforms.len());
 
         let len = joint_transforms.len();
+        #[allow(clippy::needless_range_loop)]
         for i in 0..len {
             animation_uniform.joint_transform[i] = joint_transforms[i].into();
         }

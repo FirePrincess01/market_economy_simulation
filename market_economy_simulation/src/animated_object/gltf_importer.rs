@@ -26,8 +26,8 @@ impl GltfImporter {
         }
     }
 
-    fn get_mesh_data(buffer_data: &Vec<gltf::buffer::Data>, mesh: &gltf::Mesh<'_>) -> MeshData {
-        let mut positions = Vec::new();
+    fn get_mesh_data(buffer_data: &[gltf::buffer::Data], mesh: &gltf::Mesh<'_>) -> MeshData {
+        let mut positions: Vec<[f32; 3]> = Vec::new();
         let mut normals = Vec::new();
         let mut tex_coords = Vec::new();
         let mut joints = Vec::new();
@@ -162,7 +162,7 @@ impl GltfImporter {
     fn get_animation_data(
         buffer_data: &[gltf::buffer::Data],
         animations: gltf::iter::Animations<'_>,
-        joint_names: &Vec<String>,
+        joint_names: &[String],
     ) -> Vec<AnimationData> {
         let mut animation_data: Vec<AnimationData> = Vec::new();
 
@@ -179,6 +179,7 @@ impl GltfImporter {
             let channels_len = channesls_iter.clone().count();
             let _length = joint_names.len();
 
+            #[allow(clippy::needless_range_loop)]
             for i in 0..channels_len / 3 {
                 let channel_translate = channesls_iter.next().unwrap();
                 let channel_rotate = channesls_iter.next().unwrap();
