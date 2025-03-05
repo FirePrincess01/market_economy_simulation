@@ -6,7 +6,7 @@ use crate::{
 };
 
 use super::{
-    animated_model::skeleton::{Skeleton},
+    animated_model::skeleton::Skeleton,
     animated_object_renderer::AnimatedObjectRendererResult,
     gltf_importer::GltfImporter,
 };
@@ -14,14 +14,14 @@ use super::{
 pub struct AnimatedObject {
     pub _is_visible: bool,
     // pub update_position: bool,
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
+    pub _x: f32,
+    pub _y: f32,
+    pub _z: f32,
 
     pub skeleton: Skeleton,
     pub animation: Animation,
 
-    pub instance: deferred_animation_shader::Instance,
+    pub _instance: deferred_animation_shader::Instance,
     pub animation_uniform: deferred_animation_shader::AnimationUniform,
 
     mesh: deferred_animation_shader::Mesh,
@@ -96,14 +96,14 @@ impl WgpuAnimatedObjectRenderer<'_> {
 
         let element = AnimatedObject {
             _is_visible: true,
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
+            _x: 0.0,
+            _y: 0.0,
+            _z: 0.0,
 
             skeleton: skeleton,
             animation: animation_0,
 
-            instance,
+            _instance: instance,
             animation_uniform,
 
             mesh,

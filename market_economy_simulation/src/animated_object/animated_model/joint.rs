@@ -1,8 +1,8 @@
 
 
 pub struct Joint {
-    name: String,
-    child_names: Vec<String>,
+    _name: String,
+    _child_names: Vec<String>,
     children: Vec<usize>,
 
     translation: cgmath::Vector3<f32>,
@@ -20,8 +20,8 @@ impl Joint {
         inverse_bind_transform: cgmath::Matrix4<f32>,
     ) -> Self {
         Self {
-            name,
-            child_names,
+            _name: name,
+            _child_names: child_names,
             children,
             translation,
             rotation,
@@ -44,8 +44,8 @@ impl Joint {
         self.inverse_bind_transform
     }
 
-    pub fn get_name(&self) -> &str {
-        &self.name
+    pub fn _get_name(&self) -> &str {
+        &self._name
     }
 
     pub fn get_children_indices(&self) -> &[usize] {

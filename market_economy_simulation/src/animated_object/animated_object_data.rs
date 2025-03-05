@@ -48,8 +48,8 @@ impl AnimationRotation {
 
 #[derive(Clone)]
 pub struct AnimationData {
-    pub name: String,
-    pub joint_target_names: Vec<String>,
+    pub _name: String,
+    pub _joint_target_names: Vec<String>,
     pub joint_translations: Vec<AnimationTranslation>,
     pub joint_rotations: Vec<AnimationRotation>,
 }
@@ -58,7 +58,7 @@ pub struct MeshData {
     // vertex data
     pub positions: Vec<[f32; 3]>,
     pub normals: Vec<[f32; 3]>,
-    pub tex_coords: Vec<[f32; 2]>,
+    pub _tex_coords: Vec<[f32; 2]>,
     pub joints: Vec<[u8; 4]>,
     pub weights: Vec<[f32; 4]>,
 

@@ -8,7 +8,7 @@ pub struct GltfImporter {}
 
 impl GltfImporter {
     pub fn create(glb_bin: &[u8]) -> AnimatedObjectData {
-        let (document, buffer_data, image_data) = gltf::import_slice(glb_bin).unwrap();
+        let (document, buffer_data, _image_data) = gltf::import_slice(glb_bin).unwrap();
         let scene = document.scenes().next().expect("No scene found!");
         let node = scene.nodes().next().expect("No Node in scene found!");
         let mesh_node = node.children().next().expect("No children found in node!");
@@ -52,13 +52,12 @@ impl GltfImporter {
 
             let tex_coords_iter = reader.read_tex_coords(0).expect("No tex_coords found");
             match tex_coords_iter {
-                gltf::mesh::util::ReadTexCoords::U8(iter) => todo!(),
-                gltf::mesh::util::ReadTexCoords::U16(iter) => todo!(),
                 gltf::mesh::util::ReadTexCoords::F32(iter) => {
                     for elem in iter {
                         tex_coords.push(elem);
                     }
-                }
+                },
+                _ => { panic!("Only f32 is supported so far!")}
             }
 
             let joints_iter = reader.read_joints(0).expect("No joints found");
@@ -67,37 +66,35 @@ impl GltfImporter {
                     for elem in iter {
                         joints.push(elem);
                     }
-                }
-                gltf::mesh::util::ReadJoints::U16(iter) => todo!(),
+                },
+                _ => { panic!("Only u8 is supported so far!")}
             }
 
             let weights_iter = reader.read_weights(0).expect("No weights found");
             match weights_iter {
-                gltf::mesh::util::ReadWeights::U8(iter) => todo!(),
-                gltf::mesh::util::ReadWeights::U16(iter) => todo!(),
                 gltf::mesh::util::ReadWeights::F32(iter) => {
                     for elem in iter {
                         weights.push(elem);
                     }
-                }
+                },
+                _ => { panic!("Only f32 is supported so far!")}
             }
 
             let indices_iter = reader.read_indices().expect("Nod indices found");
             match indices_iter {
-                gltf::mesh::util::ReadIndices::U8(iter) => todo!(),
                 gltf::mesh::util::ReadIndices::U16(iter) => {
                     for elem in iter {
                         indices.push(elem);
                     }
-                }
-                gltf::mesh::util::ReadIndices::U32(iter) => todo!(),
+                },
+                _ => { panic!("Only u16 is supported so far!")}
             }
         }
 
         let mesh_data = MeshData {
             positions,
             normals,
-            tex_coords,
+            _tex_coords: tex_coords,
             joints,
             weights,
             indices,
@@ -114,7 +111,6 @@ impl GltfImporter {
         let mut inverse_bind_transform: Vec<cgmath::Matrix4<f32>> = Vec::new();
 
         // inverse bind transform
-        let inverse_bind_matrices = skin.inverse_bind_matrices().unwrap();
         let reader = skin.reader(|buffer| Some(&buffer_data[buffer.index()]));
 
         let inverse_bind_matrices_iter = reader.read_inverse_bind_matrices().unwrap();
@@ -127,8 +123,8 @@ impl GltfImporter {
         let joints_iter = skin.joints();
         for joint in joints_iter {
             let name = joint.name().unwrap();
-            let (translation, rotation, scale) = joint.transform().decomposed();
-            let bind_transform = joint.transform().matrix();
+            let (translation, rotation, _scale) = joint.transform().decomposed();
+            let _bind_transform = joint.transform().matrix();
 
             let children = joint.children();
             println!("children: {}", children.clone().count());
@@ -164,15 +160,13 @@ impl GltfImporter {
         let mut animation_data: Vec<AnimationData> = Vec::new();
 
         for animation in animations {
-            let mut name: String = String::new();
             let mut joint_target_names: Vec<String> = Vec::new();
             let mut joint_translations: Vec<AnimationTranslation> = Vec::new();
             let mut joint_rotations: Vec<AnimationRotation> = Vec::new();
 
             // gen name
             let animation_name = animation.name().unwrap();
-            name = animation_name.to_string();
-            println!("animation name: {}", name);
+            // println!("animation name: {}", name);
 
             let mut channesls_iter = animation.channels();
             let channels_len = channesls_iter.clone().count();
@@ -246,8 +240,8 @@ impl GltfImporter {
             }
 
             let animation_data_element = AnimationData {
-                name,
-                joint_target_names,
+                _name: animation_name.to_string(),
+                _joint_target_names: joint_target_names,
                 joint_translations,
                 joint_rotations,
             };

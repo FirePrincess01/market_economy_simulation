@@ -42,16 +42,6 @@ impl Animation {
         }
     }
 
-    fn find_key_frame(key_times: &[f32], time: instant::Duration) -> usize {
-        for (i, key_time) in key_times.iter().enumerate() {
-            if time.as_secs_f32() <= *key_time {
-                return i;
-            }
-        }
-
-        0
-    }
-
     fn get_sample_poses(
         &self,
     ) -> Vec<Decomposed> {

@@ -22,7 +22,7 @@ pub struct Mesh {
     instance_buffer: InstanceBuffer,
     max_instances: u32,
     nr_instances: u32,
-    nr_vertices: u32,
+    _nr_vertices: u32,
 }
 
 #[allow(dead_code)]
@@ -57,7 +57,7 @@ impl Mesh {
             instance_buffer,
             max_instances,
             nr_instances,
-            nr_vertices,
+            _nr_vertices: nr_vertices,
         }
     }
 
