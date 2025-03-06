@@ -35,6 +35,8 @@ rusttype = "0.9"
 fastrand = "2.0"
 gltf = "1.4.1"
 noise = "0.9.0"
+market_economy_simulation_server = { path = "../market_economy_simulation_server" }
+
 
 # [dependencies.image]
 # version = "0.24"

@@ -1,10 +1,10 @@
 mod animated_object;
 mod base_factory;
 mod create_entities;
-mod deferred_color_shader;
 mod deferred_animation_shader;
-mod deferred_terrain_shader;
+mod deferred_color_shader;
 mod deferred_light_shader;
+mod deferred_terrain_shader;
 mod ecs;
 mod ecs2;
 mod geometry;
@@ -12,10 +12,14 @@ mod ground_plane;
 mod performance_monitor;
 mod renderer;
 mod world_mesh;
-mod terrain;
+mod game_state;
 
 use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,
+};
+use deferred_terrain_shader::DeferredTerrainShaderDraw;
+use market_economy_simulation_server::game_logic::game_logic_interface::{
+    GameLogicInterface, GameLogicMessageHeavy, GameLogicMessageRequest,
 };
 use wgpu_renderer::{
     default_application::{DefaultApplication, DefaultApplicationInterface},
@@ -48,6 +52,9 @@ struct MarketEconomySimulation {
     font: rusttype::Font<'static>,
     entity_index_label: wgpu_renderer::label::Label,
     entity_index_mesh: wgpu_renderer::label::LabelMesh,
+
+    game_server: market_economy_simulation_server::GameLogicServer,
+    game_state:  game_state::GameState,
 }
 
 impl MarketEconomySimulation {
@@ -109,6 +116,27 @@ impl MarketEconomySimulation {
         // let glb_bin = include_bytes!("../res/wiggle_tower2.glb");
         animated_object_renderer.create_from_glb(glb_bin);
 
+        // create game server
+        let mut game_server = market_economy_simulation_server::GameLogicServer::new();
+
+        game_server
+            .send_messages()
+            .send(GameLogicMessageRequest::GetTerrain)
+            .unwrap();
+        game_server.update();
+
+        // get base values from game server
+        let terrain_server: market_economy_simulation_server::terrain::Terrain;
+        let msg: GameLogicMessageHeavy = game_server.get_heavy_messages().recv().unwrap();
+        match msg {
+            GameLogicMessageHeavy::Terrain(terrain) => {
+                terrain_server = terrain;
+            }
+        }
+
+        // create the game state
+        let game_state = game_state::GameState::new(renderer_interface, terrain_server);
+
         Self {
             size,
             scale_factor,
@@ -128,6 +156,9 @@ impl MarketEconomySimulation {
             font,
             entity_index_label,
             entity_index_mesh,
+
+            game_server,
+            game_state,
         }
     }
 }
@@ -193,11 +224,12 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         );
 
         self.performance_monitor.watch.start(3);
-        self.animated_object_storage.update(renderer_interface, &dt);
+        self.game_server.update();
         // ecs::system::move_agents(&mut self.world);
         self.performance_monitor.watch.stop(3);
-
+        
         self.performance_monitor.watch.start(4);
+        self.animated_object_storage.update(renderer_interface, &dt);
         // self.draw_agents.update(&mut self.world, &mut self.renderer.wgpu_renderer);
         self.performance_monitor.watch.stop(4);
 
@@ -261,6 +293,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         self.renderer.render(
             renderer_interface,
             &self.world_mesh,
+            &self.game_state.terrain_mesh,
             &self.animated_object_storage,
             &self.entity_index_mesh,
             &mut self.performance_monitor,

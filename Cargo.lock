@@ -1202,6 +1202,7 @@ dependencies = [
  "gltf",
  "instant",
  "log",
+ "market_economy_simulation_server",
  "noise",
  "pollster",
  "rusttype",
@@ -1211,6 +1212,14 @@ dependencies = [
  "wgpu",
  "wgpu_renderer",
  "winit",
+]
+
+[[package]]
+name = "market_economy_simulation_server"
+version = "0.1.0"
+dependencies = [
+ "cfg-if",
+ "noise",
 ]
 
 [[package]]

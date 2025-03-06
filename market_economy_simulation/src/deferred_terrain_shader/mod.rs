@@ -1,7 +1,7 @@
 //! Deferred shader drawing animated objects
 //!
 
-// mod deferred_animation_shader_draw;
+mod deferred_terrain_shader_draw;
 mod mesh;
 mod pipeline;
 mod vertex;
@@ -13,7 +13,7 @@ mod instance;
 
 // pub use animation_bind_group_layout::AnimationBindGroupLayout;
 // pub use animation_uniform::AnimationUniform;
-// pub use deferred_animation_shader_draw::DeferredAnimationShaderDraw;
+pub use deferred_terrain_shader_draw::DeferredTerrainShaderDraw;
 pub use mesh::Mesh;
 pub use pipeline::Pipeline;
 pub use vertex::Vertex;

@@ -1,6 +1,7 @@
 //! Contains the device buffers to render an object with this shader
 //!
 
+use super::DeferredTerrainShaderDraw;
 // use super::DeferredShaderDraw;
 use super::Instance;
 use super::Vertex;
@@ -51,8 +52,10 @@ impl Mesh {
         self.instance_buffer.update(queue, instances);
         self.nr_instances = u32::min(instances.len() as u32, self.max_instances);
     }
+}
 
-    pub fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
+impl DeferredTerrainShaderDraw for Mesh {
+    fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         self.vertex_buffer.bind(render_pass);
         self.index_buffer.bind(render_pass);
         self.instance_buffer.bind(render_pass);
@@ -60,13 +63,3 @@ impl Mesh {
         render_pass.draw_indexed(0..self.index_buffer.size(), 0, 0..self.nr_instances);
     }
 }
-
-// impl DeferredShaderDraw for Mesh {
-//     fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
-//         self.vertex_buffer.bind(render_pass);
-//         self.index_buffer.bind(render_pass);
-//         self.instance_buffer.bind(render_pass);
-
-//         render_pass.draw_indexed(0..self.index_buffer.size(), 0, 0..self.nr_instances);
-//     }
-// }

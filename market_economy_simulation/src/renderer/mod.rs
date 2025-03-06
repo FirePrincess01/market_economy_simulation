@@ -6,8 +6,10 @@ mod camera_controller;
 use crate::animated_object::wgpu_animated_object_renderer::WgpuAnimatedObjectStorage;
 use crate::deferred_color_shader::{self, DeferredShaderDraw, EntityBuffer, GBuffer};
 use crate::deferred_light_shader::DeferredLightShaderDraw;
+use crate::deferred_terrain_shader::{self, DeferredTerrainShaderDraw};
 use crate::performance_monitor::PerformanceMonitor;
 use camera_controller::CameraController;
+use market_economy_simulation_server::terrain;
 use wgpu_renderer::renderer::camera::{Camera, Projection};
 use wgpu_renderer::renderer::WgpuRendererInterface;
 use wgpu_renderer::vertex_color_shader::{self, VertexColorShaderDraw};
@@ -31,6 +33,8 @@ pub struct Renderer {
 
     pub animation_bind_group_layout: deferred_animation_shader::AnimationBindGroupLayout,
     pipeline_deferred_animated: deferred_animation_shader::Pipeline,
+
+    pipeline_deferred_terrain: deferred_terrain_shader::Pipeline,
 
     // camera
     camera: Camera,
@@ -117,6 +121,13 @@ impl Renderer {
             surface_format,
         );
 
+        // pipeline deferred terrain
+        let pipeline_deferred_terrain = deferred_terrain_shader::Pipeline::new(
+            wgpu_renderer.device(),
+            &camera_bind_group_layout,
+            surface_format,
+        );
+
         // camera
         let position = cgmath::Point3::new(0.0, 0.0, 0.0);
         let yaw = cgmath::Deg(0.0);
@@ -169,6 +180,8 @@ impl Renderer {
 
             animation_bind_group_layout,
             pipeline_deferred_animated,
+
+            pipeline_deferred_terrain,
 
             camera,
             camera_controller,
@@ -252,6 +265,7 @@ impl Renderer {
         view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
         meshes: &[&dyn DeferredShaderDraw],
+        deferred_terrain: &dyn DeferredTerrainShaderDraw,
         animated_object_storage: &WgpuAnimatedObjectStorage,
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -347,6 +361,11 @@ impl Renderer {
         self.camera_uniform_buffer.bind(&mut render_pass);
 
         animated_object_storage.draw(&mut render_pass);
+
+        self.pipeline_deferred_terrain.bind(&mut render_pass);
+        self.camera_uniform_buffer.bind(&mut render_pass);
+        deferred_terrain.draw(&mut render_pass);
+
     }
 
     fn render_light(
@@ -460,6 +479,7 @@ impl Renderer {
         // deferred: & impl DeferredShaderDraw,
         // deferred_light: & impl DeferredLightShaderDraw,
         deferred_combined: &(impl DeferredShaderDraw + DeferredLightShaderDraw),
+        deferred_terrain: &dyn DeferredTerrainShaderDraw,
         animated_object_storage: &WgpuAnimatedObjectStorage,
 
         mesh_textured_gui: &impl VertexTextureShaderDraw,
@@ -488,6 +508,7 @@ impl Renderer {
             &view,
             &mut encoder,
             &[deferred_combined],
+            deferred_terrain,
             animated_object_storage,
         );
         self.render_light(
