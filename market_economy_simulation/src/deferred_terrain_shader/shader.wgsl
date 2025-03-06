@@ -26,6 +26,8 @@ struct VertexOutput {
     @location(1) position: vec3<f32>,
     @location(2) normal: vec3<f32>,
     @location(3) entity: vec3<u32>,
+    @location(4) color_heighlights: vec3<f32>,
+    @location(5) barycentric_coordinate: vec3<f32>,
 };
 
 @vertex 
@@ -49,6 +51,8 @@ fn vs_main(
     out.position = position;
     out.normal = model.normal;
     out.entity = instance.entity;
+    out.color_heighlights = instance.color_heighlights;
+    out.barycentric_coordinate = model.barycentric_coordinate;
 
     return out;
 }
@@ -65,16 +69,23 @@ struct FragmentOutput {
 @fragment
 fn fs_main(in: VertexOutput) -> FragmentOutput {
 
+    // entity
     var entity0 = (in.entity[0] >> 0u) & 0xffu;
     var entity1 = (in.entity[0] >> 8u) & 0xffu;
     var entity2 = (in.entity[0] >> 16u) & 0xffu;
     var entity3 = (in.entity[0] >> 24u) & 0xffu;
 
+    // barycentric coordinate
+    let bary = 1.0 - in.barycentric_coordinate.x;
+    let intensity =  min(1.0, 1.0 / (1.0 + 131072.0 * bary* bary * bary)); // some magic just so that lines look fine
+
+    let color = in.color * (1.0-intensity) + in.color_heighlights * intensity;
+
     var out: FragmentOutput;
-    out.surface = vec4<f32>(in.color, 1.0);
+    out.surface = vec4<f32>(color, 1.0);
     out.position =  vec4<f32>(in.position, 1.0);
     out.normal =  vec4<f32>(in.normal, 1.0);
-    out.albedo = vec4<f32>(in.color, 1.0);
+    out.albedo = vec4<f32>(color, 1.0);
     out.entity =  vec4<f32>(
         f32(entity0)/255.0, 
         f32(entity1)/255.0, 
