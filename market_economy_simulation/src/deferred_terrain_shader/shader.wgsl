@@ -36,9 +36,16 @@ fn vs_main(
 
     let position = instance.position + model.position;
 
+    // calculate lighting
+    let light_intensity = 0.8;
+    let light_direction = normalize(vec3<f32>(1.0, -0.1, 1.0));
+
+    let diffuse_lighting = clamp(dot(model.normal.xyz, light_direction) * light_intensity, 0.0, 1.0);
+    let color = instance.color * diffuse_lighting;
+
     var out: VertexOutput;
     out.clip_position = camera.view_proj * vec4<f32>(position, 1.0);
-    out.color = instance.color;
+    out.color = color;
     out.position = position;
     out.normal = model.normal;
     out.entity = instance.entity;
