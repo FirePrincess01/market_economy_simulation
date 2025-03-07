@@ -1,7 +1,8 @@
 //! Contains the device buffers to render an object with this shader
 //!
 
-use super::DeferredShaderDraw;
+use super::DeferredTerrainShaderDraw;
+// use super::DeferredShaderDraw;
 use super::Instance;
 use super::Vertex;
 
@@ -53,7 +54,7 @@ impl Mesh {
     }
 }
 
-impl DeferredShaderDraw for Mesh {
+impl DeferredTerrainShaderDraw for Mesh {
     fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         self.vertex_buffer.bind(render_pass);
         self.index_buffer.bind(render_pass);

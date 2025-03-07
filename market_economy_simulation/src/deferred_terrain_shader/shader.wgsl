@@ -1,36 +1,23 @@
-
-const MAX_JOINTS: u32 = 16u;
-const MAX_JOINT_WEIGHTS: u32 = 4u;
-
 // Vertex shader
 struct CameraUniform {
     view_pos: vec4<f32>,
     view_proj: mat4x4<f32>,
 };
 
-struct JointUniform {
-    joint_transform: array<mat4x4<f32>, MAX_JOINTS>,
-}
-
 @group(0) @binding(0)
 var<uniform> camera: CameraUniform;
 
-@group(1) @binding(0)
-var<uniform> joints: JointUniform;
-
 struct VertexInput {
-    @location(0) position: vec4<f32>,
-    @location(1) normal: vec4<f32>,
-
-    // animation data
-    @location(2) joint_indices: vec4<u32>,
-    @location(3) joint_weights: vec4<f32>,
+    @location(0) position: vec3<f32>,
+    @location(1) normal: vec3<f32>,
+    @location(2) barycentric_coordinate: vec3<f32>,
 }
 
 struct InstanceInput {
     @location(5) position: vec3<f32>,
     @location(6) color: vec3<f32>,
     @location(7) entity: vec3<u32>,
+    @location(8) color_heighlights: vec3<f32>,
 }
 
 struct VertexOutput {
@@ -39,6 +26,8 @@ struct VertexOutput {
     @location(1) position: vec3<f32>,
     @location(2) normal: vec3<f32>,
     @location(3) entity: vec3<u32>,
+    @location(4) color_heighlights: vec3<f32>,
+    @location(5) barycentric_coordinate: vec3<f32>,
 };
 
 @vertex 
@@ -47,47 +36,23 @@ fn vs_main(
     instance: InstanceInput,
 ) -> VertexOutput {
 
-    // calculate the animation
-    var total_local_pos = vec4<f32>(0.0);
-    var total_local_normal = vec4<f32>(0.0);
-
-    for (var i: u32 = 0u; i < MAX_JOINT_WEIGHTS; i++) {
-        // get vertex data
-        let joint_index = model.joint_indices[i];
-        let joint_weight = model.joint_weights[i];
-
-        // get transform matrix
-        let joint_transform = joints.joint_transform[joint_index];
-
-        // move position
-        let local_position = joint_transform * model.position;
-        total_local_pos += local_position * joint_weight;
-
-        // move normal
-        let local_normal = joint_transform * model.normal;
-        total_local_normal += local_normal * joint_weight;
-    }
-
-    // move to the instance position
-    let world_position = instance.position + total_local_pos.xyz;
+    let position = instance.position + model.position;
 
     // calculate lighting
     let light_intensity = 0.8;
     let light_direction = normalize(vec3<f32>(1.0, -0.1, 1.0));
 
-    let diffuse_lighting = clamp(dot(total_local_normal.xyz, light_direction) * light_intensity, 0.0, 1.0);
+    let diffuse_lighting = clamp(dot(model.normal.xyz, light_direction) * light_intensity, 0.0, 1.0);
     let color = instance.color * diffuse_lighting;
 
-    // apply camera
-    let clip_position = camera.view_proj * vec4<f32>(world_position, 1.0);
-
-    // calculate output
     var out: VertexOutput;
-    out.clip_position = clip_position;
+    out.clip_position = camera.view_proj * vec4<f32>(position, 1.0);
     out.color = color;
-    out.position = world_position;
-    out.normal = total_local_normal.xyz;
+    out.position = position;
+    out.normal = model.normal;
     out.entity = instance.entity;
+    out.color_heighlights = instance.color_heighlights;
+    out.barycentric_coordinate = model.barycentric_coordinate;
 
     return out;
 }
@@ -104,16 +69,23 @@ struct FragmentOutput {
 @fragment
 fn fs_main(in: VertexOutput) -> FragmentOutput {
 
+    // entity
     var entity0 = (in.entity[0] >> 0u) & 0xffu;
     var entity1 = (in.entity[0] >> 8u) & 0xffu;
     var entity2 = (in.entity[0] >> 16u) & 0xffu;
     var entity3 = (in.entity[0] >> 24u) & 0xffu;
 
+    // barycentric coordinate
+    let bary = 1.0 - in.barycentric_coordinate.x;
+    let intensity =  min(1.0, 1.0 / (1.0 + 131072.0 * bary* bary * bary)); // some magic just so that lines look fine
+
+    let color = in.color * (1.0-intensity) + in.color_heighlights * intensity;
+
     var out: FragmentOutput;
-    out.surface = vec4<f32>(in.color, 0.8);
+    out.surface = vec4<f32>(color, 1.0);
     out.position =  vec4<f32>(in.position, 1.0);
     out.normal =  vec4<f32>(in.normal, 1.0);
-    out.albedo = vec4<f32>(in.color, 0.8);
+    out.albedo = vec4<f32>(color, 1.0);
     out.entity =  vec4<f32>(
         f32(entity0)/255.0, 
         f32(entity1)/255.0, 

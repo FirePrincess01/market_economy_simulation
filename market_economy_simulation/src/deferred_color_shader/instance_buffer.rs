@@ -1,16 +1,19 @@
 //! GPU memory buffer containing the instances for this shader
 //!
 
-use super::Instance;
 use wgpu::util::DeviceExt;
 
-pub struct InstanceBuffer {
+pub struct InstanceBuffer<TInstance> {
     buffer: wgpu::Buffer,
     _size: u32,
+    phantom: std::marker::PhantomData<TInstance>,
 }
 
-impl InstanceBuffer {
-    pub fn new(device: &wgpu::Device, instances: &[Instance]) -> Self {
+impl<TInstance> InstanceBuffer<TInstance>
+where
+    TInstance: bytemuck::Pod,
+{
+    pub fn new(device: &wgpu::Device, instances: &[TInstance]) -> Self {
         let buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some("Instance Buffer"),
             contents: bytemuck::cast_slice(instances),
@@ -19,10 +22,14 @@ impl InstanceBuffer {
 
         let _size = instances.len() as u32;
 
-        Self { buffer, _size }
+        Self {
+            buffer,
+            _size,
+            phantom: std::marker::PhantomData,
+        }
     }
 
-    pub fn update(&mut self, queue: &wgpu::Queue, instances: &[Instance]) {
+    pub fn update(&mut self, queue: &wgpu::Queue, instances: &[TInstance]) {
         let data = bytemuck::cast_slice(instances);
 
         if data.len() as u64 <= self.buffer.size() {

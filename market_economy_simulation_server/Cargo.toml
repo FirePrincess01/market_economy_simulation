@@ -1,0 +1,11 @@
+[package]
+name = "market_economy_simulation_server"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+cfg-if = "1"
+noise = "0.9.0"
