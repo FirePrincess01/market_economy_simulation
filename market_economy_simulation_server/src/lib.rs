@@ -1,5 +1,5 @@
 //! Contains the game logic
-//! Intended to be easyly ported to be used in a multiplayer session,
+//! Intended to be easily ported to be used in a multiplayer session,
 //! if this feature may ever be implemented
 
 pub mod game_logic;
