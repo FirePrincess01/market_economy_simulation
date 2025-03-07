@@ -85,17 +85,17 @@ impl Pipeline {
                 targets: &[
                     Some(wgpu::ColorTargetState {
                         format: surface_format,
-                        blend: None,
+                        blend: Some(BlendState::ALPHA_BLENDING),
                         write_mask: wgpu::ColorWrites::ALL,
                     }),
                     Some(wgpu::ColorTargetState {
                         format: GBuffer::G_BUFFER_FORMAT_POSITION,
-                        blend: None,
+                        blend: Some(BlendState::ALPHA_BLENDING),
                         write_mask: wgpu::ColorWrites::ALL,
                     }),
                     Some(wgpu::ColorTargetState {
                         format: GBuffer::G_BUFFER_FORMAT_NORMAL,
-                        blend: None,
+                        blend: Some(BlendState::ALPHA_BLENDING),
                         write_mask: wgpu::ColorWrites::ALL,
                     }),
                     Some(wgpu::ColorTargetState {
@@ -105,7 +105,7 @@ impl Pipeline {
                     }),
                     Some(wgpu::ColorTargetState {
                         format: EntityBuffer::FORMAT,
-                        blend: None,
+                        blend: Some(BlendState::ALPHA_BLENDING),
                         write_mask: wgpu::ColorWrites::ALL,
                     }),
                 ],
