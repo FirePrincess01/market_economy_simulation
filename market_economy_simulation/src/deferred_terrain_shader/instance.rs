@@ -44,12 +44,12 @@ impl Instance {
                     format: wgpu::VertexFormat::Float32x3,
                 },
                 wgpu::VertexAttribute {
-                    offset: mem::size_of::<[f32; 3*2]>() as wgpu::BufferAddress,
+                    offset: mem::size_of::<[f32; 3 * 2]>() as wgpu::BufferAddress,
                     shader_location: 7,
                     format: wgpu::VertexFormat::Uint32x3,
                 },
                 wgpu::VertexAttribute {
-                    offset: mem::size_of::<[f32; 3*3]>() as wgpu::BufferAddress,
+                    offset: mem::size_of::<[f32; 3 * 3]>() as wgpu::BufferAddress,
                     shader_location: 8,
                     format: wgpu::VertexFormat::Float32x3,
                 },

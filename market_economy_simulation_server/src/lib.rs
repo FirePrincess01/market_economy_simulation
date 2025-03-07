@@ -11,7 +11,8 @@ use std::time::Duration;
 
 use game_logic::GameLagic;
 use game_logic::game_logic_interface::{
-    GameLogicInterface, GameLogicMessageCritical, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageRequest
+    GameLogicInterface, GameLogicMessageCritical, GameLogicMessageHeavy, GameLogicMessageLight,
+    GameLogicMessageRequest,
 };
 
 pub struct GameLogicSingleThreaded {
@@ -50,11 +51,11 @@ impl GameLogicInterface for GameLogicSingleThreaded {
     fn get_heavy_messages(&self) -> &mpsc::Receiver<GameLogicMessageHeavy> {
         &self.channel_1_rx
     }
-    
+
     fn get_light_messages(&self) -> &mpsc::Receiver<GameLogicMessageLight> {
         &self.channel_2_rx
     }
-    
+
     fn get_critical_messages(&self) -> &mpsc::Receiver<GameLogicMessageCritical> {
         &self.channel_3_rx
     }
@@ -65,7 +66,7 @@ impl GameLogicInterface for GameLogicSingleThreaded {
 }
 
 pub struct GameLogicMultiThreaded {
-    game_logic:  thread::JoinHandle<()>,
+    game_logic: thread::JoinHandle<()>,
 
     channel_0_tx: mpsc::Sender<GameLogicMessageRequest>,
     channel_1_rx: mpsc::Receiver<GameLogicMessageHeavy>,
@@ -81,15 +82,14 @@ impl GameLogicMultiThreaded {
         let (channel_3_tx, channel_3_rx) = mpsc::channel();
 
         let game_logic = thread::spawn(move || {
-
-            let mut game_logic = GameLagic::new(channel_0_rx, channel_1_tx, channel_2_tx, channel_3_tx);
+            let mut game_logic =
+                GameLagic::new(channel_0_rx, channel_1_tx, channel_2_tx, channel_3_tx);
 
             loop {
                 game_logic.update();
                 thread::sleep(Duration::from_millis(20));
             }
         });
-
 
         Self {
             game_logic,
@@ -105,11 +105,11 @@ impl GameLogicInterface for GameLogicMultiThreaded {
     fn get_heavy_messages(&self) -> &mpsc::Receiver<GameLogicMessageHeavy> {
         &self.channel_1_rx
     }
-    
+
     fn get_light_messages(&self) -> &mpsc::Receiver<GameLogicMessageLight> {
         &self.channel_2_rx
     }
-    
+
     fn get_critical_messages(&self) -> &mpsc::Receiver<GameLogicMessageCritical> {
         &self.channel_3_rx
     }
@@ -118,7 +118,6 @@ impl GameLogicInterface for GameLogicMultiThreaded {
         return &self.channel_0_tx;
     }
 }
-
 
 enum GameLogicExecution {
     SingleThreaded(GameLogicSingleThreaded),

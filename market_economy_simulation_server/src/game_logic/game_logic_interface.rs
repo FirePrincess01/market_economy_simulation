@@ -10,13 +10,9 @@ pub enum GameLogicMessageHeavy {
     Terrain(terrain::Terrain), // The terrain heightmap data
 }
 
-pub enum GameLogicMessageLight {
+pub enum GameLogicMessageLight {}
 
-}
-
-pub enum GameLogicMessageCritical {
-
-}
+pub enum GameLogicMessageCritical {}
 
 pub trait GameLogicInterface {
     fn get_heavy_messages(&self) -> &mpsc::Receiver<GameLogicMessageHeavy>;

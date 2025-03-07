@@ -2,10 +2,10 @@
 //!
 
 mod deferred_terrain_shader_draw;
+mod instance;
 mod mesh;
 mod pipeline;
 mod vertex;
-mod instance;
 
 // mod animation_bind_group_layout;
 // mod animation_uniform;
@@ -14,10 +14,10 @@ mod instance;
 // pub use animation_bind_group_layout::AnimationBindGroupLayout;
 // pub use animation_uniform::AnimationUniform;
 pub use deferred_terrain_shader_draw::DeferredTerrainShaderDraw;
+pub use instance::Instance;
 pub use mesh::Mesh;
 pub use pipeline::Pipeline;
 pub use vertex::Vertex;
-pub use instance::Instance;
 
 // pub use super::deferred_color_shader::Instance;
 pub use super::deferred_color_shader::InstanceBuffer;

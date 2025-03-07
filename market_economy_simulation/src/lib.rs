@@ -7,12 +7,12 @@ mod deferred_light_shader;
 mod deferred_terrain_shader;
 mod ecs;
 mod ecs2;
+mod game_state;
 mod geometry;
 mod ground_plane;
 mod performance_monitor;
 mod renderer;
 mod world_mesh;
-mod game_state;
 
 use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,
@@ -54,7 +54,7 @@ struct MarketEconomySimulation {
     entity_index_mesh: wgpu_renderer::label::LabelMesh,
 
     game_server: market_economy_simulation_server::GameLogicServer,
-    game_state:  game_state::GameState,
+    game_state: game_state::GameState,
 }
 
 impl MarketEconomySimulation {
@@ -227,7 +227,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         self.game_server.update();
         // ecs::system::move_agents(&mut self.world);
         self.performance_monitor.watch.stop(3);
-        
+
         self.performance_monitor.watch.start(4);
         self.animated_object_storage.update(renderer_interface, &dt);
         // self.draw_agents.update(&mut self.world, &mut self.renderer.wgpu_renderer);

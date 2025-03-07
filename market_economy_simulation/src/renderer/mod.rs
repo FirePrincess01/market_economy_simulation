@@ -365,9 +365,6 @@ impl Renderer {
         self.camera_uniform_buffer.bind(&mut render_pass);
 
         animated_object_storage.draw(&mut render_pass);
-
-
-
     }
 
     fn render_light(
