@@ -7,6 +7,7 @@ use super::super::deferred_color_shader::GBuffer;
 use super::animation_bind_group_layout::AnimationBindGroupLayout;
 use super::Instance;
 use super::Vertex;
+use wgpu::BlendState;
 use wgpu_renderer::renderer::depth_texture;
 
 /// A general purpose shader using vertices, colors and an instance matrix
@@ -99,7 +100,7 @@ impl Pipeline {
                     }),
                     Some(wgpu::ColorTargetState {
                         format: GBuffer::G_BUFFER_FORMAT_ALBEDO,
-                        blend: None,
+                        blend: Some(BlendState::ALPHA_BLENDING),
                         write_mask: wgpu::ColorWrites::ALL,
                     }),
                     Some(wgpu::ColorTargetState {

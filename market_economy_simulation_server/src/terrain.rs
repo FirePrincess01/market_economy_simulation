@@ -10,7 +10,7 @@ pub struct Terrain {
 
 impl Terrain {
     pub fn new(steps_x: usize, steps_y: usize, distance: f32) -> Self {
-        let amplitude = 10.0;
+        let amplitude = 5.0;
         let scale = 1.5;
         
         // user perlin noise to generate a terrain

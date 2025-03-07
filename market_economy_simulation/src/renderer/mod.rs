@@ -357,14 +357,16 @@ impl Renderer {
             mesh.draw(&mut render_pass);
         }
 
+        self.pipeline_deferred_terrain.bind(&mut render_pass);
+        self.camera_uniform_buffer.bind(&mut render_pass);
+        deferred_terrain.draw(&mut render_pass);
+
         self.pipeline_deferred_animated.bind(&mut render_pass);
         self.camera_uniform_buffer.bind(&mut render_pass);
 
         animated_object_storage.draw(&mut render_pass);
 
-        self.pipeline_deferred_terrain.bind(&mut render_pass);
-        self.camera_uniform_buffer.bind(&mut render_pass);
-        deferred_terrain.draw(&mut render_pass);
+
 
     }
 
