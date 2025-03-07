@@ -66,7 +66,7 @@ impl GameLogicInterface for GameLogicSingleThreaded {
 }
 
 pub struct GameLogicMultiThreaded {
-    game_logic: thread::JoinHandle<()>,
+    _game_logic: thread::JoinHandle<()>,
 
     channel_0_tx: mpsc::Sender<GameLogicMessageRequest>,
     channel_1_rx: mpsc::Receiver<GameLogicMessageHeavy>,
@@ -92,7 +92,7 @@ impl GameLogicMultiThreaded {
         });
 
         Self {
-            game_logic,
+            _game_logic: game_logic,
             channel_0_tx,
             channel_1_rx,
             channel_2_rx,
@@ -120,6 +120,7 @@ impl GameLogicInterface for GameLogicMultiThreaded {
 }
 
 enum GameLogicExecution {
+    #[allow(dead_code)]
     SingleThreaded(GameLogicSingleThreaded),
     Multithreaded(GameLogicMultiThreaded),
 }

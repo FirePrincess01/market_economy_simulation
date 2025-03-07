@@ -11,7 +11,7 @@ pub struct Instance {
 }
 
 impl Instance {
-    pub fn new() -> Self {
+    pub fn _new() -> Self {
         Self {
             position: [0.0, 0.0, 0.0],
             color: [0.0, 0.0, 0.0],

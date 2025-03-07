@@ -9,7 +9,6 @@ use crate::deferred_light_shader::DeferredLightShaderDraw;
 use crate::deferred_terrain_shader::{self, DeferredTerrainShaderDraw};
 use crate::performance_monitor::PerformanceMonitor;
 use camera_controller::CameraController;
-use market_economy_simulation_server::terrain;
 use wgpu_renderer::renderer::camera::{Camera, Projection};
 use wgpu_renderer::renderer::WgpuRendererInterface;
 use wgpu_renderer::vertex_color_shader::{self, VertexColorShaderDraw};

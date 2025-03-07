@@ -11,8 +11,8 @@ pub mod game_logic_interface;
 pub struct GameLagic {
     channel_0_rx: mpsc::Receiver<GameLogicMessageRequest>,
     channel_1_tx: mpsc::Sender<GameLogicMessageHeavy>,
-    channel_2_tx: mpsc::Sender<GameLogicMessageLight>,
-    channel_3_tx: mpsc::Sender<GameLogicMessageCritical>,
+    _channel_2_tx: mpsc::Sender<GameLogicMessageLight>,
+    _channel_3_tx: mpsc::Sender<GameLogicMessageCritical>,
 
     terrain: terrain::Terrain,
 }
@@ -29,8 +29,8 @@ impl GameLagic {
         Self {
             channel_0_rx,
             channel_1_tx,
-            channel_2_tx,
-            channel_3_tx,
+            _channel_2_tx: channel_2_tx,
+            _channel_3_tx: channel_3_tx,
 
             terrain,
         }
@@ -50,7 +50,9 @@ impl GameLagic {
                     }
                 }
             },
-            Err(err) => {}
+            Err(_err) => {
+                // no message found
+            }
         }
     }
 }

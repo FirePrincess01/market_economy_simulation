@@ -17,7 +17,6 @@ mod world_mesh;
 use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,
 };
-use deferred_terrain_shader::DeferredTerrainShaderDraw;
 use market_economy_simulation_server::game_logic::game_logic_interface::{
     GameLogicInterface, GameLogicMessageHeavy, GameLogicMessageRequest,
 };

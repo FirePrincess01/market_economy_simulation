@@ -8,8 +8,8 @@ pub fn create_vertices(
     let mut vertices: Vec<deferred_terrain_shader::Vertex> = Vec::new();
     let mut indices: Vec<u32> = Vec::new();
 
-    for y in (0..terrain.size_y - 1) {
-        for x in (0..terrain.size_x - 1) {
+    for y in 0..terrain.size_y - 1 {
+        for x in 0..terrain.size_x - 1 {
             let height_0 = terrain.heights[y][x];
             let height_1 = terrain.heights[y][x + 1];
             let height_2 = terrain.heights[y + 1][x + 1];

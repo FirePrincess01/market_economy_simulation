@@ -9,12 +9,12 @@ use crate::deferred_terrain_shader;
 
 pub struct GameState {
     // values form the game server
-    terrain_server: market_economy_simulation_server::terrain::Terrain,
+    _terrain_server: market_economy_simulation_server::terrain::Terrain,
 
     // derived values
-    terrain_vertices: Vec<deferred_terrain_shader::Vertex>,
-    terrain_indices: Vec<u32>,
-    terrain_instance: deferred_terrain_shader::Instance,
+    _terrain_vertices: Vec<deferred_terrain_shader::Vertex>,
+    _terrain_indices: Vec<u32>,
+    _terrain_instance: deferred_terrain_shader::Instance,
     pub terrain_mesh: deferred_terrain_shader::Mesh,
 }
 
@@ -38,10 +38,10 @@ impl GameState {
         );
 
         Self {
-            terrain_server,
-            terrain_vertices,
-            terrain_indices,
-            terrain_instance,
+            _terrain_server: terrain_server,
+            _terrain_vertices: terrain_vertices,
+            _terrain_indices: terrain_indices,
+            _terrain_instance: terrain_instance,
             terrain_mesh,
         }
     }
