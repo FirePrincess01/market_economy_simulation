@@ -134,6 +134,7 @@ impl GameLogicInterface for GameLogicMultiThreaded {
 enum GameLogicExecution {
     #[allow(dead_code)]
     SingleThreaded(GameLogicSingleThreaded),
+    #[allow(dead_code)]
     Multithreaded(GameLogicMultiThreaded),
 }
 
