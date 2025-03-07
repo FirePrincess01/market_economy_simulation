@@ -125,6 +125,7 @@ impl MarketEconomySimulation {
         game_server.update();
 
         // get base values from game server
+        #[allow(clippy::needless_late_init)]
         let terrain_server: market_economy_simulation_server::terrain::Terrain;
         let msg: GameLogicMessageHeavy = game_server.get_heavy_messages().recv().unwrap();
         match msg {

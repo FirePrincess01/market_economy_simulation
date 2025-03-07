@@ -47,6 +47,12 @@ impl GameLogicSingleThreaded {
     }
 }
 
+impl Default for GameLogicSingleThreaded {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl GameLogicInterface for GameLogicSingleThreaded {
     fn get_heavy_messages(&self) -> &mpsc::Receiver<GameLogicMessageHeavy> {
         &self.channel_1_rx
@@ -61,7 +67,7 @@ impl GameLogicInterface for GameLogicSingleThreaded {
     }
 
     fn send_messages(&self) -> &mpsc::Sender<GameLogicMessageRequest> {
-        return &self.channel_0_tx;
+        &self.channel_0_tx
     }
 }
 
@@ -101,6 +107,12 @@ impl GameLogicMultiThreaded {
     }
 }
 
+impl Default for GameLogicMultiThreaded {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl GameLogicInterface for GameLogicMultiThreaded {
     fn get_heavy_messages(&self) -> &mpsc::Receiver<GameLogicMessageHeavy> {
         &self.channel_1_rx
@@ -115,7 +127,7 @@ impl GameLogicInterface for GameLogicMultiThreaded {
     }
 
     fn send_messages(&self) -> &mpsc::Sender<GameLogicMessageRequest> {
-        return &self.channel_0_tx;
+        &self.channel_0_tx
     }
 }
 
@@ -131,6 +143,7 @@ pub struct GameLogicServer {
 
 impl GameLogicServer {
     pub fn new() -> Self {
+        #[allow(clippy::needless_late_init)]
         let server: GameLogicExecution;
         cfg_if::cfg_if! {
             // apply scale factor for the web
@@ -157,6 +170,12 @@ impl GameLogicServer {
                 // update is done in another thread
             }
         }
+    }
+}
+
+impl Default for GameLogicServer {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
