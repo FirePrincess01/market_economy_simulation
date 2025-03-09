@@ -116,7 +116,7 @@ impl Pipeline {
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: depth_texture::DepthTexture::DEPTH_FORMAT,
                 depth_write_enabled: true,
-                depth_compare: wgpu::CompareFunction::Less,
+                depth_compare: wgpu::CompareFunction::Always, // for the light orb to shine through
                 stencil: wgpu::StencilState::default(),
                 bias: wgpu::DepthBiasState::default(),
             }),

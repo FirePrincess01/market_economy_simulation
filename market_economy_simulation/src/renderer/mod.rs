@@ -29,6 +29,7 @@ pub struct Renderer {
     entity_buffer: deferred_color_shader::EntityBuffer,
     pipeline_deferred_color: deferred_color_shader::Pipeline,
     pipeline_deferred_light: deferred_light_shader::Pipeline,
+    pipeline_deferred_light_ambient: deferred_light_shader::Pipeline,
 
     pub animation_bind_group_layout: deferred_animation_shader::AnimationBindGroupLayout,
     pipeline_deferred_animated: deferred_animation_shader::Pipeline,
@@ -107,6 +108,15 @@ impl Renderer {
             &camera_bind_group_layout,
             &g_buffer_bind_group_layout,
             surface_format,
+            false,
+        );
+
+        let pipeline_deferred_light_ambient = deferred_light_shader::Pipeline::new(
+            wgpu_renderer.device(),
+            &camera_bind_group_layout,
+            &g_buffer_bind_group_layout,
+            surface_format,
+            true,
         );
 
         let animation_bind_group_layout =
@@ -176,6 +186,7 @@ impl Renderer {
             entity_buffer,
             pipeline_deferred_color,
             pipeline_deferred_light,
+            pipeline_deferred_light_ambient,
 
             animation_bind_group_layout,
             pipeline_deferred_animated,
@@ -265,6 +276,7 @@ impl Renderer {
         encoder: &mut wgpu::CommandEncoder,
         meshes: &[&dyn DeferredShaderDraw],
         deferred_terrain: &dyn DeferredTerrainShaderDraw,
+        ant_light_orbs: &dyn DeferredShaderDraw,
         animated_object_storage: &WgpuAnimatedObjectStorage,
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -275,9 +287,9 @@ impl Renderer {
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 0.01,
-                            g: 0.02,
-                            b: 0.03,
+                            r: 0.00,
+                            g: 0.00,
+                            b: 0.00,
                             a: 1.0,
                         }),
                         store: wgpu::StoreOp::default(),
@@ -288,9 +300,9 @@ impl Renderer {
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 1.0,
-                            g: 1.0,
-                            b: 1.0,
+                            r: 0.00,
+                            g: 0.00,
+                            b: 0.00,
                             a: 1.0,
                         }),
                         store: wgpu::StoreOp::default(),
@@ -301,9 +313,9 @@ impl Renderer {
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 1.0,
-                            g: 1.0,
-                            b: 1.0,
+                            r: 0.00,
+                            g: 0.00,
+                            b: 0.00,
                             a: 1.0,
                         }),
                         store: wgpu::StoreOp::default(),
@@ -314,9 +326,9 @@ impl Renderer {
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 1.0,
-                            g: 1.0,
-                            b: 1.0,
+                            r: 0.00,
+                            g: 0.00,
+                            b: 0.00,
                             a: 1.0,
                         }),
                         store: wgpu::StoreOp::default(),
@@ -327,9 +339,9 @@ impl Renderer {
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 1.0,
-                            g: 1.0,
-                            b: 1.0,
+                            r: 0.00,
+                            g: 0.00,
+                            b: 0.00,
                             a: 1.0,
                         }),
                         store: wgpu::StoreOp::default(),
@@ -348,22 +360,28 @@ impl Renderer {
             occlusion_query_set: None,
         });
 
+        // ants
+        self.pipeline_deferred_animated.bind(&mut render_pass);
+        self.camera_uniform_buffer.bind(&mut render_pass);
+        animated_object_storage.draw(&mut render_pass);
+
+        // light orbs (shining through the ants)
         self.pipeline_deferred_color.bind(&mut render_pass);
         self.camera_uniform_buffer.bind(&mut render_pass);
+        ant_light_orbs.draw(&mut render_pass);
 
-        // meshes
-        for mesh in meshes {
-            mesh.draw(&mut render_pass);
-        }
-
+        // terrain
         self.pipeline_deferred_terrain.bind(&mut render_pass);
         self.camera_uniform_buffer.bind(&mut render_pass);
         deferred_terrain.draw(&mut render_pass);
 
-        self.pipeline_deferred_animated.bind(&mut render_pass);
+        // other
+        self.pipeline_deferred_color.bind(&mut render_pass);
         self.camera_uniform_buffer.bind(&mut render_pass);
+        for mesh in meshes {
+            mesh.draw(&mut render_pass);
+        }
 
-        animated_object_storage.draw(&mut render_pass);
     }
 
     fn render_light(
@@ -372,6 +390,7 @@ impl Renderer {
         view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
         meshes: &[&dyn DeferredLightShaderDraw],
+        ambient_light_quad: &impl DeferredLightShaderDraw,
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Light Render Pass"),
@@ -381,9 +400,9 @@ impl Renderer {
                 ops: wgpu::Operations {
                     // load: wgpu::LoadOp::Load,
                     load: wgpu::LoadOp::Clear(wgpu::Color {
-                        r: 0.01,
-                        g: 0.02,
-                        b: 0.03,
+                        r: 0.00,
+                        g: 0.00,
+                        b: 0.00,
                         a: 1.0,
                     }),
                     store: wgpu::StoreOp::default(),
@@ -401,6 +420,12 @@ impl Renderer {
             timestamp_writes: None,
             occlusion_query_set: None,
         });
+
+        // ambient light
+        self.pipeline_deferred_light_ambient.bind(&mut render_pass);
+        self.camera_uniform_buffer.bind(&mut render_pass);
+        self.g_buffer.bind(&mut render_pass);
+        ambient_light_quad.draw_lights(&mut render_pass);
 
         // lights
         self.pipeline_deferred_light.bind(&mut render_pass);
@@ -476,11 +501,12 @@ impl Renderer {
         renderer_interface: &mut dyn WgpuRendererInterface,
         // deferred: & impl DeferredShaderDraw,
         // deferred_light: & impl DeferredLightShaderDraw,
-        deferred_combined: &(impl DeferredShaderDraw + DeferredLightShaderDraw),
+        // deferred_combined: &(impl DeferredShaderDraw + DeferredLightShaderDraw),
         deferred_terrain: &dyn DeferredTerrainShaderDraw,
         animated_object_storage: &WgpuAnimatedObjectStorage,
-
+        ant_light_orbs: &(impl DeferredShaderDraw + DeferredLightShaderDraw),
         mesh_textured_gui: &impl VertexTextureShaderDraw,
+        ambient_light_quad: &impl DeferredLightShaderDraw,
         performance_monitor: &mut PerformanceMonitor,
     ) -> Result<(), wgpu::SurfaceError> {
         performance_monitor.watch.start(0);
@@ -505,15 +531,17 @@ impl Renderer {
             renderer_interface,
             &view,
             &mut encoder,
-            &[deferred_combined],
+            &[],
             deferred_terrain,
+            ant_light_orbs,
             animated_object_storage,
         );
         self.render_light(
             renderer_interface,
             &view,
             &mut encoder,
-            &[deferred_combined],
+            &[ant_light_orbs],
+            ambient_light_quad,
         );
         self.render_forward(
             renderer_interface,

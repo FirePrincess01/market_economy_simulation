@@ -21,11 +21,17 @@ impl Pipeline {
         camera_bind_group_layout: &CameraBindGroupLayout,
         g_buffer_bind_group_layout: &GBufferBindGroupLayout,
         surface_format: wgpu::TextureFormat,
+        use_ambient_shader: bool
     ) -> Self {
+        let shader_source = match use_ambient_shader {
+            true => include_str!("shader_ambient_light.wgsl"),
+            false => include_str!("shader.wgsl"),
+        };
+
         // Shader
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("Deferred Light Shader"),
-            source: wgpu::ShaderSource::Wgsl(include_str!("shader.wgsl").into()),
+            source: wgpu::ShaderSource::Wgsl(shader_source.into()),
         });
 
         // Pipeline

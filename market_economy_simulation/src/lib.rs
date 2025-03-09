@@ -13,6 +13,7 @@ mod ground_plane;
 mod performance_monitor;
 mod renderer;
 mod world_mesh;
+mod ant;
 
 use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,
@@ -36,7 +37,7 @@ struct MarketEconomySimulation {
 
     renderer: renderer::Renderer,
     _world: ecs2::World,
-    world_mesh: world_mesh::WorldMesh,
+    // world_mesh: world_mesh::WorldMesh,
 
     // ant: deferred_color_shader::Mesh,
     animated_object_storage: WgpuAnimatedObjectStorage,
@@ -54,6 +55,10 @@ struct MarketEconomySimulation {
 
     game_server: market_economy_simulation_server::GameLogicServer,
     game_state: game_state::GameState,
+
+    ant: ant::Ant,
+
+    ambient_light_quad: deferred_light_shader::Mesh, // Quad running the global ambient light shader
 }
 
 impl MarketEconomySimulation {
@@ -137,6 +142,16 @@ impl MarketEconomySimulation {
         // create the game state
         let game_state = game_state::GameState::new(renderer_interface, terrain_server);
 
+        let ant = ant::Ant::new(renderer_interface);
+
+        let ambient_light_quad_vertices = geometry::Quad::new(2.0);
+        let amblient_light_quad_instance = deferred_light_shader::Instance{
+            position: [-1.0, -1.0, 0.1],
+            intensity: [0.4, 0.4, 0.4],
+        };
+        let ambient_light_quad = deferred_light_shader::Mesh::new(renderer_interface.device(),
+        &ambient_light_quad_vertices.vertices, &ambient_light_quad_vertices.indices, &[amblient_light_quad_instance]);
+
         Self {
             size,
             scale_factor,
@@ -144,7 +159,7 @@ impl MarketEconomySimulation {
             renderer,
 
             _world: world,
-            world_mesh,
+            // world_mesh,
 
             animated_object_storage,
 
@@ -159,6 +174,10 @@ impl MarketEconomySimulation {
 
             game_server,
             game_state,
+
+            ant,
+
+            ambient_light_quad,
         }
     }
 }
@@ -292,10 +311,12 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         // render current frame
         self.renderer.render(
             renderer_interface,
-            &self.world_mesh,
+            // &self.world_mesh,
             &self.game_state.terrain_mesh,
             &self.animated_object_storage,
+            &self.ant,
             &self.entity_index_mesh,
+            &self.ambient_light_quad,
             &mut self.performance_monitor,
         )
     }

@@ -48,6 +48,7 @@ impl<'a> EntityBufferSlice<'a> {
         let elem2 = data.nth(0_usize).unwrap_or(&default);
         let elem3 = data.nth(0_usize).unwrap_or(&default);
 
+        // Self::as_u32_le(&[*elem0, *elem1, *elem2, 0])
         Self::as_u32_le(&[*elem0, *elem1, *elem2, *elem3])
     }
 

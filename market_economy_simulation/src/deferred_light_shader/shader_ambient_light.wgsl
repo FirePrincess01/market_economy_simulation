@@ -32,7 +32,7 @@ fn vs_main(
     let position = instance.position + model.position;
 
     var out: VertexOutput;
-    out.clip_position = camera.view_proj * vec4<f32>(position, 1.0);
+    out.clip_position = vec4<f32>(position, 1.0);
     out.view_position = camera.view_pos.xyz;
     out.model_position = instance.position;
     out.intensity = instance.intensity;
@@ -61,21 +61,26 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
     let vertex_pnormal: vec4<f32> = textureLoad(t_normal, index, 0);
     let vertex_color: vec4<f32> = textureLoad(t_albedo, index, 0);
 
-    // calculate light intensity based on distance
-    let intensity_0 = in.intensity[0];
-    let intensity_ambient = in.intensity[1];
-    let distance: f32 = min(distance(vertex_position.xyz, in.model_position) * 1.0 * in.intensity[0] , 1.0);
-    let light_intensity = 1.0 - distance;
-    
-    var out: FragmentOutput;
-    // if(intensity_ambient == 0.0) {
-    //     out.surface = vertex_color * light_intensity;
-    // }
-    // else {
-    //     out.surface = vertex_color * intensity_ambient;
-    // }
+    // calculate lighting
+    let ambient_strength = 0.01;
+    let diffuse_strength = 0.1;
+    let specular_strength = 0.2;
 
-    out.surface = vertex_color * 0.2;
+    // diffuse lighting
+    let light_direction = normalize(vec3<f32>(1.0, 0.0, 1.0));
+    let diffuse_lighting = clamp(dot(vertex_pnormal.xyz, light_direction) * diffuse_strength, 0.0, 1.0);
+
+    // pong shading
+    let light_stength = diffuse_lighting + ambient_strength;
+    let light_color: vec3<f32> = light_stength * vertex_color.xyz;
+
+    // blend with intensity
+    let intensity = vertex_color[3];
+    let out_color: vec3<f32> = vertex_color.xyz * intensity + light_color * (1.0 -intensity);
+
+    // out color
+    var out: FragmentOutput;
+    out.surface = vec4<f32>(out_color, 1.0);
 
     return out;
 }

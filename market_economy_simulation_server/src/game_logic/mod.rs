@@ -24,7 +24,7 @@ impl GameLagic {
         channel_2_tx: mpsc::Sender<GameLogicMessageLight>,
         channel_3_tx: mpsc::Sender<GameLogicMessageCritical>,
     ) -> Self {
-        let terrain = terrain::Terrain::new(20, 20, 1.0);
+        let terrain = terrain::Terrain::new(1000, 1000, 1.0);
 
         Self {
             channel_0_rx,

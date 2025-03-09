@@ -25,10 +25,10 @@ impl GameState {
     ) -> Self {
         let (terrain_vertices, terrain_indices) = terrain::create_vertices(&terrain_server);
         let terrain_instance = deferred_terrain_shader::Instance {
-            position: [10.0, 10.0, 1.0],
+            position: [0.0, 0.0, 1.0],
             color: [0.1, 0.1, 0.1],
             entity: [72, 0, 0],
-            color_heighlights: [1.0, 0.2, 1.0],
+            color_heighlights: [0.3, 0.05, 0.3],
         };
         let terrain_mesh = deferred_terrain_shader::Mesh::new(
             renderer.device(),

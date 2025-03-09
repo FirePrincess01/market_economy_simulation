@@ -72,11 +72,12 @@ fn vs_main(
     let world_position = instance.position + total_local_pos.xyz;
 
     // calculate lighting
-    let light_intensity = 0.8;
-    let light_direction = normalize(vec3<f32>(1.0, -0.1, 1.0));
+    // let light_intensity = 0.8;
+    // let light_direction = normalize(vec3<f32>(1.0, -0.1, 1.0));
 
-    let diffuse_lighting = clamp(dot(total_local_normal.xyz, light_direction) * light_intensity, 0.0, 1.0);
-    let color = instance.color * diffuse_lighting;
+    // let diffuse_lighting = clamp(dot(total_local_normal.xyz, light_direction) * light_intensity, 0.0, 1.0);
+    // let color = instance.color * diffuse_lighting;
+    let color = instance.color;
 
     // apply camera
     let clip_position = camera.view_proj * vec4<f32>(world_position, 1.0);
@@ -113,7 +114,7 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
     out.surface = vec4<f32>(in.color, 0.8);
     out.position =  vec4<f32>(in.position, 1.0);
     out.normal =  vec4<f32>(in.normal, 1.0);
-    out.albedo = vec4<f32>(in.color, 0.8);
+    out.albedo = vec4<f32>(in.color, 0.0);
     out.entity =  vec4<f32>(
         f32(entity0)/255.0, 
         f32(entity1)/255.0, 
