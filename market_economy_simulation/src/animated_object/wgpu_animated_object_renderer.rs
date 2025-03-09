@@ -80,7 +80,7 @@ impl WgpuAnimatedObjectRenderer<'_> {
         let animation_uniform = deferred_animation_shader::AnimationUniform::zero();
 
         let instance = deferred_animation_shader::Instance {
-            position: [20.0, 20.0, 5.0],
+            position: [500.0, 20.0, 5.0],
             color: [0.5, 0.5, 0.8],
             entity: [99, 0, 0],
         };
