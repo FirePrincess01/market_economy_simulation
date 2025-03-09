@@ -64,14 +64,23 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
     // calculate lighting
     let ambient_strength = 0.01;
     let diffuse_strength = 0.1;
-    let specular_strength = 0.2;
+    let specular_strength = 0.1;
 
     // diffuse lighting
-    let light_direction = normalize(vec3<f32>(1.0, 0.0, 1.0));
-    let diffuse_lighting = clamp(dot(vertex_pnormal.xyz, light_direction) * diffuse_strength, 0.0, 1.0);
+    let light_direction = normalize(vec3<f32>(0.0, 1.0, 0.25));
+    let diffuse_lighting = max(dot(vertex_pnormal.xyz, light_direction) * diffuse_strength, 0.0);
+
+    // specular lighting
+    let view_position = in.view_position;
+    let model_position = vertex_position.xyz;
+    let model_normal = vertex_pnormal.xyz;
+
+    let view_dir = normalize(view_position - model_position);
+    let reflect_dir = reflect(-light_direction, model_normal);
+    let specular_lighting = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0) * specular_strength;
 
     // pong shading
-    let light_stength = diffuse_lighting + ambient_strength;
+    let light_stength = ambient_strength + diffuse_lighting + specular_lighting;
     let light_color: vec3<f32> = light_stength * vertex_color.xyz;
 
     // blend with intensity
