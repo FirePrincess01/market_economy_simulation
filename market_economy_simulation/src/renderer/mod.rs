@@ -361,27 +361,31 @@ impl Renderer {
         });
 
         // ants
-        self.pipeline_deferred_animated.bind(&mut render_pass);
-        self.camera_uniform_buffer.bind(&mut render_pass);
-        animated_object_storage.draw(&mut render_pass);
+        self.pipeline_deferred_animated.draw(
+            &mut render_pass,
+            &self.camera_uniform_buffer,
+            animated_object_storage,
+        );
 
         // light orbs (shining through the ants)
-        self.pipeline_deferred_color.bind(&mut render_pass);
-        self.camera_uniform_buffer.bind(&mut render_pass);
-        ant_light_orbs.draw(&mut render_pass);
+        self.pipeline_deferred_color.draw(
+            &mut render_pass,
+            &self.camera_uniform_buffer,
+            ant_light_orbs,
+        );
 
         // terrain
-        self.pipeline_deferred_terrain.bind(&mut render_pass);
-        self.camera_uniform_buffer.bind(&mut render_pass);
-        deferred_terrain.draw(&mut render_pass);
+        self.pipeline_deferred_terrain.draw(
+            &mut render_pass,
+            &self.camera_uniform_buffer,
+            deferred_terrain,
+        );
 
         // other
-        self.pipeline_deferred_color.bind(&mut render_pass);
-        self.camera_uniform_buffer.bind(&mut render_pass);
         for mesh in meshes {
-            mesh.draw(&mut render_pass);
+            self.pipeline_deferred_color
+                .draw(&mut render_pass, &self.camera_uniform_buffer, *mesh);
         }
-
     }
 
     fn render_light(
@@ -422,18 +426,21 @@ impl Renderer {
         });
 
         // ambient light
-        self.pipeline_deferred_light_ambient.bind(&mut render_pass);
-        self.camera_uniform_buffer.bind(&mut render_pass);
-        self.g_buffer.bind(&mut render_pass);
-        ambient_light_quad.draw_lights(&mut render_pass);
+        self.pipeline_deferred_light_ambient.draw(
+            &mut render_pass,
+            &self.camera_uniform_buffer,
+            &self.g_buffer,
+            ambient_light_quad,
+        );
 
         // lights
-        self.pipeline_deferred_light.bind(&mut render_pass);
-        self.camera_uniform_buffer.bind(&mut render_pass);
-        self.g_buffer.bind(&mut render_pass);
-
         for mesh in meshes {
-            mesh.draw_lights(&mut render_pass);
+            self.pipeline_deferred_light.draw(
+                &mut render_pass,
+                &self.camera_uniform_buffer,
+                &self.g_buffer,
+                *mesh,
+            );
         }
     }
 

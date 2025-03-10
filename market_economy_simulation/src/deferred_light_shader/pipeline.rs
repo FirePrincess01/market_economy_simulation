@@ -2,8 +2,12 @@
 //!
 
 use wgpu_renderer::renderer::depth_texture::DepthTexture;
+use wgpu_renderer::vertex_color_shader;
+
+use crate::deferred_color_shader;
 
 use super::CameraBindGroupLayout;
+use super::DeferredLightShaderDraw;
 use super::GBufferBindGroupLayout;
 use super::Instance;
 use super::Vertex;
@@ -95,7 +99,16 @@ impl Pipeline {
         Self { render_pipeline }
     }
 
-    pub fn bind<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
+    pub fn draw<'a>(
+        &self,
+        mut render_pass: &mut wgpu::RenderPass<'a>,
+        camera: &'a vertex_color_shader::CameraUniformBuffer,
+        g_buffer: &'a deferred_color_shader::GBuffer,
+        mesh: &'a dyn DeferredLightShaderDraw,
+    ) {
         render_pass.set_pipeline(&self.render_pipeline);
+        camera.bind(&mut render_pass);
+        g_buffer.bind(&mut render_pass);
+        mesh.draw_lights(&mut render_pass);
     }
 }

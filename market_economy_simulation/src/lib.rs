@@ -14,6 +14,7 @@ mod performance_monitor;
 mod renderer;
 mod world_mesh;
 mod ant;
+mod shape;
 
 use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,

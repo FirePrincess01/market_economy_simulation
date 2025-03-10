@@ -3,10 +3,12 @@
 
 use super::entity_buffer::EntityBuffer;
 use super::CameraBindGroupLayout;
+use super::DeferredShaderDraw;
 use super::GBuffer;
 use super::Instance;
 use super::Vertex;
 use wgpu_renderer::renderer::depth_texture;
+use wgpu_renderer::vertex_color_shader;
 
 /// A general purpose shader using vertices, colors and an instance matrix
 pub struct Pipeline {
@@ -132,7 +134,14 @@ impl Pipeline {
         Self { render_pipeline }
     }
 
-    pub fn bind<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
+    pub fn draw<'a>(
+        &self,
+        mut render_pass: &mut wgpu::RenderPass<'a>,
+        camera: &'a vertex_color_shader::CameraUniformBuffer,
+        mesh: &'a dyn DeferredShaderDraw,
+    ) {
         render_pass.set_pipeline(&self.render_pipeline);
+        camera.bind(&mut render_pass);
+        mesh.draw(&mut render_pass);
     }
 }

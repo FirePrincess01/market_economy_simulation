@@ -52,8 +52,10 @@ impl WgpuAnimatedObjectStorage {
                 .update_animation_buffer(renderer_interface.queue(), &elem.animation_uniform);
         }
     }
+}
 
-    pub fn draw<'b>(&'b self, render_pass: &mut wgpu::RenderPass<'b>) {
+impl DeferredAnimationShaderDraw for WgpuAnimatedObjectStorage {
+    fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         for elem in &self.elements {
             elem.mesh.draw(render_pass);
         }
