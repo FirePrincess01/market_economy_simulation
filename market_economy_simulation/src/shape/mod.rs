@@ -1,11 +1,12 @@
 
 
 pub mod uv_sphere;
+pub use uv_sphere::UVSphere;
 
 
 pub struct MeshData {
-    pub positions: Vec<[f32; 3]>,
-    pub normals: Vec<[f32; 3]>,
+    pub positions: Vec<cgmath::Vector3<f32>>,
+    pub normals: Vec<cgmath::Vector3<f32>>,
     pub indices: Vec<u16>,
 }
 

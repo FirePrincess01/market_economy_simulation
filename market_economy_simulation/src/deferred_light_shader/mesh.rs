@@ -12,7 +12,7 @@ use super::VertexBuffer;
 /// A general purpose shader using vertices, colors and an instance matrix
 pub struct Mesh {
     vertex_buffer: VertexBuffer,
-    index_buffer: IndexBuffer,
+    index_buffer: IndexBuffer<u16>,
     instance_buffer: InstanceBuffer,
     max_instances: u32,
     nr_instances: u32,
@@ -23,7 +23,7 @@ impl Mesh {
     pub fn new(
         device: &wgpu::Device,
         vertices: &[Vertex],
-        indices: &[u32],
+        indices: &[u16],
         instances: &[Instance],
     ) -> Self {
         let vertex_buffer = VertexBuffer::new(device, vertices);

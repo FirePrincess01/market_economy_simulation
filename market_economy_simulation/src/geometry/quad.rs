@@ -10,7 +10,7 @@ use crate::deferred_color_shader;
 pub struct Quad {
     pub vertices: Vec<Vertex>,
     pub colors: Vec<Color>,
-    pub indices: Vec<u32>,
+    pub indices: Vec<u16>,
 
     pub deferred_vertices: Vec<deferred_color_shader::Vertex>,
 }

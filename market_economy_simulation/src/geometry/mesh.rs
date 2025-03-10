@@ -5,13 +5,13 @@ use glam::Vec3;
 pub trait MeshInterface {
     fn vertices(&self) -> &[Vec3];
     fn normals(&self) -> &[Vec3];
-    fn indices(&self) -> &[u32];
+    fn indices(&self) -> &[u16];
 }
 
 pub struct Mesh {
     pub vertices: Vec<Vec3>,
     pub normals: Vec<Vec3>,
-    pub indices: Vec<u32>,
+    pub indices: Vec<u16>,
 }
 
 impl Mesh {
@@ -24,7 +24,7 @@ impl Mesh {
     }
 
     pub fn add(&mut self, other: &impl MeshInterface) {
-        let indices_base = self.vertices.len() as u32;
+        let indices_base = self.vertices.len() as u16;
 
         for elem in other.vertices() {
             self.vertices.push(*elem);

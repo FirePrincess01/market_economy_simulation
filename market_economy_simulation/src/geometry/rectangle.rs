@@ -8,7 +8,7 @@ use super::mesh::MeshInterface;
 pub struct Rectangle {
     vertices: [Vec3; 4],
     normals: [Vec3; 4],
-    indices: [u32; 6],
+    indices: [u16; 6],
 }
 
 impl Rectangle {
@@ -44,7 +44,7 @@ impl MeshInterface for Rectangle {
         &self.normals
     }
 
-    fn indices(&self) -> &[u32] {
+    fn indices(&self) -> &[u16] {
         &self.indices
     }
 }

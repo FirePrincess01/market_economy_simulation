@@ -31,9 +31,16 @@ impl UVSphere {
 
 
 
-        let positions: Vec<[f32; 3]> = Vec::new();
-        let normals: Vec<[f32; 3]> = Vec::new();
-        let indices: Vec<u16> = Vec::new();
+        let positions: Vec<cgmath::Vector3<f32>> = Vec::new();
+        let normals: Vec<cgmath::Vector3<f32>> = Vec::new();
+        let mut indices: Vec<u16> = Vec::new();
+
+        let positions = grid.clone();
+        let normals = grid;
+
+        for i in 0..n*n {
+            indices.push(i as u16);
+        }
 
         Self {
             mesh_data: MeshData {

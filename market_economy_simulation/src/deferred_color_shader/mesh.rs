@@ -1,6 +1,8 @@
 //! Contains the device buffers to render an object with this shader
 //!
 
+use crate::shape;
+
 use super::DeferredShaderDraw;
 use super::Instance;
 use super::Vertex;
@@ -12,7 +14,7 @@ use super::VertexBuffer;
 /// A general purpose shader using vertices, colors and an instance matrix
 pub struct Mesh {
     vertex_buffer: VertexBuffer<Vertex>,
-    index_buffer: IndexBuffer,
+    index_buffer: IndexBuffer<u16>,
     instance_buffer: InstanceBuffer<Instance>,
     max_instances: u32,
     nr_instances: u32,
@@ -23,7 +25,7 @@ impl Mesh {
     pub fn new(
         device: &wgpu::Device,
         vertices: &[Vertex],
-        indices: &[u32],
+        indices: &[u16],
         instances: &[Instance],
     ) -> Self {
         let vertex_buffer = VertexBuffer::new(device, vertices);
@@ -41,6 +43,12 @@ impl Mesh {
             max_instances,
             nr_instances,
         }
+    }
+
+    pub fn from_shape(shape: shape::MeshData, instances: &[Instance]) {
+        let vertices = shape.positions;
+        let normals = shape.normals;
+        let indices = shape.indices;
     }
 
     pub fn update_vertex_buffer(&mut self, queue: &wgpu::Queue, vertices: &[Vertex]) {
