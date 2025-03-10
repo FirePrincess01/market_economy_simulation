@@ -1,15 +1,80 @@
-
-
 pub mod uv_sphere;
+use cgmath::InnerSpace;
 pub use uv_sphere::UVSphere;
 
+pub trait MeshDataInterface {
+    fn data(&self) -> &MeshData;
+}
 
+#[derive(Clone)]
+pub enum MeshDataKind {
+    Grid2D(usize),
+    Triangles,
+}
+
+#[derive(Clone)]
 pub struct MeshData {
     pub positions: Vec<cgmath::Vector3<f32>>,
     pub normals: Vec<cgmath::Vector3<f32>>,
     pub indices: Vec<u16>,
+
+    pub kind: MeshDataKind,
 }
 
-pub trait MeshDataInterface {
-    fn get_mesh_data(&self) -> &MeshData;
+impl MeshData {
+    pub fn triangulate(&self) -> MeshData {
+        match &self.kind {
+            MeshDataKind::Grid2D(n) => {
+                let positions = &self.positions;
+                let normals = &self.normals;
+                let indices = &self.indices;
+
+                assert_eq!(positions.len(), n * n);
+                assert_eq!(normals.len(), n * n);
+
+                let mut positions_res = Vec::new();
+                let mut normals_res = Vec::new();
+                let mut indices_res = Vec::new();
+
+                for y in 0..n - 1 {
+                    for x in 0..n - 1 {
+                        let pos_0 = positions[y * n + x];
+                        let pos_1 = positions[y * n + x + 1];
+                        let pos_2 = positions[(y + 1) * n + x + 1];
+                        let pos_3 = positions[(y + 1) * n + x];
+
+                        let normal_0 = (pos_1 - pos_0).cross(pos_3 - pos_0).normalize();
+
+                        let indices_local: [u32; 6] = [
+                            0, 1, 2, // triangle 0
+                            2, 3, 0, // triangle 1
+                        ];
+
+                        positions_res.push(pos_0);
+                        positions_res.push(pos_1);
+                        positions_res.push(pos_2);
+                        positions_res.push(pos_3);
+
+                        normals_res.push(normal_0);
+                        normals_res.push(normal_0);
+                        normals_res.push(normal_0);
+                        normals_res.push(normal_0);
+
+                        let current_index = (y * (n - 1) + x) * 4;
+                        for index in indices_local {
+                            indices_res.push(current_index as u16 + index as u16);
+                        }
+                    }
+                }
+
+                MeshData {
+                    positions: positions_res,
+                    normals: normals_res,
+                    indices: indices_res,
+                    kind: MeshDataKind::Triangles,
+                }
+            }
+            MeshDataKind::Triangles => self.clone(),
+        }
+    }
 }

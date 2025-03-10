@@ -45,10 +45,26 @@ impl Mesh {
         }
     }
 
-    pub fn from_shape(shape: shape::MeshData, instances: &[Instance]) {
-        let vertices = shape.positions;
-        let normals = shape.normals;
-        let indices = shape.indices;
+    pub fn from_shape(device: &wgpu::Device, shape: &shape::MeshData, instances: &[Instance]) -> Self {
+        let shape = shape.triangulate();
+
+        let vertices = &shape.positions;
+        let normals = &shape.normals;
+        let indices = &shape.indices;
+
+        assert_eq!(vertices.len(), normals.len());
+
+        let len = vertices.iter().len();
+        let mut mesh_vertices = Vec::with_capacity(len);
+
+        for i in 0 ..len {
+            mesh_vertices.push(Vertex{
+                position: vertices[i].into(),
+                normal: normals[i].into(),
+            });
+        }
+
+        Self::new(device, &mesh_vertices, &indices, instances)
     }
 
     pub fn update_vertex_buffer(&mut self, queue: &wgpu::Queue, vertices: &[Vertex]) {

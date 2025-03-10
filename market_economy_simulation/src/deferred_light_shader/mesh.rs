@@ -1,6 +1,8 @@
 //! Contains the device buffers to render an object with this shader
 //!
 
+use crate::shape;
+
 use super::DeferredLightShaderDraw;
 use super::Instance;
 use super::Vertex;
@@ -41,6 +43,24 @@ impl Mesh {
             max_instances,
             nr_instances,
         }
+    }
+
+    pub fn from_shape(device: &wgpu::Device, shape: &shape::MeshData, instances: &[Instance]) -> Self {
+        let shape = shape.triangulate();
+
+        let vertices = &shape.positions;
+        let indices = &shape.indices;
+
+        let len = vertices.iter().len();
+        let mut mesh_vertices = Vec::with_capacity(len);
+
+        for i in 0 ..len {
+            mesh_vertices.push(Vertex{
+                position: vertices[i].into(),
+            });
+        }
+
+        Self::new(device, &mesh_vertices, &indices, instances)
     }
 
     pub fn update_vertex_buffer(&mut self, queue: &wgpu::Queue, vertices: &[Vertex]) {

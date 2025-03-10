@@ -1,6 +1,6 @@
-use cgmath::Zero;
+use cgmath::{Angle, Zero};
 
-use super::{MeshData, MeshDataInterface};
+use super::{MeshData, MeshDataInterface, MeshDataKind};
 
 pub struct UVSphere {
     mesh_data: MeshData,
@@ -13,16 +13,15 @@ impl UVSphere {
         grid.resize(n*n, cgmath::Vector3::zero());
 
         for j in 0..n {
-            let alpha = -90.0 + 180.0 / (n) as f32 * j as f32;  
-            let current_radius = radius * alpha.sin();
-
-            let z = -radius + j as f32 * (2.0 * radius / n as f32);
+            let alpha = -90.0 + 180.0 / (n-1) as f32 * j as f32;  
+            let current_radius = radius * cgmath::Deg(alpha).cos();
+            let z = radius * cgmath::Deg(alpha).sin();
 
             for i in 0..n {
-                let beta = 360.0 / n as f32 * i as f32;
+                let beta = 360.0 / (n-1) as f32 * i as f32;
 
-                let x = current_radius * beta.cos();
-                let y = current_radius * beta.sin();
+                let x = current_radius * cgmath::Deg(beta).cos();
+                let y = current_radius * cgmath::Deg(beta).sin();
 
                 grid[j * n + i] = cgmath::Vector3::new(x, y, z);
             }
@@ -47,13 +46,14 @@ impl UVSphere {
                 positions,
                 normals,
                 indices,
+                kind: MeshDataKind::Grid2D(n),
             },
         }
     }
 }
 
 impl MeshDataInterface for UVSphere {
-    fn get_mesh_data(&self) -> &MeshData {
+    fn data(&self) -> &MeshData {
         &self.mesh_data
     }
 }

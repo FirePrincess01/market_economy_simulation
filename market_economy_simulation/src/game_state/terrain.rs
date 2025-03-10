@@ -16,22 +16,22 @@ pub fn create_vertices(
             let height_3 = terrain.heights[(y+1) * terrain.size_x  + x];
 
             let pos_0 = cgmath::Vector3::new(
-                x as f32 * terrain.distance,
+                x as f32 * terrain.distance - terrain.distance * terrain.size_x as f32 / 2.0,
                 y as f32 * terrain.distance,
                 height_0,
             );
             let pos_1 = cgmath::Vector3::new(
-                (x + 1) as f32 * terrain.distance,
+                (x + 1) as f32 * terrain.distance - terrain.distance * terrain.size_x as f32 / 2.0,
                 y as f32 * terrain.distance,
                 height_1,
             );
             let pos_2 = cgmath::Vector3::new(
-                (x + 1) as f32 * terrain.distance,
+                (x + 1) as f32 * terrain.distance - terrain.distance * terrain.size_x as f32 / 2.0,
                 (y + 1) as f32 * terrain.distance,
                 height_2,
             );
             let pos_3 = cgmath::Vector3::new(
-                x as f32 * terrain.distance,
+                x as f32 * terrain.distance - terrain.distance * terrain.size_x as f32 / 2.0,
                 (y + 1) as f32 * terrain.distance,
                 height_3,
             );

@@ -15,6 +15,7 @@
 </head>
 
 <body id="wasm-demo">
+
   <script type="module">
         import init from "./market_economy_simulation/pkg/market_economy_simulation.js";
         console.log("WASM Loading");
@@ -25,7 +26,7 @@
         });
 
         function resizeCanvas() {
-            var width = window.innerWidth -15;
+            var width = window.innerWidth -15 * 2;
             var height = window.innerHeight -15;
             
             var elem = document.getElementById('wasm-demo');
@@ -37,6 +38,7 @@
             canvas.style.height = height.toString() + 'px';;
         }
   </script>
+
 </body>
 
 </html>
