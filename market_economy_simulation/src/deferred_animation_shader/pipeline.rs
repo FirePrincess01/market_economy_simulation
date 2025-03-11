@@ -152,7 +152,7 @@ impl Pipeline {
         mesh: &'a dyn DeferredAnimationShaderDraw,
     ) {
         render_pass.set_pipeline(&self.render_pipeline);
-        camera.bind(&mut render_pass);
-        mesh.draw(&mut render_pass);
+        camera.bind(render_pass);
+        mesh.draw(render_pass);
     }
 }

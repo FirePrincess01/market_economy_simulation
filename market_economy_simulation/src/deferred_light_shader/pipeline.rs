@@ -107,8 +107,8 @@ impl Pipeline {
         mesh: &'a dyn DeferredLightShaderDraw,
     ) {
         render_pass.set_pipeline(&self.render_pipeline);
-        camera.bind(&mut render_pass);
-        g_buffer.bind(&mut render_pass);
-        mesh.draw_lights(&mut render_pass);
+        camera.bind(render_pass);
+        g_buffer.bind(render_pass);
+        mesh.draw_lights(render_pass);
     }
 }
