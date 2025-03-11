@@ -138,7 +138,7 @@ impl Pipeline {
 
     pub fn draw<'a>(
         &self,
-        mut render_pass: &mut wgpu::RenderPass<'a>,
+        render_pass: &mut wgpu::RenderPass<'a>,
         camera: &'a vertex_color_shader::CameraUniformBuffer,
         mesh: &'a dyn DeferredShaderDraw,
     ) {
