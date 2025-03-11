@@ -7,7 +7,7 @@ use super::DeferredShaderDraw;
 use super::GBuffer;
 use super::Instance;
 use super::Vertex;
-use wgpu_renderer::renderer::depth_texture;
+use wgpu_renderer::wgpu_renderer::depth_texture;
 use wgpu_renderer::vertex_color_shader;
 
 /// A general purpose shader using vertices, colors and an instance matrix
@@ -38,7 +38,7 @@ impl Pipeline {
             device,
             camera_bind_group_layout,
             surface_format,
-            wgpu::PrimitiveTopology::TriangleList,
+            wgpu::PrimitiveTopology::LineList,
         )
     }
 
@@ -63,7 +63,7 @@ impl Pipeline {
             });
 
         let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-            label: Some("Render Pipeline"),
+            label: Some("Deferred Color Render Pipeline"),
             layout: Some(&render_pipeline_layout),
             vertex: wgpu::VertexState {
                 module: &shader,
@@ -75,11 +75,12 @@ impl Pipeline {
                 module: &shader,
                 entry_point: Some("fs_main"),
                 targets: &[
-                    Some(wgpu::ColorTargetState {
-                        format: surface_format,
-                        blend: None,
-                        write_mask: wgpu::ColorWrites::ALL,
-                    }),
+                    // Some(wgpu::ColorTargetState {
+                    //     format: surface_format,
+                    //     blend: None,
+                    //     write_mask: wgpu::ColorWrites::ALL,
+                    // }),
+                    // None,
                     Some(wgpu::ColorTargetState {
                         format: GBuffer::G_BUFFER_FORMAT_POSITION,
                         blend: None,
@@ -108,6 +109,7 @@ impl Pipeline {
                 strip_index_format: None,
                 front_face: wgpu::FrontFace::Ccw, // counter-clockwise direction
                 cull_mode: Some(wgpu::Face::Back),
+                // cull_mode: None,
                 // Setting this to anything other than Fill requires Features::NON_FILL_POLYGON_MODE
                 polygon_mode: wgpu::PolygonMode::Fill,
                 // Requires Features::DEPTH_CLIP_CONTROL

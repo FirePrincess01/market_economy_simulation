@@ -1,4 +1,4 @@
-use wgpu_renderer::renderer::WgpuRendererInterface;
+use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
 
 use crate::{
     animated_object::animated_model::animation::Animation,
@@ -66,7 +66,7 @@ pub struct WgpuAnimatedObjectRenderer<'a> {
     pub storage: &'a mut WgpuAnimatedObjectStorage,
 
     // wgpu renderer
-    pub wgpu_renderer: &'a mut dyn wgpu_renderer::renderer::WgpuRendererInterface,
+    pub wgpu_renderer: &'a mut dyn wgpu_renderer::wgpu_renderer::WgpuRendererInterface,
     pub animation_bind_group_layout: &'a deferred_animation_shader::AnimationBindGroupLayout,
 }
 

@@ -64,7 +64,7 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
     // calculate lighting
     let ambient_strength = 0.01;
     let diffuse_strength = 0.1;
-    let specular_strength = 0.1;
+    let specular_strength = 0.4;
 
     // diffuse lighting
     let light_direction = normalize(vec3<f32>(0.0, 1.0, 0.25));

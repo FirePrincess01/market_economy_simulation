@@ -3,7 +3,7 @@
 
 use cgmath::*;
 use instant::Duration;
-use wgpu_renderer::renderer::camera::Camera;
+use wgpu_renderer::wgpu_renderer::camera::Camera;
 use winit::dpi::PhysicalPosition;
 use winit::event::*;
 

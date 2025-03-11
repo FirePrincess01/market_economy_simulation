@@ -15,6 +15,7 @@ mod renderer;
 mod world_mesh;
 mod ant;
 mod shape;
+mod settings;
 
 use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,
@@ -24,7 +25,7 @@ use market_economy_simulation_server::game_logic::game_logic_interface::{
 };
 use wgpu_renderer::{
     default_application::{DefaultApplication, DefaultApplicationInterface},
-    renderer::WgpuRendererInterface,
+    wgpu_renderer::WgpuRendererInterface,
     vertex_texture_shader,
 };
 use winit::event::{ElementState, WindowEvent};
@@ -33,6 +34,8 @@ use winit::event::{ElementState, WindowEvent};
 use wasm_bindgen::prelude::*;
 
 struct MarketEconomySimulation {
+    settings: settings::Settings,
+
     size: winit::dpi::PhysicalSize<u32>,
     scale_factor: f32,
 
@@ -68,10 +71,12 @@ impl MarketEconomySimulation {
         size: winit::dpi::PhysicalSize<u32>,
         scale_factor: f32,
     ) -> Self {
+        let settings = settings::Settings::new();
+
         // let size: winit::dpi::PhysicalSize<u32> = window.inner_size();
         // let scale_factor = window.scale_factor() as f32;
 
-        let renderer = renderer::Renderer::new(renderer_interface);
+        let renderer = renderer::Renderer::new(renderer_interface, settings.get_renderer_settings());
 
         // world
         let mut world = ecs2::World::new();
@@ -122,7 +127,7 @@ impl MarketEconomySimulation {
         animated_object_renderer.create_from_glb(glb_bin);
 
         // create game server
-        let mut game_server = market_economy_simulation_server::GameLogicServer::new();
+        let mut game_server = market_economy_simulation_server::GameLogicServer::new(settings.get_server_settings());
 
         game_server
             .send_messages()
@@ -154,6 +159,8 @@ impl MarketEconomySimulation {
         &ambient_light_quad_vertices.vertices, &ambient_light_quad_vertices.indices, &[amblient_light_quad_instance]);
 
         Self {
+            settings,
+
             size,
             scale_factor,
 
@@ -319,6 +326,10 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             &self.entity_index_mesh,
             &self.ambient_light_quad,
             &mut self.performance_monitor,
+            deferred_color_shader::entity_buffer::MousePosition{
+                x: self.mouse_pos_x,
+                y: self.mouse_pos_y,
+            }
         )
     }
 }

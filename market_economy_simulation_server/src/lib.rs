@@ -9,11 +9,11 @@ use std::sync::mpsc;
 use std::thread::{self};
 use std::time::Duration;
 
-use game_logic::GameLagic;
 use game_logic::game_logic_interface::{
     GameLogicInterface, GameLogicMessageCritical, GameLogicMessageHeavy, GameLogicMessageLight,
     GameLogicMessageRequest,
 };
+use game_logic::{GameLagic, GameLogicSettings};
 
 pub struct GameLogicSingleThreaded {
     game_logic: GameLagic,
@@ -25,13 +25,19 @@ pub struct GameLogicSingleThreaded {
 }
 
 impl GameLogicSingleThreaded {
-    pub fn new() -> Self {
+    pub fn new(settings: GameLogicSettings) -> Self {
         let (channel_0_tx, channel_0_rx) = mpsc::channel();
         let (channel_1_tx, channel_1_rx) = mpsc::channel();
         let (channel_2_tx, channel_2_rx) = mpsc::channel();
         let (channel_3_tx, channel_3_rx) = mpsc::channel();
 
-        let game_logic = GameLagic::new(channel_0_rx, channel_1_tx, channel_2_tx, channel_3_tx);
+        let game_logic = GameLagic::new(
+            settings,
+            channel_0_rx,
+            channel_1_tx,
+            channel_2_tx,
+            channel_3_tx,
+        );
 
         Self {
             game_logic,
@@ -44,12 +50,6 @@ impl GameLogicSingleThreaded {
 
     fn update(&mut self) {
         self.game_logic.update();
-    }
-}
-
-impl Default for GameLogicSingleThreaded {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -81,15 +81,20 @@ pub struct GameLogicMultiThreaded {
 }
 
 impl GameLogicMultiThreaded {
-    pub fn new() -> Self {
+    pub fn new(settings: GameLogicSettings) -> Self {
         let (channel_0_tx, channel_0_rx) = mpsc::channel();
         let (channel_1_tx, channel_1_rx) = mpsc::channel();
         let (channel_2_tx, channel_2_rx) = mpsc::channel();
         let (channel_3_tx, channel_3_rx) = mpsc::channel();
 
         let game_logic = thread::spawn(move || {
-            let mut game_logic =
-                GameLagic::new(channel_0_rx, channel_1_tx, channel_2_tx, channel_3_tx);
+            let mut game_logic = GameLagic::new(
+                settings,
+                channel_0_rx,
+                channel_1_tx,
+                channel_2_tx,
+                channel_3_tx,
+            );
 
             loop {
                 game_logic.update();
@@ -104,12 +109,6 @@ impl GameLogicMultiThreaded {
             channel_2_rx,
             channel_3_rx,
         }
-    }
-}
-
-impl Default for GameLogicMultiThreaded {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -143,18 +142,18 @@ pub struct GameLogicServer {
 }
 
 impl GameLogicServer {
-    pub fn new() -> Self {
+    pub fn new(settings: GameLogicSettings) -> Self {
         #[allow(clippy::needless_late_init)]
         let server: GameLogicExecution;
         cfg_if::cfg_if! {
             // apply scale factor for the web
             if #[cfg(target_arch = "wasm32")] {
                 server =
-                GameLogicExecution::SingleThreaded(GameLogicSingleThreaded::new())
+                GameLogicExecution::SingleThreaded(GameLogicSingleThreaded::new(settings))
             }
             else {
                 server =
-                GameLogicExecution::Multithreaded(GameLogicMultiThreaded::new())
+                GameLogicExecution::Multithreaded(GameLogicMultiThreaded::new(settings))
                 // GameLogicExecution::SingleThreaded(GameLogicSingleThreaded::new())
             }
         }
@@ -171,12 +170,6 @@ impl GameLogicServer {
                 // update is done in another thread
             }
         }
-    }
-}
-
-impl Default for GameLogicServer {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

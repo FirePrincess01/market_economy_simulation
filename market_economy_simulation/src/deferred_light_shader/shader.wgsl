@@ -55,17 +55,17 @@ struct FragmentOutput {
 @fragment
 fn fs_main(in: VertexOutput) -> FragmentOutput {
 
-    // read gbuffer
+    // // read gbuffer
     let index = vec2<u32>(u32(in.clip_position.x), u32(in.clip_position.y));
-    let vertex_position: vec4<f32> = textureLoad(t_position, index, 0);
-    let vertex_pnormal: vec4<f32> = textureLoad(t_normal, index, 0);
+    // let vertex_position: vec4<f32> = textureLoad(t_position, index, 0);
+    // let vertex_pnormal: vec4<f32> = textureLoad(t_normal, index, 0);
     let vertex_color: vec4<f32> = textureLoad(t_albedo, index, 0);
 
-    // calculate light intensity based on distance
-    let intensity_0 = in.intensity[0];
-    let intensity_ambient = in.intensity[1];
-    let distance: f32 = min(distance(vertex_position.xyz, in.model_position) * 1.0 * in.intensity[0] , 1.0);
-    let light_intensity = 1.0 - distance;
+    // // calculate light intensity based on distance
+    // let intensity_0 = in.intensity[0];
+    // let intensity_ambient = in.intensity[1];
+    // let distance: f32 = min(distance(vertex_position.xyz, in.model_position) * 1.0 * in.intensity[0] , 1.0);
+    // let light_intensity = 1.0 - distance;
     
     var out: FragmentOutput;
     // if(intensity_ambient == 0.0) {
@@ -75,7 +75,9 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
     //     out.surface = vertex_color * intensity_ambient;
     // }
 
-    out.surface = vertex_color * 0.2;
+    // out.surface = vertex_color * 0.2;
+    // out.surface = vertex_color + vec4(0.0, 1.0, 0.0, 0.0) * 0.5;
+    out.surface = vec4(0.0, 1.0, 0.0, 0.5) * 0.5;
 
     return out;
 }

@@ -8,7 +8,13 @@ use crate::terrain;
 
 pub mod game_logic_interface;
 
+pub struct GameLogicSettings {
+    pub map_size: usize,
+}
+
 pub struct GameLagic {
+    settings: GameLogicSettings,
+
     channel_0_rx: mpsc::Receiver<GameLogicMessageRequest>,
     channel_1_tx: mpsc::Sender<GameLogicMessageHeavy>,
     _channel_2_tx: mpsc::Sender<GameLogicMessageLight>,
@@ -19,14 +25,19 @@ pub struct GameLagic {
 
 impl GameLagic {
     pub fn new(
+        settings: GameLogicSettings,
         channel_0_rx: mpsc::Receiver<GameLogicMessageRequest>,
         channel_1_tx: mpsc::Sender<GameLogicMessageHeavy>,
         channel_2_tx: mpsc::Sender<GameLogicMessageLight>,
         channel_3_tx: mpsc::Sender<GameLogicMessageCritical>,
     ) -> Self {
-        let terrain = terrain::Terrain::new(1000, 1000, 1.0);
+        let size = settings.map_size;
+
+        let terrain = terrain::Terrain::new(size, size, 1.0);
 
         Self {
+            settings,
+
             channel_0_rx,
             channel_1_tx,
             _channel_2_tx: channel_2_tx,

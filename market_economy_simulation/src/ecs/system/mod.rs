@@ -1,7 +1,7 @@
 //! Functions operating on the data of the entities with components
 //!
 
-use wgpu_renderer::renderer::WgpuRendererInterface;
+use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
 
 use crate::deferred_color_shader::DeferredShaderDraw;
 use crate::deferred_light_shader::DeferredLightShaderDraw;

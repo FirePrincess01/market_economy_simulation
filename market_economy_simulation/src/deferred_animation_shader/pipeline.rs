@@ -9,7 +9,7 @@ use super::DeferredAnimationShaderDraw;
 use super::Instance;
 use super::Vertex;
 use wgpu::BlendState;
-use wgpu_renderer::renderer::depth_texture;
+use wgpu_renderer::wgpu_renderer::depth_texture;
 use wgpu_renderer::vertex_color_shader;
 
 /// A general purpose shader using vertices, colors and an instance matrix
@@ -85,11 +85,12 @@ impl Pipeline {
                 module: &shader,
                 entry_point: Some("fs_main"),
                 targets: &[
-                    Some(wgpu::ColorTargetState {
-                        format: surface_format,
-                        blend: None,
-                        write_mask: wgpu::ColorWrites::ALL,
-                    }),
+                    // Some(wgpu::ColorTargetState {
+                    //     format: surface_format,
+                    //     blend: None,
+                    //     write_mask: wgpu::ColorWrites::ALL,
+                    // }),
+                    // None,
                     Some(wgpu::ColorTargetState {
                         format: GBuffer::G_BUFFER_FORMAT_POSITION,
                         blend: None,

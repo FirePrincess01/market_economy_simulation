@@ -1,11 +1,12 @@
 //! Deferred shader pipeline drawing light stage
 //!
 
-use wgpu_renderer::renderer::depth_texture::DepthTexture;
+use wgpu_renderer::wgpu_renderer::depth_texture::DepthTexture;
 use wgpu_renderer::vertex_color_shader;
 
 use crate::deferred_color_shader;
 
+use super::depth_texture_bind_group_layout::DepthTextureBindGroup;
 use super::CameraBindGroupLayout;
 use super::DeferredLightShaderDraw;
 use super::GBufferBindGroupLayout;
@@ -82,8 +83,8 @@ impl Pipeline {
             },
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: DepthTexture::DEPTH_FORMAT,
-                depth_write_enabled: true,
-                depth_compare: wgpu::CompareFunction::Always,
+                depth_write_enabled: false,
+                depth_compare: wgpu::CompareFunction::Less,
                 stencil: wgpu::StencilState::default(),
                 bias: wgpu::DepthBiasState::default(),
             }),

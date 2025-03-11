@@ -3,7 +3,7 @@
 
 mod terrain;
 
-use wgpu_renderer::renderer::WgpuRendererInterface;
+use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
 
 use crate::deferred_terrain_shader;
 
@@ -27,7 +27,7 @@ impl GameState {
         let terrain_instance = deferred_terrain_shader::Instance {
             position: [0.0, 0.0, 1.0],
             color: [0.1, 0.1, 0.1],
-            entity: [72, 0, 0],
+            entity: [725, 0, 0],
             color_heighlights: [0.3, 0.05, 0.3],
         };
         let terrain_mesh = deferred_terrain_shader::Mesh::new(

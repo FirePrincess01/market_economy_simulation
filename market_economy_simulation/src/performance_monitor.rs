@@ -1,6 +1,6 @@
 use wgpu_renderer::{
     performance_monitor,
-    renderer::WgpuRendererInterface,
+    wgpu_renderer::WgpuRendererInterface,
     vertex_color_shader::{self, VertexColorShaderDraw},
 };
 

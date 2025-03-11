@@ -1,6 +1,6 @@
 //! Contains the meshes for all objects of the world
 
-use wgpu_renderer::renderer::WgpuRendererInterface;
+use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
 
 use crate::{
     base_factory::BaseFactoryMesh, deferred_color_shader::DeferredShaderDraw,

@@ -95,11 +95,11 @@ fn vs_main(
 
 // Fragment shader
 struct FragmentOutput {
-    @location(0) surface: vec4<f32>,
-    @location(1) position: vec4<f32>,
-    @location(2) normal: vec4<f32>,
-    @location(3) albedo: vec4<f32>,
-    @location(4) entity: vec4<f32>,
+    // @location(0) surface: vec4<f32>,
+    @location(0) position: vec4<f32>,
+    @location(1) normal: vec4<f32>,
+    @location(2) albedo: vec4<f32>,
+    @location(3) entity: vec4<f32>,
 };
 
 @fragment
@@ -111,7 +111,7 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
     var entity3 = (in.entity[0] >> 24u) & 0xffu;
 
     var out: FragmentOutput;
-    out.surface = vec4<f32>(in.color, 0.8);
+    // out.surface = vec4<f32>(in.color, 0.8);
     out.position =  vec4<f32>(in.position, 1.0);
     out.normal =  vec4<f32>(in.normal, 1.0);
     out.albedo = vec4<f32>(in.color, 0.0);
