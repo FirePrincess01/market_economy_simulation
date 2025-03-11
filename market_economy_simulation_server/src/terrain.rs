@@ -26,7 +26,7 @@ impl Terrain {
                 height +=  (noise::NoiseFn::get(&perlin, [x as f64 / 4.0, y as f64 / 4.0]) * 2.0).max(0.0) as f32;
 
                 // create canyon 
-                height = height * Terrain::canyon((x as f32 - size_x as f32 / 2.0) / 10.0);
+                height *= Terrain::canyon((x as f32 - size_x as f32 / 2.0) / 10.0);
 
                 heights[y * size_x + x] = height;
             }
