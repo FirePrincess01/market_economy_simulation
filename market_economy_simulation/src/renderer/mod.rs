@@ -531,7 +531,7 @@ impl Renderer {
         mesh_textured_gui: &impl VertexTextureShaderDraw,
         ambient_light_quad: &impl DeferredLightShaderDraw,
         performance_monitor: &mut PerformanceMonitor,
-        mouse_postion: MousePosition,
+        mouse_position: MousePosition,
     ) -> Result<(), wgpu::SurfaceError> {
         performance_monitor.watch.start(0);
         let output = renderer_interface.get_current_texture()?;
@@ -579,7 +579,7 @@ impl Renderer {
 
         // copy entity texture
         self.entity_buffer
-            .copy_texture_to_buffer(&mut encoder, mouse_postion);
+            .copy_texture_to_buffer(&mut encoder, mouse_position);
 
         renderer_interface
             .queue()

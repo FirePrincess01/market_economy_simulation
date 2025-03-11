@@ -58,7 +58,7 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
     // read gbuffer
     let index = vec2<u32>(u32(in.clip_position.x), u32(in.clip_position.y));
     let vertex_position: vec4<f32> = textureLoad(t_position, index, 0);
-    let vertex_pnormal: vec4<f32> = textureLoad(t_normal, index, 0);
+    let vertex_normal: vec4<f32> = textureLoad(t_normal, index, 0);
     let vertex_color: vec4<f32> = textureLoad(t_albedo, index, 0);
 
     // calculate lighting
@@ -68,20 +68,20 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
 
     // diffuse lighting
     let light_direction = normalize(vec3<f32>(0.0, 1.0, 0.25));
-    let diffuse_lighting = max(dot(vertex_pnormal.xyz, light_direction) * diffuse_strength, 0.0);
+    let diffuse_lighting = max(dot(vertex_normal.xyz, light_direction) * diffuse_strength, 0.0);
 
     // specular lighting
     let view_position = in.view_position;
     let model_position = vertex_position.xyz;
-    let model_normal = vertex_pnormal.xyz;
+    let model_normal = vertex_normal.xyz;
 
     let view_dir = normalize(view_position - model_position);
     let reflect_dir = reflect(-light_direction, model_normal);
     let specular_lighting = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0) * specular_strength;
 
     // pong shading
-    let light_stength = ambient_strength + diffuse_lighting + specular_lighting;
-    let light_color: vec3<f32> = light_stength * vertex_color.xyz;
+    let light_strength = ambient_strength + diffuse_lighting + specular_lighting;
+    let light_color: vec3<f32> = light_strength * vertex_color.xyz;
 
     // blend with intensity
     let intensity = vertex_color[3];

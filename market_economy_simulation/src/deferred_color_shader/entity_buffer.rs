@@ -173,7 +173,7 @@ impl EntityBuffer {
         if !self.memory_in_mapping {
             self.memory_in_mapping = true;
 
-            // memory mapping the buffer is extremly slow on the smartphone
+            // memory mapping the buffer is extremely slow on the smartphone
             if self.enable_memory_mapped_read {
                 let buffer_slice: wgpu::BufferSlice<'_> = self.output_buffer.slice(0..4);
                 let memory_is_mapped = self.memory_is_mapped.clone();
