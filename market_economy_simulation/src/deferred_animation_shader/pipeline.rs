@@ -51,7 +51,7 @@ impl Pipeline {
         device: &wgpu::Device,
         camera_bind_group_layout: &CameraBindGroupLayout,
         animation_bind_group_layout: &AnimationBindGroupLayout,
-        surface_format: wgpu::TextureFormat,
+        _surface_format: wgpu::TextureFormat,
         topology: wgpu::PrimitiveTopology,
     ) -> Self {
         // Shader

@@ -9,8 +9,8 @@ pub struct Terrain {
 
 impl Terrain {
     pub fn new(size_x: usize, size_y: usize, distance: f32) -> Self {
-        let amplitude = 10.0;
-        let scale = 0.1;
+        let _amplitude = 10.0;
+        let _scale = 0.1;
 
         // user perlin noise to generate a terrain
         let mut heights: Vec<f32> = Vec::new();
@@ -32,20 +32,6 @@ impl Terrain {
             }
         }
    
-        // for y in 0..steps_y {
-        //     let mut x_values: Vec<f32> = Vec::new();
-        //     for x in 0..steps_x {
-        //         let point_x = x as f64 * scale;
-        //         let point_y = y as f64 * scale;
-
-        //         let height = noise::NoiseFn::get(&perlin, [point_x, point_y]) * amplitude;
-
-        //         x_values.push((height) as f32);
-        //         // x_values.push(0.0);
-        //     }
-        //     heights.push(x_values);
-        // }
-
         Self {
             heights,
             distance,

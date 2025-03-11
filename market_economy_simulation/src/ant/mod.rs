@@ -8,22 +8,22 @@ use crate::{
 
 pub struct Ant {
     // host data
-    circle: geometry::Circle,
-    circle_light: geometry::Circle,
+    _circle: geometry::Circle,
+    _circle_light: geometry::Circle,
 
-    circle_instance: deferred_color_shader::Instance,
-    circle_light_instance: deferred_light_shader::Instance,
+    _circle_instance: deferred_color_shader::Instance,
+    _circle_light_instance: deferred_light_shader::Instance,
 
     // gpu data
-    circle_mesh: deferred_color_shader::Mesh,
-    circle_light_mesh: deferred_light_shader::Mesh,
+    _circle_mesh: deferred_color_shader::Mesh,
+    _circle_light_mesh: deferred_light_shader::Mesh,
 
     // sphere
-    sphere: shape::UVSphere,
-    sphere_light: shape::UVSphere,
+    _sphere: shape::UVSphere,
+    _sphere_light: shape::UVSphere,
 
-    sphere_instance: deferred_color_shader::Instance,
-    sphere_light_instance: deferred_light_shader::Instance,
+    _sphere_instance: deferred_color_shader::Instance,
+    _sphere_light_instance: deferred_light_shader::Instance,
 
     // gpu data
     sphere_mesh: deferred_color_shader::Mesh,
@@ -85,17 +85,17 @@ impl Ant {
         );
 
         Self {
-            circle,
-            circle_light,
-            circle_instance,
-            circle_light_instance,
-            circle_mesh,
-            circle_light_mesh,
+            _circle: circle,
+            _circle_light: circle_light,
+            _circle_instance: circle_instance,
+            _circle_light_instance: circle_light_instance,
+            _circle_mesh: circle_mesh,
+            _circle_light_mesh: circle_light_mesh,
             
-            sphere,
-            sphere_light,
-            sphere_instance,
-            sphere_light_instance,
+            _sphere: sphere,
+            _sphere_light: sphere_light,
+            _sphere_instance: sphere_instance,
+            _sphere_light_instance: sphere_light_instance,
             sphere_mesh,
             sphere_light_mesh,
         }

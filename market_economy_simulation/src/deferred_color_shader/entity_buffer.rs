@@ -21,9 +21,9 @@ pub struct EntityBuffer {
     // pub bind_group: wgpu::BindGroup,
     pub output_buffer: wgpu::Buffer,
 
-    unpadded_bytes_per_row: u32,
-    padded_bytes_per_row: u32,
-    height: u32,
+    _unpadded_bytes_per_row: u32,
+    _padded_bytes_per_row: u32,
+    _height: u32,
     size: wgpu::Extent3d,
 
     pixel_val: u32,
@@ -76,7 +76,7 @@ impl EntityBuffer {
         let padded_bytes_per_row = unpadded_bytes_per_row + padding;
 
         // create a buffer to copy the texture to so we can get the data
-        let buffer_size = (padded_bytes_per_row * surface_height) as wgpu::BufferAddress;
+        let _buffer_size = (padded_bytes_per_row * surface_height) as wgpu::BufferAddress;
         let buffer_desc = wgpu::BufferDescriptor {
             size: 4,
             usage: wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::MAP_READ,
@@ -91,9 +91,9 @@ impl EntityBuffer {
 
             output_buffer,
 
-            unpadded_bytes_per_row,
-            padded_bytes_per_row,
-            height: surface_height,
+            _unpadded_bytes_per_row: unpadded_bytes_per_row,
+            _padded_bytes_per_row: padded_bytes_per_row,
+            _height: surface_height,
             size,
 
             pixel_val: 0,
@@ -162,8 +162,8 @@ impl EntityBuffer {
             &self.output_buffer,
             buffer_slice,
             self.size,
-            self.unpadded_bytes_per_row,
-            self.padded_bytes_per_row,
+            self._unpadded_bytes_per_row,
+            self._padded_bytes_per_row,
         );
 
         entity_buffer_slice

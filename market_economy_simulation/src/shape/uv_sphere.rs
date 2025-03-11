@@ -28,10 +28,8 @@ impl UVSphere {
         }
 
 
-
-
-        let positions: Vec<cgmath::Vector3<f32>> = Vec::new();
-        let normals: Vec<cgmath::Vector3<f32>> = Vec::new();
+        // let positions: Vec<cgmath::Vector3<f32>> = Vec::new();
+        // let normals: Vec<cgmath::Vector3<f32>> = Vec::new();
         let mut indices: Vec<u16> = Vec::new();
 
         let positions = grid.clone();

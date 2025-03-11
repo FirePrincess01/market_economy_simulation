@@ -3,11 +3,13 @@
 
 use wgpu_renderer::wgpu_renderer::depth_texture::DepthTexture;
 
+#[allow(unused)]
 pub struct DepthTextureBindGroup {
     bind_group_layout: wgpu::BindGroupLayout,
     bind_group: wgpu::BindGroup,
 }
 
+#[allow(unused)]
 impl DepthTextureBindGroup {
     pub fn new(device: &wgpu::Device, depth_texture: &DepthTexture) -> Self {
         // Texture

@@ -13,7 +13,7 @@ pub struct GameLogicSettings {
 }
 
 pub struct GameLagic {
-    settings: GameLogicSettings,
+    _settings: GameLogicSettings,
 
     channel_0_rx: mpsc::Receiver<GameLogicMessageRequest>,
     channel_1_tx: mpsc::Sender<GameLogicMessageHeavy>,
@@ -36,7 +36,7 @@ impl GameLagic {
         let terrain = terrain::Terrain::new(size, size, 1.0);
 
         Self {
-            settings,
+            _settings: settings,
 
             channel_0_rx,
             channel_1_tx,

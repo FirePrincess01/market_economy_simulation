@@ -27,7 +27,7 @@ impl MeshData {
             MeshDataKind::Grid2D(n) => {
                 let positions = &self.positions;
                 let normals = &self.normals;
-                let indices = &self.indices;
+                let _indices = &self.indices;
 
                 assert_eq!(positions.len(), n * n);
                 assert_eq!(normals.len(), n * n);

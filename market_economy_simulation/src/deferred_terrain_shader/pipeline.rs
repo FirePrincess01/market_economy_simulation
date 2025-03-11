@@ -45,7 +45,7 @@ impl Pipeline {
     fn new_parameterized(
         device: &wgpu::Device,
         camera_bind_group_layout: &CameraBindGroupLayout,
-        surface_format: wgpu::TextureFormat,
+        _surface_format: wgpu::TextureFormat,
         topology: wgpu::PrimitiveTopology,
     ) -> Self {
         // Shader

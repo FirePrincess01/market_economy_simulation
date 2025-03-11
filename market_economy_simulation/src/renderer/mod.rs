@@ -294,7 +294,7 @@ impl Renderer {
     fn render_deferred(
         &self,
         renderer_interface: &mut dyn WgpuRendererInterface,
-        view: &wgpu::TextureView,
+        _view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
         meshes: &[&dyn DeferredShaderDraw],
         deferred_terrain: &dyn DeferredTerrainShaderDraw,
@@ -513,9 +513,6 @@ impl Renderer {
 
     pub fn read_entity_index(
         &mut self,
-        renderer_interface: &mut dyn WgpuRendererInterface,
-        y: u32,
-        x: u32,
     ) -> u32 {
         {
             self.entity_buffer
