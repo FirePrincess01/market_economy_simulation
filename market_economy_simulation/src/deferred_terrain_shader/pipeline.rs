@@ -7,8 +7,8 @@ use super::super::deferred_color_shader::GBuffer;
 use super::DeferredTerrainShaderDraw;
 use super::Instance;
 use super::Vertex;
-use wgpu_renderer::wgpu_renderer::depth_texture;
 use wgpu_renderer::vertex_color_shader;
+use wgpu_renderer::wgpu_renderer::depth_texture;
 
 /// A general purpose shader using vertices, colors and an instance matrix
 pub struct Pipeline {

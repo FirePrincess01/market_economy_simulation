@@ -512,12 +512,9 @@ impl Renderer {
         textured_meshes.draw(&mut render_pass);
     }
 
-    pub fn read_entity_index(
-        &mut self,
-    ) -> u32 {
+    pub fn read_entity_index(&mut self) -> u32 {
         {
-            self.entity_buffer
-                .read_pixel()
+            self.entity_buffer.read_pixel()
         }
     }
 

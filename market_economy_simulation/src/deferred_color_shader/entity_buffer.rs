@@ -185,7 +185,6 @@ impl EntityBuffer {
     }
 
     pub fn read_pixel(&mut self) -> u32 {
-
         let memory_is_mapped = self
             .memory_is_mapped
             .load(std::sync::atomic::Ordering::Relaxed);
@@ -213,7 +212,7 @@ impl EntityBuffer {
             self.memory_in_copying = false;
         }
 
-        self.pixel_val 
+        self.pixel_val
     }
 
     fn as_u32_le(array: &[u8]) -> u32 {
@@ -223,5 +222,3 @@ impl EntityBuffer {
             + ((array[3] as u32) << 24)
     }
 }
-
-

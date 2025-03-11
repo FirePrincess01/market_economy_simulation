@@ -1,8 +1,8 @@
 //! Deferred shader pipeline drawing light stage
 //!
 
-use wgpu_renderer::wgpu_renderer::depth_texture::DepthTexture;
 use wgpu_renderer::vertex_color_shader;
+use wgpu_renderer::wgpu_renderer::depth_texture::DepthTexture;
 
 use crate::deferred_color_shader;
 
@@ -25,7 +25,7 @@ impl Pipeline {
         camera_bind_group_layout: &CameraBindGroupLayout,
         g_buffer_bind_group_layout: &GBufferBindGroupLayout,
         surface_format: wgpu::TextureFormat,
-        use_ambient_shader: bool
+        use_ambient_shader: bool,
     ) -> Self {
         let shader_source = match use_ambient_shader {
             true => include_str!("shader_ambient_light.wgsl"),

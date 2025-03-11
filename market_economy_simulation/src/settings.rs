@@ -1,7 +1,6 @@
 //! Global settings of the application
 //!
 
-
 use crate::renderer;
 
 pub struct Settings {
@@ -28,19 +27,17 @@ impl Settings {
     }
 
     pub fn get_renderer_settings(&self) -> renderer::RendererSettings {
-        renderer::RendererSettings{
+        renderer::RendererSettings {
             enable_memory_mapped_read: self.enable_memory_mapped_read,
             wait_for_renderloop_to_finish: self.wait_for_renderloop_to_finish,
         }
     }
 
-    pub fn get_server_settings(&self) ->  market_economy_simulation_server::game_logic::GameLogicSettings 
-    {
+    pub fn get_server_settings(
+        &self,
+    ) -> market_economy_simulation_server::game_logic::GameLogicSettings {
         market_economy_simulation_server::game_logic::GameLogicSettings {
             map_size: self.map_size,
         }
     }
 }
-
-
-

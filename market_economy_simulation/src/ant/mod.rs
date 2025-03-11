@@ -3,7 +3,8 @@ use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
 use crate::{
     deferred_color_shader::{self, DeferredShaderDraw},
     deferred_light_shader::{self, DeferredLightShaderDraw},
-    geometry, shape::{self, MeshDataInterface},
+    geometry,
+    shape::{self, MeshDataInterface},
 };
 
 pub struct Ant {
@@ -91,7 +92,7 @@ impl Ant {
             _circle_light_instance: circle_light_instance,
             _circle_mesh: circle_mesh,
             _circle_light_mesh: circle_light_mesh,
-            
+
             _sphere: sphere,
             _sphere_light: sphere_light,
             _sphere_instance: sphere_instance,

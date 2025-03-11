@@ -1,7 +1,7 @@
 use wgpu_renderer::{
     performance_monitor,
-    wgpu_renderer::WgpuRendererInterface,
     vertex_color_shader::{self, VertexColorShaderDraw},
+    wgpu_renderer::WgpuRendererInterface,
 };
 
 const WATCHPOINTS_SIZE: usize = 5;

@@ -45,7 +45,11 @@ impl Mesh {
         }
     }
 
-    pub fn from_shape(device: &wgpu::Device, shape: &shape::MeshData, instances: &[Instance]) -> Self {
+    pub fn from_shape(
+        device: &wgpu::Device,
+        shape: &shape::MeshData,
+        instances: &[Instance],
+    ) -> Self {
         let shape = shape.triangulate();
 
         let vertices = &shape.positions;
@@ -57,8 +61,8 @@ impl Mesh {
         let len = vertices.iter().len();
         let mut mesh_vertices = Vec::with_capacity(len);
 
-        for i in 0 ..len {
-            mesh_vertices.push(Vertex{
+        for i in 0..len {
+            mesh_vertices.push(Vertex {
                 position: vertices[i].into(),
                 normal: normals[i].into(),
             });

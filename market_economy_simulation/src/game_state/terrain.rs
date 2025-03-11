@@ -10,10 +10,10 @@ pub fn create_vertices(
 
     for y in 0..terrain.size_y - 1 {
         for x in 0..terrain.size_x - 1 {
-            let height_0 = terrain.heights[y * terrain.size_x  + x];
-            let height_1 = terrain.heights[y * terrain.size_x  + (x+1)];
-            let height_2 = terrain.heights[(y+1) * terrain.size_x  + (x+1)];
-            let height_3 = terrain.heights[(y+1) * terrain.size_x  + x];
+            let height_0 = terrain.heights[y * terrain.size_x + x];
+            let height_1 = terrain.heights[y * terrain.size_x + (x + 1)];
+            let height_2 = terrain.heights[(y + 1) * terrain.size_x + (x + 1)];
+            let height_3 = terrain.heights[(y + 1) * terrain.size_x + x];
 
             let pos_0 = cgmath::Vector3::new(
                 x as f32 * terrain.distance - terrain.distance * terrain.size_x as f32 / 2.0,

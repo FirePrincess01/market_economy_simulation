@@ -14,19 +14,17 @@ impl DepthTextureBindGroup {
     pub fn new(device: &wgpu::Device, depth_texture: &DepthTexture) -> Self {
         // Texture
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-            entries: &[
-                wgpu::BindGroupLayoutEntry {
-                    // depth texture
-                    binding: 0,
-                    visibility: wgpu::ShaderStages::FRAGMENT,
-                    ty: wgpu::BindingType::Texture {
-                        multisampled: false,
-                        view_dimension: wgpu::TextureViewDimension::D2,
-                        sample_type: wgpu::TextureSampleType::Float { filterable: false },
-                    },
-                    count: None,
+            entries: &[wgpu::BindGroupLayoutEntry {
+                // depth texture
+                binding: 0,
+                visibility: wgpu::ShaderStages::FRAGMENT,
+                ty: wgpu::BindingType::Texture {
+                    multisampled: false,
+                    view_dimension: wgpu::TextureViewDimension::D2,
+                    sample_type: wgpu::TextureSampleType::Float { filterable: false },
                 },
-            ],
+                count: None,
+            }],
             label: Some("depth texture bind_group_layout"),
         });
 
@@ -39,7 +37,10 @@ impl DepthTextureBindGroup {
             label: Some("depth texture bind group"),
         });
 
-        Self { bind_group_layout, bind_group }
+        Self {
+            bind_group_layout,
+            bind_group,
+        }
     }
 
     pub fn get_layout(&self) -> &wgpu::BindGroupLayout {
