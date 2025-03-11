@@ -291,6 +291,7 @@ impl Renderer {
         self.camera_controller.process_scroll(delta);
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn render_deferred(
         &self,
         renderer_interface: &mut dyn WgpuRendererInterface,
@@ -520,6 +521,7 @@ impl Renderer {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn render(
         &mut self,
         renderer_interface: &mut dyn WgpuRendererInterface,
