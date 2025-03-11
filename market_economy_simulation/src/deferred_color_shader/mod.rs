@@ -11,7 +11,7 @@ mod instance_buffer;
 mod vertex;
 mod vertex_buffer;
 
-mod entity_buffer;
+pub mod entity_buffer;
 mod entity_buffer_slice;
 
 pub use deferred_color_shader_draw::DeferredShaderDraw;

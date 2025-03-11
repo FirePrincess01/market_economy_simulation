@@ -17,7 +17,7 @@ use super::VertexBuffer;
 pub struct Mesh {
     vertex_buffer: VertexBuffer<Vertex>,
     animation_buffer: AnimationUniformBuffer,
-    index_buffer: IndexBuffer,
+    index_buffer: IndexBuffer<u32>,
     instance_buffer: InstanceBuffer<Instance>,
     max_instances: u32,
     nr_instances: u32,
@@ -27,7 +27,7 @@ pub struct Mesh {
 #[allow(dead_code)]
 impl Mesh {
     pub fn new(
-        wgpu_renderer: &mut dyn wgpu_renderer::renderer::WgpuRendererInterface,
+        wgpu_renderer: &mut dyn wgpu_renderer::wgpu_renderer::WgpuRendererInterface,
         animation_bind_group_layout: &AnimationBindGroupLayout,
         vertices: &[Vertex],
         animation: &AnimationUniform,
@@ -61,7 +61,7 @@ impl Mesh {
     }
 
     pub fn from_animation_data(
-        wgpu_renderer: &mut dyn wgpu_renderer::renderer::WgpuRendererInterface,
+        wgpu_renderer: &mut dyn wgpu_renderer::wgpu_renderer::WgpuRendererInterface,
         animation_bind_group_layout: &AnimationBindGroupLayout,
         animation_data: &crate::animated_object::animated_object_data::AnimatedObjectData,
         instances: &[Instance],

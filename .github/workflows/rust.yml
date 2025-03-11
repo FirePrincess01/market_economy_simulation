@@ -142,6 +142,7 @@ jobs:
           mkdir public/market_economy_simulation/pkg
           cp market_economy_simulation/pkg/* public/market_economy_simulation/pkg
           cp index.html public/index.html
+          cp favicon.ico public/favicon.ico
 
       - name: Upload static files as artifact
         id: deployment

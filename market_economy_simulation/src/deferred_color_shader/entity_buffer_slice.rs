@@ -1,6 +1,7 @@
 //! Contains a reference to the gpu buffer with all the entity indices
 //!
 
+#[allow(unused)]
 pub struct EntityBufferSlice<'a> {
     buffer: &'a wgpu::Buffer,
     buffer_slice: wgpu::BufferSlice<'a>,
@@ -9,6 +10,7 @@ pub struct EntityBufferSlice<'a> {
     padded_bytes_per_row: u32,
 }
 
+#[allow(unused)]
 impl<'a> EntityBufferSlice<'a> {
     pub fn new(
         buffer: &'a wgpu::Buffer,

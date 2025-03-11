@@ -1,9 +1,13 @@
 //! Deferred shader pipeline drawing light stage
 //!
 
-use wgpu_renderer::renderer::depth_texture::DepthTexture;
+use wgpu_renderer::vertex_color_shader;
+use wgpu_renderer::wgpu_renderer::depth_texture::DepthTexture;
+
+use crate::deferred_color_shader;
 
 use super::CameraBindGroupLayout;
+use super::DeferredLightShaderDraw;
 use super::GBufferBindGroupLayout;
 use super::Instance;
 use super::Vertex;
@@ -21,11 +25,17 @@ impl Pipeline {
         camera_bind_group_layout: &CameraBindGroupLayout,
         g_buffer_bind_group_layout: &GBufferBindGroupLayout,
         surface_format: wgpu::TextureFormat,
+        use_ambient_shader: bool,
     ) -> Self {
+        let shader_source = match use_ambient_shader {
+            true => include_str!("shader_ambient_light.wgsl"),
+            false => include_str!("shader.wgsl"),
+        };
+
         // Shader
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("Deferred Light Shader"),
-            source: wgpu::ShaderSource::Wgsl(include_str!("shader.wgsl").into()),
+            source: wgpu::ShaderSource::Wgsl(shader_source.into()),
         });
 
         // Pipeline
@@ -72,8 +82,8 @@ impl Pipeline {
             },
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: DepthTexture::DEPTH_FORMAT,
-                depth_write_enabled: true,
-                depth_compare: wgpu::CompareFunction::Always,
+                depth_write_enabled: false,
+                depth_compare: wgpu::CompareFunction::Less,
                 stencil: wgpu::StencilState::default(),
                 bias: wgpu::DepthBiasState::default(),
             }),
@@ -89,7 +99,16 @@ impl Pipeline {
         Self { render_pipeline }
     }
 
-    pub fn bind<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
+    pub fn draw<'a>(
+        &self,
+        render_pass: &mut wgpu::RenderPass<'a>,
+        camera: &'a vertex_color_shader::CameraUniformBuffer,
+        g_buffer: &'a deferred_color_shader::GBuffer,
+        mesh: &'a dyn DeferredLightShaderDraw,
+    ) {
         render_pass.set_pipeline(&self.render_pipeline);
+        camera.bind(render_pass);
+        g_buffer.bind(render_pass);
+        mesh.draw_lights(render_pass);
     }
 }

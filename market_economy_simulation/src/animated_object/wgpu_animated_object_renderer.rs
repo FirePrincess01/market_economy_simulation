@@ -1,4 +1,4 @@
-use wgpu_renderer::renderer::WgpuRendererInterface;
+use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
 
 use crate::{
     animated_object::animated_model::animation::Animation,
@@ -52,8 +52,10 @@ impl WgpuAnimatedObjectStorage {
                 .update_animation_buffer(renderer_interface.queue(), &elem.animation_uniform);
         }
     }
+}
 
-    pub fn draw<'b>(&'b self, render_pass: &mut wgpu::RenderPass<'b>) {
+impl DeferredAnimationShaderDraw for WgpuAnimatedObjectStorage {
+    fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         for elem in &self.elements {
             elem.mesh.draw(render_pass);
         }
@@ -64,7 +66,7 @@ pub struct WgpuAnimatedObjectRenderer<'a> {
     pub storage: &'a mut WgpuAnimatedObjectStorage,
 
     // wgpu renderer
-    pub wgpu_renderer: &'a mut dyn wgpu_renderer::renderer::WgpuRendererInterface,
+    pub wgpu_renderer: &'a mut dyn wgpu_renderer::wgpu_renderer::WgpuRendererInterface,
     pub animation_bind_group_layout: &'a deferred_animation_shader::AnimationBindGroupLayout,
 }
 
@@ -80,7 +82,7 @@ impl WgpuAnimatedObjectRenderer<'_> {
         let animation_uniform = deferred_animation_shader::AnimationUniform::zero();
 
         let instance = deferred_animation_shader::Instance {
-            position: [20.0, 20.0, 5.0],
+            position: [0.0, 20.0, 5.0],
             color: [0.5, 0.5, 0.8],
             entity: [99, 0, 0],
         };

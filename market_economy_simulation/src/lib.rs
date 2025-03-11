@@ -1,4 +1,5 @@
 mod animated_object;
+mod ant;
 mod base_factory;
 mod create_entities;
 mod deferred_animation_shader;
@@ -12,6 +13,8 @@ mod geometry;
 mod ground_plane;
 mod performance_monitor;
 mod renderer;
+mod settings;
+mod shape;
 mod world_mesh;
 
 use animated_object::wgpu_animated_object_renderer::{
@@ -22,8 +25,8 @@ use market_economy_simulation_server::game_logic::game_logic_interface::{
 };
 use wgpu_renderer::{
     default_application::{DefaultApplication, DefaultApplicationInterface},
-    renderer::WgpuRendererInterface,
     vertex_texture_shader,
+    wgpu_renderer::WgpuRendererInterface,
 };
 use winit::event::{ElementState, WindowEvent};
 
@@ -31,12 +34,14 @@ use winit::event::{ElementState, WindowEvent};
 use wasm_bindgen::prelude::*;
 
 struct MarketEconomySimulation {
+    _settings: settings::Settings,
+
     size: winit::dpi::PhysicalSize<u32>,
     scale_factor: f32,
 
     renderer: renderer::Renderer,
     _world: ecs2::World,
-    world_mesh: world_mesh::WorldMesh,
+    // world_mesh: world_mesh::WorldMesh,
 
     // ant: deferred_color_shader::Mesh,
     animated_object_storage: WgpuAnimatedObjectStorage,
@@ -54,6 +59,10 @@ struct MarketEconomySimulation {
 
     game_server: market_economy_simulation_server::GameLogicServer,
     game_state: game_state::GameState,
+
+    ant: ant::Ant,
+
+    ambient_light_quad: deferred_light_shader::Mesh, // Quad running the global ambient light shader
 }
 
 impl MarketEconomySimulation {
@@ -62,10 +71,13 @@ impl MarketEconomySimulation {
         size: winit::dpi::PhysicalSize<u32>,
         scale_factor: f32,
     ) -> Self {
+        let settings = settings::Settings::new();
+
         // let size: winit::dpi::PhysicalSize<u32> = window.inner_size();
         // let scale_factor = window.scale_factor() as f32;
 
-        let renderer = renderer::Renderer::new(renderer_interface);
+        let renderer =
+            renderer::Renderer::new(renderer_interface, settings.get_renderer_settings());
 
         // world
         let mut world = ecs2::World::new();
@@ -80,7 +92,7 @@ impl MarketEconomySimulation {
             .produce(&mut world.resources, &mut world.agents);
 
         // world mesh
-        let world_mesh = world_mesh::WorldMesh::new(renderer_interface, &world);
+        let _world_mesh = world_mesh::WorldMesh::new(renderer_interface, &world);
 
         let mut animated_object_storage = WgpuAnimatedObjectStorage::new();
 
@@ -116,7 +128,8 @@ impl MarketEconomySimulation {
         animated_object_renderer.create_from_glb(glb_bin);
 
         // create game server
-        let mut game_server = market_economy_simulation_server::GameLogicServer::new();
+        let mut game_server =
+            market_economy_simulation_server::GameLogicServer::new(settings.get_server_settings());
 
         game_server
             .send_messages()
@@ -137,15 +150,30 @@ impl MarketEconomySimulation {
         // create the game state
         let game_state = game_state::GameState::new(renderer_interface, terrain_server);
 
+        let ant = ant::Ant::new(renderer_interface);
+
+        let ambient_light_quad_vertices = geometry::Quad::new(2.0);
+        let amblient_light_quad_instance = deferred_light_shader::Instance {
+            position: [-1.0, -1.0, 0.1],
+            intensity: [0.4, 0.4, 0.4],
+        };
+        let ambient_light_quad = deferred_light_shader::Mesh::new(
+            renderer_interface.device(),
+            &ambient_light_quad_vertices.vertices,
+            &ambient_light_quad_vertices.indices,
+            &[amblient_light_quad_instance],
+        );
+
         Self {
+            _settings: settings,
+
             size,
             scale_factor,
 
             renderer,
 
             _world: world,
-            world_mesh,
-
+            // world_mesh,
             animated_object_storage,
 
             performance_monitor,
@@ -159,6 +187,10 @@ impl MarketEconomySimulation {
 
             game_server,
             game_state,
+
+            ant,
+
+            ambient_light_quad,
         }
     }
 }
@@ -285,18 +317,22 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         renderer_interface: &mut dyn WgpuRendererInterface,
     ) -> Result<(), wgpu::SurfaceError> {
         // will be used for the next frame
-        self.entity_index =
-            self.renderer
-                .read_entity_index(renderer_interface, self.mouse_pos_y, self.mouse_pos_x);
+        self.entity_index = self.renderer.read_entity_index();
 
         // render current frame
         self.renderer.render(
             renderer_interface,
-            &self.world_mesh,
+            // &self.world_mesh,
             &self.game_state.terrain_mesh,
             &self.animated_object_storage,
+            &self.ant,
             &self.entity_index_mesh,
+            &self.ambient_light_quad,
             &mut self.performance_monitor,
+            deferred_color_shader::entity_buffer::MousePosition {
+                x: self.mouse_pos_x,
+                y: self.mouse_pos_y,
+            },
         )
     }
 }

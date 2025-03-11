@@ -2,6 +2,7 @@
 //!
 
 mod deferred_light_shader_draw;
+mod depth_texture_bind_group_layout;
 mod g_buffer_bind_group_layout;
 mod mesh;
 mod pipeline;

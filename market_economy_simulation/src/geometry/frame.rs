@@ -12,7 +12,7 @@ use super::rectangle::Rectangle;
 
 pub struct Frame {
     pub deferred_vertices: Vec<deferred_color_shader::Vertex>,
-    pub indices: Vec<u32>,
+    pub indices: Vec<u16>,
 }
 
 impl Frame {

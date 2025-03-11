@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WGPU Demo</title>
+    <link rel=”shortcut icon” href =“./favicon.ico”>
+    <title>Market Economy Simulation</title>
     <style>
         canvas {
             background-color: black;
@@ -14,6 +15,7 @@
 </head>
 
 <body id="wasm-demo">
+
   <script type="module">
         import init from "./market_economy_simulation/pkg/market_economy_simulation.js";
         console.log("WASM Loading");
@@ -24,7 +26,7 @@
         });
 
         function resizeCanvas() {
-            var width = window.innerWidth -15;
+            var width = window.innerWidth -15 * 2;
             var height = window.innerHeight -15;
             
             var elem = document.getElementById('wasm-demo');
@@ -36,6 +38,7 @@
             canvas.style.height = height.toString() + 'px';;
         }
   </script>
+
 </body>
 
 </html>

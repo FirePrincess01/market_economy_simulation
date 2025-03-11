@@ -5,10 +5,11 @@ use super::super::deferred_color_shader::CameraBindGroupLayout;
 use super::super::deferred_color_shader::EntityBuffer;
 use super::super::deferred_color_shader::GBuffer;
 use super::animation_bind_group_layout::AnimationBindGroupLayout;
+use super::DeferredAnimationShaderDraw;
 use super::Instance;
 use super::Vertex;
-use wgpu::BlendState;
-use wgpu_renderer::renderer::depth_texture;
+use wgpu_renderer::vertex_color_shader;
+use wgpu_renderer::wgpu_renderer::depth_texture;
 
 /// A general purpose shader using vertices, colors and an instance matrix
 pub struct Pipeline {
@@ -50,7 +51,7 @@ impl Pipeline {
         device: &wgpu::Device,
         camera_bind_group_layout: &CameraBindGroupLayout,
         animation_bind_group_layout: &AnimationBindGroupLayout,
-        surface_format: wgpu::TextureFormat,
+        _surface_format: wgpu::TextureFormat,
         topology: wgpu::PrimitiveTopology,
     ) -> Self {
         // Shader
@@ -83,29 +84,30 @@ impl Pipeline {
                 module: &shader,
                 entry_point: Some("fs_main"),
                 targets: &[
-                    Some(wgpu::ColorTargetState {
-                        format: surface_format,
-                        blend: Some(BlendState::ALPHA_BLENDING),
-                        write_mask: wgpu::ColorWrites::ALL,
-                    }),
+                    // Some(wgpu::ColorTargetState {
+                    //     format: surface_format,
+                    //     blend: None,
+                    //     write_mask: wgpu::ColorWrites::ALL,
+                    // }),
+                    // None,
                     Some(wgpu::ColorTargetState {
                         format: GBuffer::G_BUFFER_FORMAT_POSITION,
-                        blend: Some(BlendState::ALPHA_BLENDING),
+                        blend: None,
                         write_mask: wgpu::ColorWrites::ALL,
                     }),
                     Some(wgpu::ColorTargetState {
                         format: GBuffer::G_BUFFER_FORMAT_NORMAL,
-                        blend: Some(BlendState::ALPHA_BLENDING),
+                        blend: None,
                         write_mask: wgpu::ColorWrites::ALL,
                     }),
                     Some(wgpu::ColorTargetState {
                         format: GBuffer::G_BUFFER_FORMAT_ALBEDO,
-                        blend: Some(BlendState::ALPHA_BLENDING),
+                        blend: None,
                         write_mask: wgpu::ColorWrites::ALL,
                     }),
                     Some(wgpu::ColorTargetState {
                         format: EntityBuffer::FORMAT,
-                        blend: Some(BlendState::ALPHA_BLENDING),
+                        blend: None,
                         write_mask: wgpu::ColorWrites::ALL,
                     }),
                 ],
@@ -143,7 +145,14 @@ impl Pipeline {
         Self { render_pipeline }
     }
 
-    pub fn bind<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
+    pub fn draw<'a>(
+        &self,
+        render_pass: &mut wgpu::RenderPass<'a>,
+        camera: &'a vertex_color_shader::CameraUniformBuffer,
+        mesh: &'a dyn DeferredAnimationShaderDraw,
+    ) {
         render_pass.set_pipeline(&self.render_pipeline);
+        camera.bind(render_pass);
+        mesh.draw(render_pass);
     }
 }
