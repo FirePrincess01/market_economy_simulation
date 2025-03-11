@@ -6,15 +6,14 @@ mod camera_controller;
 use crate::animated_object::wgpu_animated_object_renderer::WgpuAnimatedObjectStorage;
 use crate::deferred_color_shader::entity_buffer::MousePosition;
 use crate::deferred_color_shader::{self, DeferredShaderDraw, EntityBuffer, GBuffer};
-use crate::deferred_light_shader::{DeferredLightShaderDraw, DepthTextureBindGroup};
+use crate::deferred_light_shader::DeferredLightShaderDraw;
 use crate::deferred_terrain_shader::{self, DeferredTerrainShaderDraw};
 use crate::performance_monitor::PerformanceMonitor;
 use camera_controller::CameraController;
 use wgpu_renderer::vertex_color_shader::{self, VertexColorShaderDraw};
 use wgpu_renderer::vertex_texture_shader::{self, VertexTextureShaderDraw};
 use wgpu_renderer::wgpu_renderer::camera::{Camera, Projection};
-use wgpu_renderer::wgpu_renderer::depth_texture::DepthTexture;
-use wgpu_renderer::wgpu_renderer::{depth_texture, WgpuRendererInterface};
+use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
 use winit::event::{ElementState, MouseScrollDelta};
 
 use crate::{deferred_animation_shader, deferred_light_shader};

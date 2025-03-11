@@ -6,7 +6,6 @@ use wgpu_renderer::vertex_color_shader;
 
 use crate::deferred_color_shader;
 
-use super::depth_texture_bind_group_layout::DepthTextureBindGroup;
 use super::CameraBindGroupLayout;
 use super::DeferredLightShaderDraw;
 use super::GBufferBindGroupLayout;
