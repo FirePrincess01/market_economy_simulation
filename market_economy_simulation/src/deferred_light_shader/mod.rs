@@ -12,7 +12,6 @@ mod instance_buffer;
 
 pub use deferred_light_shader_draw::DeferredLightShaderDraw;
 pub use g_buffer_bind_group_layout::GBufferBindGroupLayout;
-pub use depth_texture_bind_group_layout::DepthTextureBindGroup;
 pub use mesh::Mesh;
 pub use pipeline::Pipeline;
 
