@@ -15,7 +15,7 @@ use super::VertexBuffer;
 pub struct Mesh {
     vertex_buffer: VertexBuffer,
     index_buffer: IndexBuffer<u16>,
-    instance_buffer: InstanceBuffer,
+    instance_buffer: InstanceBuffer<Instance>,
     max_instances: u32,
     nr_instances: u32,
 }
@@ -75,18 +75,14 @@ impl Mesh {
         self.instance_buffer.update(queue, instances);
         self.nr_instances = u32::min(instances.len() as u32, self.max_instances);
     }
-
-    pub fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
-        self.vertex_buffer.bind(render_pass);
-        self.index_buffer.bind(render_pass);
-        self.instance_buffer.bind(render_pass);
-
-        render_pass.draw_indexed(0..self.index_buffer.size(), 0, 0..self.nr_instances);
-    }
 }
 
 impl DeferredLightShaderDraw for Mesh {
     fn draw_lights<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
-        self.draw(render_pass);
+        self.vertex_buffer.bind(render_pass);
+        self.index_buffer.bind(render_pass);
+        self.instance_buffer.bind_slot(render_pass, 1);
+
+        render_pass.draw_indexed(0..self.index_buffer.size(), 0, 0..self.nr_instances);
     }
 }

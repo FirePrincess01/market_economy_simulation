@@ -113,6 +113,6 @@ impl DeferredShaderDraw for Ant {
 impl DeferredLightShaderDraw for Ant {
     fn draw_lights<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         // self.circle_light_mesh.draw(render_pass);
-        self.sphere_light_mesh.draw(render_pass);
+        self.sphere_light_mesh.draw_lights(render_pass);
     }
 }

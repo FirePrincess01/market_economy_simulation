@@ -114,6 +114,6 @@ impl DeferredShaderDraw for DrawAgents {
 
 impl DeferredLightShaderDraw for DrawAgents {
     fn draw_lights<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
-        self.mesh_light.draw(render_pass);
+        self.mesh_light.draw_lights(render_pass);
     }
 }

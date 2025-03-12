@@ -29,7 +29,7 @@ impl Pipeline {
     ) -> Self {
         let shader_source = match use_ambient_shader {
             true => include_str!("shader_ambient_light.wgsl"),
-            false => include_str!("shader.wgsl"),
+            false => include_str!("shader_point_light.wgsl"),
         };
 
         // Shader
