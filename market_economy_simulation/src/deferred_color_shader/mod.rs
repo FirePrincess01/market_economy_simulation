@@ -23,7 +23,7 @@ pub use instance::Instance;
 pub use vertex::Vertex;
 pub use vertex_buffer::VertexBuffer;
 
+pub use wgpu_renderer::vertex_color_shader::CameraBindGroupLayout;
 pub use wgpu_renderer::vertex_color_shader::IndexBuffer;
 pub use wgpu_renderer::vertex_color_shader::InstanceBuffer;
-pub use wgpu_renderer::vertex_color_shader::CameraBindGroupLayout;
 

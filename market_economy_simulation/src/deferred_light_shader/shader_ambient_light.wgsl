@@ -68,7 +68,7 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
     let specular_strength = 0.4;
 
     // diffuse lighting
-    let light_direction = normalize(vec3<f32>(0.0, 1.0, 0.25));
+    let light_direction = normalize(vec3<f32>(0.0, 1.0, 0.5));
     let diffuse_lighting_strength = max(dot(vertex_normal.xyz, light_direction) * diffuse_strength, 0.0);
 
     // specular lighting
@@ -77,8 +77,15 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
     let model_normal = vertex_normal.xyz;
 
     let view_dir = normalize(view_position - model_position);
+    
+    // pong model
     let reflect_dir = reflect(-light_direction, model_normal);
     let specular_lighting_strength = pow(max(dot(view_dir, reflect_dir), 0.0), 32.0) * specular_strength;
+
+    // bling-pong model
+    // let halfway_dir = normalize(light_direction + view_dir);
+    // let specular_lighting_strength = pow(max(dot(model_normal, halfway_dir), 0.0), 32.0) * specular_strength;
+
 
     // pong shading
     let pong_lighting = light_color * (ambient_strength + diffuse_lighting_strength + specular_lighting_strength);
