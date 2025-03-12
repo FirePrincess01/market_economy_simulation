@@ -72,7 +72,11 @@ impl Pipeline {
                 topology: wgpu::PrimitiveTopology::TriangleList,
                 strip_index_format: None,
                 front_face: wgpu::FrontFace::Ccw, // counter-clockwise direction
-                cull_mode: Some(wgpu::Face::Back),
+                cull_mode: match use_ambient_shader {
+                    true => Some(wgpu::Face::Back),
+                    false => Some(wgpu::Face::Front),
+                } ,
+                // cull_mode: None,
                 // Setting this to anything other than Fill requires Features::NON_FILL_POLYGON_MODE
                 polygon_mode: wgpu::PolygonMode::Fill,
                 // Requires Features::DEPTH_CLIP_CONTROL
@@ -83,7 +87,10 @@ impl Pipeline {
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: DepthTexture::DEPTH_FORMAT,
                 depth_write_enabled: false,
-                depth_compare: wgpu::CompareFunction::Less,
+                depth_compare: match use_ambient_shader {
+                    true => wgpu::CompareFunction::Less,
+                    false => wgpu::CompareFunction::Always,
+                },
                 stencil: wgpu::StencilState::default(),
                 bias: wgpu::DepthBiasState::default(),
             }),
