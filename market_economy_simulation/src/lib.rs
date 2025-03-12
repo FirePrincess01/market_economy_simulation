@@ -153,15 +153,15 @@ impl MarketEconomySimulation {
         let ant = ant::Ant::new(renderer_interface);
 
         let ambient_light_quad_vertices = geometry::Quad::new(2.0);
-        let amblient_light_quad_instance = deferred_light_shader::Instance {
-            position: [-1.0, -1.0, 0.1],
-            intensity: [0.4, 0.4, 0.4],
+        let ambient_light_quad_instance = deferred_light_shader::Instance {
+            position: [-1.0, -1.0, 0.1, 1.0],
+            light_color: [0.4, 0.4, 0.4, 1.0],
         };
         let ambient_light_quad = deferred_light_shader::Mesh::new(
             renderer_interface.device(),
             &ambient_light_quad_vertices.vertices,
             &ambient_light_quad_vertices.indices,
-            &[amblient_light_quad_instance],
+            &[ambient_light_quad_instance],
         );
 
         Self {

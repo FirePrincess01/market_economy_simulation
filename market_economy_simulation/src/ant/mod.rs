@@ -43,8 +43,8 @@ impl Ant {
             entity: [34, 0, 0],
         };
         let circle_light_instance = deferred_light_shader::Instance {
-            position: circle_instance.position,
-            intensity: [0.1, 1.0, 0.0],
+            position: [circle_instance.position[0], circle_instance.position[1], circle_instance.position[2], 1.0],
+            light_color: [0.1, 1.0, 0.0, 1.0],
         };
 
         let circle_mesh = deferred_color_shader::Mesh::new(
@@ -70,8 +70,8 @@ impl Ant {
             entity: [34, 0, 0],
         };
         let sphere_light_instance = deferred_light_shader::Instance {
-            position: sphere_instance.position,
-            intensity: [0.1, 1.0, 0.0],
+            position: [sphere_instance.position[0], sphere_instance.position[1], sphere_instance.position[2], 1.0],
+            light_color: [0.1, 1.0, 0.0, 1.0],
         };
 
         let sphere_mesh = deferred_color_shader::Mesh::from_shape(

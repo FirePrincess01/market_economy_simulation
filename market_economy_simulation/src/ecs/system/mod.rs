@@ -92,8 +92,8 @@ impl DrawAgents {
         self.instances_mesh_light_host.clear();
         for (pos, _live) in iter {
             let instance = deferred_light_shader::Instance {
-                position: [pos.pos[0], pos.pos[1], pos.pos[2]],
-                intensity: [1.0 / self.light_radius, 0.0, 0.0],
+                position: [pos.pos[0], pos.pos[1], pos.pos[2], 1.0],
+                light_color: [1.0 / self.light_radius, 0.0, 0.0, 1.0],
             };
 
             self.instances_mesh_light_host.push(instance);

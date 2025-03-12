@@ -4,15 +4,18 @@
 #[repr(C)]
 #[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct Instance {
-    pub position: [f32; 3],
-    pub intensity: [f32; 3],
+    /// x, y, z and unused
+    pub position: [f32; 4],
+
+    /// red (0.0..1.0), green (0.0..1.0), blue (0.0..1.0) and light strength (0.0..)
+    pub light_color: [f32; 4],
 }
 
 impl Instance {
     pub fn new() -> Self {
         Self {
-            position: [0.0, 0.0, 0.0],
-            intensity: [0.0, 0.0, 0.0],
+            position: [0.0, 0.0, 0.0, 0.0],
+            light_color: [0.0, 0.0, 0.0, 0.0], 
         }
     }
 
@@ -35,20 +38,10 @@ impl Instance {
                 // A mat4 takes up 4 vertex slots as it is technically 4 vec4s. We need to define a slot
                 // for each vec4. We'll have to reassemble the mat4 in the shader.
                 wgpu::VertexAttribute {
-                    offset: mem::size_of::<[f32; 3]>() as wgpu::BufferAddress,
+                    offset: mem::size_of::<[f32; 4]>() as wgpu::BufferAddress,
                     shader_location: 6,
                     format: wgpu::VertexFormat::Float32x3,
                 },
-                // wgpu::VertexAttribute {
-                //     offset: mem::size_of::<[f32; 6]>() as wgpu::BufferAddress,
-                //     shader_location: 7,
-                //     format: wgpu::VertexFormat::Uint32x3,
-                // },
-                // wgpu::VertexAttribute {
-                //     offset: mem::size_of::<[f32; 12]>() as wgpu::BufferAddress,
-                //     shader_location: 8,
-                //     format: wgpu::VertexFormat::Float32x4,
-                // },
             ],
         }
     }
