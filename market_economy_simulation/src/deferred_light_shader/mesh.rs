@@ -1,6 +1,7 @@
 //! Contains the device buffers to render an object with this shader
 //!
 
+use crate::deferred_light_sphere_shader::DeferredLightSphereShaderDraw;
 use crate::shape;
 
 use super::DeferredLightShaderDraw;
@@ -79,6 +80,16 @@ impl Mesh {
 
 impl DeferredLightShaderDraw for Mesh {
     fn draw_lights<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
+        self.vertex_buffer.bind(render_pass);
+        self.index_buffer.bind(render_pass);
+        self.instance_buffer.bind_slot(render_pass, 1);
+
+        render_pass.draw_indexed(0..self.index_buffer.size(), 0, 0..self.nr_instances);
+    }
+}
+
+impl DeferredLightSphereShaderDraw for Mesh {
+    fn draw_sphere<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         self.vertex_buffer.bind(render_pass);
         self.index_buffer.bind(render_pass);
         self.instance_buffer.bind_slot(render_pass, 1);

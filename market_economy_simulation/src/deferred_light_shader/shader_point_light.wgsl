@@ -14,6 +14,9 @@ struct VertexInput {
 struct InstanceInput {
     @location(5) position: vec3<f32>,
     @location(6) light_color: vec3<f32>,
+    @location(7) radius: f32,
+    @location(8) linear: f32,
+    @location(9) quadratic: f32,
 }
 
 struct VertexOutput {
@@ -21,6 +24,8 @@ struct VertexOutput {
     @location(0) view_position: vec3<f32>,
     @location(1) model_position: vec3<f32>,
     @location(2) light_color: vec3<f32>,
+    @location(3) linear: f32,
+    @location(4) quadratic: f32,
 };
 
 @vertex 
@@ -29,13 +34,15 @@ fn vs_main(
     instance: InstanceInput,
 ) -> VertexOutput {
 
-    let position = instance.position + model.position;
+    let position = instance.position + model.position * instance.radius;
 
     var out: VertexOutput;
     out.clip_position = camera.view_proj * vec4<f32>(position, 1.0);
     out.view_position = camera.view_pos.xyz;
     out.model_position = instance.position;
     out.light_color = instance.light_color;
+    out.linear = instance.linear;
+    out.quadratic = instance.quadratic;
     return out;
 }
 
@@ -87,8 +94,8 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
 
     // attenuation
     let constant = 1.0;
-    let linear = 0.07;
-    let quadratic = 0.017;
+    let linear = in.linear;
+    let quadratic = in.quadratic;
 
     let distance = length(in.model_position - vertex_position.xyz);
     let attenuation = 1.0 / (constant + linear * distance + 

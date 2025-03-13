@@ -43,8 +43,15 @@ impl Ant {
             entity: [34, 0, 0],
         };
         let circle_light_instance = deferred_light_shader::Instance {
-            position: [circle_instance.position[0], circle_instance.position[1], circle_instance.position[2], 1.0],
-            light_color: [0.1, 1.0, 0.0, 1.0],
+            position: [
+                circle_instance.position[0],
+                circle_instance.position[1],
+                circle_instance.position[2],
+            ],
+            light_color: [0.1, 1.0, 0.0],
+            radius: 0.0,
+            linear: 0.0,
+            quadratic: 0.0,
         };
 
         let circle_mesh = deferred_color_shader::Mesh::new(
@@ -70,8 +77,15 @@ impl Ant {
             entity: [34, 0, 0],
         };
         let sphere_light_instance = deferred_light_shader::Instance {
-            position: [sphere_instance.position[0], sphere_instance.position[1], sphere_instance.position[2], 1.0],
-            light_color: [0.1, 1.0, 0.0, 1.0],
+            position: [
+                sphere_instance.position[0],
+                sphere_instance.position[1],
+                sphere_instance.position[2],
+            ],
+            light_color: [0.1, 1.0, 0.0],
+            radius: 0.0,
+            linear: 0.0,
+            quadratic: 0.0,
         };
 
         let sphere_mesh = deferred_color_shader::Mesh::from_shape(
@@ -106,13 +120,13 @@ impl Ant {
 impl DeferredShaderDraw for Ant {
     fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         // self.circle_mesh.draw(render_pass);
-        self.sphere_mesh.draw(render_pass);
+        // self.sphere_mesh.draw(render_pass);
     }
 }
 
 impl DeferredLightShaderDraw for Ant {
     fn draw_lights<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         // self.circle_light_mesh.draw(render_pass);
-        self.sphere_light_mesh.draw_lights(render_pass);
+        // self.sphere_light_mesh.draw_lights(render_pass);
     }
 }

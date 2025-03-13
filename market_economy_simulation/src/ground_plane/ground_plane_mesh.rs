@@ -60,8 +60,11 @@ impl GroundPlaneMesh {
         let ground_plane_light_quad = geometry::Quad::new(ground_plane.width() as f32 * quad_size);
 
         const INSTANCES: &[deferred_light_shader::Instance] = &[deferred_light_shader::Instance {
-            position: [0.0, 0.0, 1.0, 1.0],
-            light_color: [0.0, 0.4, 0.0, 1.0],
+            position: [0.0, 0.0, 1.0],
+            light_color: [0.0, 0.4, 0.0],
+            radius: 0.0,
+            linear: 0.0,
+            quadratic: 0.0,
         }];
 
         let mesh_light = deferred_light_shader::Mesh::new(

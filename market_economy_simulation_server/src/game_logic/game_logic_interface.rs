@@ -1,6 +1,6 @@
 use std::sync::mpsc;
 
-use crate::terrain;
+use crate::{point_lights, terrain};
 
 pub enum GameLogicMessageRequest {
     GetTerrain, // Requests the terrain heightmap
@@ -10,7 +10,9 @@ pub enum GameLogicMessageHeavy {
     Terrain(terrain::Terrain), // The terrain heightmap data
 }
 
-pub enum GameLogicMessageLight {}
+pub enum GameLogicMessageLight {
+    UpdatePointLight(point_lights::PointLight), // updates the data of a point light
+}
 
 pub enum GameLogicMessageCritical {}
 

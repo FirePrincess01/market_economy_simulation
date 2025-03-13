@@ -7,7 +7,7 @@ use wgpu_renderer::wgpu_renderer::depth_texture::DepthTexture;
 use crate::deferred_color_shader;
 
 use super::CameraBindGroupLayout;
-use super::DeferredLightShaderDraw;
+use super::DeferredLightSphereShaderDraw;
 use super::GBufferBindGroupLayout;
 use super::Instance;
 use super::Vertex;
@@ -25,12 +25,8 @@ impl Pipeline {
         camera_bind_group_layout: &CameraBindGroupLayout,
         g_buffer_bind_group_layout: &GBufferBindGroupLayout,
         surface_format: wgpu::TextureFormat,
-        use_ambient_shader: bool,
     ) -> Self {
-        let shader_source = match use_ambient_shader {
-            true => include_str!("shader_ambient_light.wgsl"),
-            false => include_str!("shader_point_light.wgsl"),
-        };
+        let shader_source = include_str!("shader_point_light_sphere.wgsl");
 
         // Shader
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
@@ -63,19 +59,16 @@ impl Pipeline {
                 entry_point: Some("fs_main"),
                 targets: &[Some(wgpu::ColorTargetState {
                     format: surface_format,
-                    blend: Some(wgpu::BlendState::ALPHA_BLENDING),
+                    blend: None,
                     write_mask: wgpu::ColorWrites::ALL,
                 })],
                 compilation_options: wgpu::PipelineCompilationOptions::default(),
             }),
             primitive: wgpu::PrimitiveState {
-                topology: wgpu::PrimitiveTopology::TriangleList,
+                topology: wgpu::PrimitiveTopology::LineList,
                 strip_index_format: None,
                 front_face: wgpu::FrontFace::Ccw, // counter-clockwise direction
-                cull_mode: match use_ambient_shader {
-                    true => Some(wgpu::Face::Back),
-                    false => Some(wgpu::Face::Front),
-                },
+                cull_mode: Some(wgpu::Face::Back),
                 // cull_mode: None,
                 // Setting this to anything other than Fill requires Features::NON_FILL_POLYGON_MODE
                 polygon_mode: wgpu::PolygonMode::Fill,
@@ -87,10 +80,7 @@ impl Pipeline {
             depth_stencil: Some(wgpu::DepthStencilState {
                 format: DepthTexture::DEPTH_FORMAT,
                 depth_write_enabled: false,
-                depth_compare: match use_ambient_shader {
-                    true => wgpu::CompareFunction::Less,
-                    false => wgpu::CompareFunction::Always,
-                },
+                depth_compare: wgpu::CompareFunction::Less,
                 stencil: wgpu::StencilState::default(),
                 bias: wgpu::DepthBiasState::default(),
             }),
@@ -111,11 +101,11 @@ impl Pipeline {
         render_pass: &mut wgpu::RenderPass<'a>,
         camera: &'a vertex_color_shader::CameraUniformBuffer,
         g_buffer: &'a deferred_color_shader::GBuffer,
-        mesh: &'a dyn DeferredLightShaderDraw,
+        mesh: &'a dyn DeferredLightSphereShaderDraw,
     ) {
         render_pass.set_pipeline(&self.render_pipeline);
         camera.bind(render_pass);
         g_buffer.bind(render_pass);
-        mesh.draw_lights(render_pass);
+        mesh.draw_sphere(render_pass);
     }
 }

@@ -14,6 +14,9 @@ struct VertexInput {
 struct InstanceInput {
     @location(5) position: vec3<f32>,
     @location(6) light_color: vec3<f32>,
+    @location(7) radius: f32,
+    @location(8) linear: f32,
+    @location(9) quadratic: f32,
 }
 
 struct VertexOutput {
