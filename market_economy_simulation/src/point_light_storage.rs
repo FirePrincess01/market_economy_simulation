@@ -303,9 +303,9 @@ fn calculate_volume_radius(
     // let attenuation = 256.0 / 5.0;
     let attenuation = 256.0 / 25.0;
 
-    let radius = (-linear
-        + (linear * linear - 4.0 * quadratic * (constant - attenuation * light_max)).sqrt())
-        / (2.0 * quadratic);
+    
 
-    radius
+    (-linear
+        + (linear * linear - 4.0 * quadratic * (constant - attenuation * light_max)).sqrt())
+        / (2.0 * quadratic)
 }
