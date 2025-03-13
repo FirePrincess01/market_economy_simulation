@@ -28,7 +28,7 @@ impl Settings {
         Self {
             enable_memory_mapped_read: true,
             wait_for_render_loop_to_finish: true,
-            map_size: 300 ,
+            map_size: 300,
             max_point_light_instances: 65536,
             dbg_point_lights: false,
         }

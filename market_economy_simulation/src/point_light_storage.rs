@@ -4,7 +4,9 @@ use market_economy_simulation_server::point_lights::Attenuation;
 use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
 
 use crate::{
-    deferred_light_shader::{self, DeferredLightShaderDraw}, deferred_light_sphere_shader::DeferredLightSphereShaderDraw, shape::{self, MeshDataInterface}
+    deferred_light_shader::{self, DeferredLightShaderDraw},
+    deferred_light_sphere_shader::DeferredLightSphereShaderDraw,
+    shape::{self, MeshDataInterface},
 };
 
 pub struct PointLightStorage {
@@ -74,7 +76,6 @@ impl PointLightStorage {
 
         self.light
             .update_instance_buffer(renderer.queue(), &active_instances[0..j]);
-
     }
 }
 
@@ -303,9 +304,6 @@ fn calculate_volume_radius(
     // let attenuation = 256.0 / 5.0;
     let attenuation = 256.0 / 25.0;
 
-    
-
-    (-linear
-        + (linear * linear - 4.0 * quadratic * (constant - attenuation * light_max)).sqrt())
+    (-linear + (linear * linear - 4.0 * quadratic * (constant - attenuation * light_max)).sqrt())
         / (2.0 * quadratic)
 }
