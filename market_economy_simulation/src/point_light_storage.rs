@@ -4,7 +4,7 @@ use market_economy_simulation_server::point_lights::Attenuation;
 use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
 
 use crate::{
-    deferred_color_shader::{self, DeferredShaderDraw}, deferred_light_shader::{self, DeferredLightShaderDraw}, deferred_light_sphere_shader::DeferredLightSphereShaderDraw, shape::{self, MeshDataInterface}
+    deferred_light_shader::{self, DeferredLightShaderDraw}, deferred_light_sphere_shader::DeferredLightSphereShaderDraw, shape::{self, MeshDataInterface}
 };
 
 pub struct PointLightStorage {
@@ -78,6 +78,7 @@ impl PointLightStorage {
     }
 }
 
+#[allow(unused)]
 pub trait PointLightInterface {
     fn add_light(
         &mut self,
