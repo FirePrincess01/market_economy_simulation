@@ -7,7 +7,7 @@ pub struct Instance {
     pub position: [f32; 3],
     pub color: [f32; 3],
     pub entity: [u32; 3],
-    pub color_heighlights: [f32; 3],
+    pub color_highlights: [f32; 3],
 }
 
 impl Instance {
@@ -16,7 +16,7 @@ impl Instance {
             position: [0.0, 0.0, 0.0],
             color: [0.0, 0.0, 0.0],
             entity: [0, 0, 0],
-            color_heighlights: [0.0, 0.0, 0.0],
+            color_highlights: [0.0, 0.0, 0.0],
         }
     }
 

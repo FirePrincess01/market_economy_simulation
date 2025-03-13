@@ -13,6 +13,9 @@ pub struct Settings {
     /// be done in the background.
     pub wait_for_render_loop_to_finish: bool,
 
+    // enables vertical sync, limiting the fps to the refresh rate of the display (60 fps)
+    pub enable_vertical_sync: bool,
+
     /// Size of the terrain map in both x and y dimension
     pub map_size: usize,
 
@@ -28,8 +31,10 @@ impl Settings {
         Self {
             enable_memory_mapped_read: true,
             wait_for_render_loop_to_finish: true,
-            map_size: 300,
-            max_point_light_instances: 65536,
+            enable_vertical_sync: false,
+            map_size: 300*2,
+            // max_point_light_instances: 65536,
+            max_point_light_instances: 16348,
             dbg_point_lights: false,
         }
     }
@@ -37,7 +42,8 @@ impl Settings {
     pub fn get_renderer_settings(&self) -> renderer::RendererSettings {
         renderer::RendererSettings {
             enable_memory_mapped_read: self.enable_memory_mapped_read,
-            wait_for_renderloop_to_finish: self.wait_for_render_loop_to_finish,
+            wait_for_render_loop_to_finish: self.wait_for_render_loop_to_finish,
+            is_vsync_enabled: self.enable_vertical_sync,
         }
     }
 

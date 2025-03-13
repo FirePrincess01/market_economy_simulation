@@ -69,6 +69,7 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
     let vertex_color_raw: vec4<f32> = textureLoad(t_albedo, index, 0);
 
     let vertex_color = vec4(vertex_color_raw.xyz, 1.0);
+    let specular_strength = vertex_color_raw[3];
 
     // calculate lighting
     let light_color = vec4(in.light_color, 1.0);
@@ -102,7 +103,8 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
     		    quadratic * (distance * distance)); 
 
     // pong shading
-    let pong_lighting = light_color * (diffuse_lighting_strength + specular_lighting_strength) * attenuation;
+    // let pong_lighting = light_color * (diffuse_lighting_strength + specular_lighting_strength * specular_strength)  * attenuation;
+    let pong_lighting = light_color * (diffuse_lighting_strength * 0.4 +  (diffuse_lighting_strength + specular_lighting_strength) * specular_strength)  * attenuation;
     let pong_light: vec4<f32> = pong_lighting * vertex_color;
 
     // blend with intensity

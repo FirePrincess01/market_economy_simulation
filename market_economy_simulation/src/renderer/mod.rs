@@ -21,7 +21,8 @@ use crate::{deferred_animation_shader, deferred_light_shader, deferred_light_sph
 
 pub struct RendererSettings {
     pub enable_memory_mapped_read: bool,
-    pub wait_for_renderloop_to_finish: bool,
+    pub wait_for_render_loop_to_finish: bool,
+    pub is_vsync_enabled: bool,
 }
 
 pub struct Renderer {
@@ -61,6 +62,10 @@ pub struct Renderer {
 
 impl Renderer {
     pub fn new(wgpu_renderer: &mut dyn WgpuRendererInterface, settings: RendererSettings) -> Self {
+
+        // enable vsync
+        wgpu_renderer.enable_vsync(settings.is_vsync_enabled);
+
         // wgpu renderer
         let surface_width = wgpu_renderer.surface_width();
         let surface_height = wgpu_renderer.surface_height();
@@ -621,7 +626,7 @@ impl Renderer {
         self.entity_buffer.map_buffer_async();
 
         // wait to see how high the gpu load is
-        if self.settings.wait_for_renderloop_to_finish {
+        if self.settings.wait_for_render_loop_to_finish {
             renderer_interface.device().poll(wgpu::Maintain::Wait);
         } else {
             renderer_interface.device().poll(wgpu::Maintain::Poll);

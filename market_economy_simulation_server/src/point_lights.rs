@@ -36,7 +36,7 @@ impl PointLights {
                     id: id as u32,
                     position,
                     color,
-                    attenuation: Attenuation::_200,
+                    attenuation: Attenuation::_100,
                 });
                 id += 1;
             }

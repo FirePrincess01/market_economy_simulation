@@ -77,9 +77,6 @@ impl MarketEconomySimulation {
     ) -> Self {
         let settings = settings::Settings::new();
 
-        // let size: winit::dpi::PhysicalSize<u32> = window.inner_size();
-        // let scale_factor = window.scale_factor() as f32;
-
         let renderer =
             renderer::Renderer::new(renderer_interface, settings.get_renderer_settings());
 
