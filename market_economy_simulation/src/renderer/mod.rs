@@ -9,6 +9,7 @@ use crate::deferred_color_shader::{self, DeferredShaderDraw, EntityBuffer, GBuff
 use crate::deferred_light_shader::DeferredLightShaderDraw;
 use crate::deferred_terrain_shader::{self, DeferredTerrainShaderDraw};
 use crate::performance_monitor::PerformanceMonitor;
+use crate::point_light_storage::PointLightStorage;
 use camera_controller::CameraController;
 use wgpu_renderer::vertex_color_shader::{self, VertexColorShaderDraw};
 use wgpu_renderer::vertex_texture_shader::{self, VertexTextureShaderDraw};
@@ -16,7 +17,7 @@ use wgpu_renderer::wgpu_renderer::camera::{Camera, Projection};
 use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
 use winit::event::{ElementState, MouseScrollDelta};
 
-use crate::{deferred_animation_shader, deferred_light_shader};
+use crate::{deferred_animation_shader, deferred_light_shader, deferred_light_sphere_shader};
 
 pub struct RendererSettings {
     pub enable_memory_mapped_read: bool,
@@ -39,6 +40,7 @@ pub struct Renderer {
 
     pipeline_deferred_light: deferred_light_shader::Pipeline,
     pipeline_deferred_light_ambient: deferred_light_shader::Pipeline,
+    pipeline_deferred_light_sphere: deferred_light_sphere_shader::Pipeline,
 
     pub animation_bind_group_layout: deferred_animation_shader::AnimationBindGroupLayout,
     pipeline_deferred_animated: deferred_animation_shader::Pipeline,
@@ -132,6 +134,13 @@ impl Renderer {
             true,
         );
 
+        let pipeline_deferred_light_sphere = deferred_light_sphere_shader::Pipeline::new(
+            wgpu_renderer.device(),
+            &camera_bind_group_layout,
+            &g_buffer_bind_group_layout,
+            surface_format,
+        );
+
         let animation_bind_group_layout =
             deferred_animation_shader::AnimationBindGroupLayout::new(wgpu_renderer.device());
 
@@ -203,6 +212,7 @@ impl Renderer {
             pipeline_deferred_color,
             pipeline_deferred_light,
             pipeline_deferred_light_ambient,
+            pipeline_deferred_light_sphere,
 
             animation_bind_group_layout,
             pipeline_deferred_animated,
@@ -420,6 +430,7 @@ impl Renderer {
         encoder: &mut wgpu::CommandEncoder,
         meshes: &[&dyn DeferredLightShaderDraw],
         ambient_light_quad: &impl DeferredLightShaderDraw,
+        point_light_storage: &PointLightStorage,
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Light Render Pass"),
@@ -467,6 +478,22 @@ impl Renderer {
                 *mesh,
             );
         }
+
+        // point lights
+        self.pipeline_deferred_light.draw(
+            &mut render_pass,
+            &self.camera_uniform_buffer,
+            &self.g_buffer,
+            point_light_storage,
+        );
+
+        // debug spheres
+        self.pipeline_deferred_light_sphere.draw(
+            &mut render_pass,
+            &self.camera_uniform_buffer,
+            &self.g_buffer,
+            point_light_storage,
+        );
     }
 
     fn render_forward(
@@ -527,9 +554,12 @@ impl Renderer {
         // deferred_combined: &(impl DeferredShaderDraw + DeferredLightShaderDraw),
         deferred_terrain: &dyn DeferredTerrainShaderDraw,
         animated_object_storage: &WgpuAnimatedObjectStorage,
+        point_light_storage: &PointLightStorage,
+
         ant_light_orbs: &(impl DeferredShaderDraw + DeferredLightShaderDraw),
         mesh_textured_gui: &impl VertexTextureShaderDraw,
         ambient_light_quad: &impl DeferredLightShaderDraw,
+
         performance_monitor: &mut PerformanceMonitor,
         mouse_position: MousePosition,
     ) -> Result<(), wgpu::SurfaceError> {
@@ -567,6 +597,7 @@ impl Renderer {
             &mut encoder,
             &[ant_light_orbs],
             ambient_light_quad,
+            point_light_storage,
         );
 
         self.render_forward(

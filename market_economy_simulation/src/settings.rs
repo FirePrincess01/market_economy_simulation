@@ -15,14 +15,22 @@ pub struct Settings {
 
     /// Size of the terrain map in both x and y dimension
     pub map_size: usize,
+
+    /// Maximum number of instances of the point lights
+    pub max_point_light_instances: usize,
+
+    // Draws a sphere around the point lights for debugging purposes
+    pub dbg_point_lights: bool,
 }
 
 impl Settings {
     pub fn new() -> Self {
         Self {
             enable_memory_mapped_read: true,
-            wait_for_render_loop_to_finish: false,
+            wait_for_render_loop_to_finish: true,
             map_size: 300,
+            max_point_light_instances: 65536,
+            dbg_point_lights: false,
         }
     }
 

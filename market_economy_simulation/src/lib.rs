@@ -5,6 +5,7 @@ mod create_entities;
 mod deferred_animation_shader;
 mod deferred_color_shader;
 mod deferred_light_shader;
+mod deferred_light_sphere_shader;
 mod deferred_terrain_shader;
 mod ecs;
 mod ecs2;
@@ -12,6 +13,7 @@ mod game_state;
 mod geometry;
 mod ground_plane;
 mod performance_monitor;
+mod point_light_storage;
 mod renderer;
 mod settings;
 mod shape;
@@ -23,6 +25,7 @@ use animated_object::wgpu_animated_object_renderer::{
 use market_economy_simulation_server::game_logic::game_logic_interface::{
     GameLogicInterface, GameLogicMessageHeavy, GameLogicMessageRequest,
 };
+use point_light_storage::{PointLightIndex, PointLightInterface};
 use wgpu_renderer::{
     default_application::{DefaultApplication, DefaultApplicationInterface},
     vertex_texture_shader,
@@ -63,6 +66,7 @@ struct MarketEconomySimulation {
     ant: ant::Ant,
 
     ambient_light_quad: deferred_light_shader::Mesh, // Quad running the global ambient light shader
+    point_light_storage: point_light_storage::PointLightStorage,
 }
 
 impl MarketEconomySimulation {
@@ -153,15 +157,24 @@ impl MarketEconomySimulation {
         let ant = ant::Ant::new(renderer_interface);
 
         let ambient_light_quad_vertices = geometry::Quad::new(2.0);
-        let amblient_light_quad_instance = deferred_light_shader::Instance {
+        let ambient_light_quad_instance = deferred_light_shader::Instance {
             position: [-1.0, -1.0, 0.1],
-            intensity: [0.4, 0.4, 0.4],
+            light_color: [0.4, 0.4, 0.4],
+            radius: 0.0,
+            linear: 0.0,
+            quadratic: 0.0,
         };
         let ambient_light_quad = deferred_light_shader::Mesh::new(
             renderer_interface.device(),
             &ambient_light_quad_vertices.vertices,
             &ambient_light_quad_vertices.indices,
-            &[amblient_light_quad_instance],
+            &[ambient_light_quad_instance],
+        );
+
+        let point_light_storage = point_light_storage::PointLightStorage::new(
+            renderer_interface,
+            settings.max_point_light_instances,
+            settings.dbg_point_lights,
         );
 
         Self {
@@ -191,6 +204,7 @@ impl MarketEconomySimulation {
             ant,
 
             ambient_light_quad,
+            point_light_storage,
         }
     }
 }
@@ -256,13 +270,30 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         );
 
         self.performance_monitor.watch.start(3);
-        self.game_server.update();
-        // ecs::system::move_agents(&mut self.world);
+        {
+            self.game_server.update();
+
+            let light_messages = self.game_server.get_light_messages();
+            for msg in light_messages.try_iter() {
+                match msg {
+                        market_economy_simulation_server::game_logic::game_logic_interface::GameLogicMessageLight::UpdatePointLight(point_light) => {
+                            let index = PointLightIndex{ instance_index: point_light.id as usize };
+                            self.point_light_storage.set_light(
+                                index,
+                                point_light.position,
+                                point_light.color,
+                                point_light.attenuation);
+                        },
+                    }
+            }
+            self.point_light_storage.update(renderer_interface);
+        }
         self.performance_monitor.watch.stop(3);
 
         self.performance_monitor.watch.start(4);
-        self.animated_object_storage.update(renderer_interface, &dt);
-        // self.draw_agents.update(&mut self.world, &mut self.renderer.wgpu_renderer);
+        {
+            self.animated_object_storage.update(renderer_interface, &dt);
+        }
         self.performance_monitor.watch.stop(4);
 
         self.performance_monitor.update(renderer_interface);
@@ -325,6 +356,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             // &self.world_mesh,
             &self.game_state.terrain_mesh,
             &self.animated_object_storage,
+            &self.point_light_storage,
             &self.ant,
             &self.entity_index_mesh,
             &self.ambient_light_quad,

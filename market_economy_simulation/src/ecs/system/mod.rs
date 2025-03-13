@@ -93,7 +93,10 @@ impl DrawAgents {
         for (pos, _live) in iter {
             let instance = deferred_light_shader::Instance {
                 position: [pos.pos[0], pos.pos[1], pos.pos[2]],
-                intensity: [1.0 / self.light_radius, 0.0, 0.0],
+                light_color: [1.0 / self.light_radius, 0.0, 0.0],
+                radius: 0.0,
+                linear: 0.0,
+                quadratic: 0.0,
             };
 
             self.instances_mesh_light_host.push(instance);
@@ -114,6 +117,6 @@ impl DeferredShaderDraw for DrawAgents {
 
 impl DeferredLightShaderDraw for DrawAgents {
     fn draw_lights<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
-        self.mesh_light.draw(render_pass);
+        self.mesh_light.draw_lights(render_pass);
     }
 }
