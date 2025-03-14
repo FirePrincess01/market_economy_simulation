@@ -5,6 +5,7 @@ resolver = "2"
 
 members = [
     "wgpu_renderer",
+    "wgpu_gui",
     "market_economy_simulation", 
     "market_economy_simulation_server",
 ]
