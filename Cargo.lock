@@ -1228,7 +1228,6 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "wgpu",
- "wgpu_gui",
  "wgpu_renderer",
  "winit",
 ]
@@ -2902,15 +2901,6 @@ dependencies = [
  "js-sys",
  "log",
  "web-sys",
-]
-
-[[package]]
-name = "wgpu_gui"
-version = "0.1.0"
-dependencies = [
- "rusttype",
- "wgpu",
- "wgpu_renderer",
 ]
 
 [[package]]

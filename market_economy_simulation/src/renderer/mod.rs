@@ -62,7 +62,6 @@ pub struct Renderer {
 
 impl Renderer {
     pub fn new(wgpu_renderer: &mut dyn WgpuRendererInterface, settings: RendererSettings) -> Self {
-
         // enable vsync
         wgpu_renderer.enable_vsync(settings.is_vsync_enabled);
 
@@ -507,7 +506,7 @@ impl Renderer {
         view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
         textured_meshes: &impl VertexTextureShaderDraw,
-        performance_monitor: &impl VertexColorShaderDraw,
+        performance_monitor: &PerformanceMonitor,
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Forward Render Pass"),
@@ -532,16 +531,24 @@ impl Renderer {
         });
 
         // performance monitor
-        self.pipeline_lines.bind(&mut render_pass);
-        self.camera_uniform_orthographic_buffer
-            .bind(&mut render_pass);
-        performance_monitor.draw(&mut render_pass);
+        self.pipeline_lines.draw(
+            &mut render_pass,
+            &self.camera_uniform_orthographic_buffer,
+            performance_monitor,
+        );
 
         // textured meshes
-        self.pipeline_texture_gui.bind(&mut render_pass);
-        self.camera_uniform_orthographic_buffer
-            .bind(&mut render_pass);
-        textured_meshes.draw(&mut render_pass);
+        self.pipeline_texture_gui.draw(
+            &mut render_pass,
+            &self.camera_uniform_orthographic_buffer,
+            textured_meshes,
+        );
+
+        self.pipeline_texture_gui.draw(
+            &mut render_pass,
+            &self.camera_uniform_orthographic_buffer,
+            performance_monitor,
+        );
     }
 
     pub fn read_entity_index(&mut self) -> u32 {

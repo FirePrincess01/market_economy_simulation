@@ -36,7 +36,6 @@ fastrand = "2.0"
 gltf = "1.4.1"
 noise = "0.9.0"
 market_economy_simulation_server = { path = "../market_economy_simulation_server" }
-wgpu_gui = { path = "../wgpu_gui" }
 
 
 # [dependencies.image]

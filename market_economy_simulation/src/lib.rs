@@ -80,6 +80,9 @@ impl MarketEconomySimulation {
         let renderer =
             renderer::Renderer::new(renderer_interface, settings.get_renderer_settings());
 
+        // font
+        let font = wgpu_renderer::freefont::create_font_free_mono();
+
         // world
         let mut world = ecs2::World::new();
 
@@ -98,13 +101,16 @@ impl MarketEconomySimulation {
         let mut animated_object_storage = WgpuAnimatedObjectStorage::new();
 
         // performance monitor
-        let performance_monitor = performance_monitor::PerformanceMonitor::new(renderer_interface);
+        let performance_monitor = performance_monitor::PerformanceMonitor::new(
+            renderer_interface,
+            &renderer.texture_bind_group_layout,
+            &font,
+        );
 
         // show the entity index
         let mouse_pos_y = 0;
         let mouse_pos_x = 0;
 
-        let font = wgpu_renderer::freefont::create_font_free_mono();
         let entity_index_label = wgpu_renderer::label::Label::new(&font, 32.0, "47114711");
         let mut entity_index_instance = vertex_texture_shader::Instance::zero();
         entity_index_instance.position.x = 20.0;
@@ -297,7 +303,9 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
     }
 
     fn input(&mut self, event: &winit::event::WindowEvent) -> bool {
-        self.performance_monitor.watch.start(2, "Process user inputs");
+        self.performance_monitor
+            .watch
+            .start(2, "Process user inputs");
         let res = match event {
             WindowEvent::KeyboardInput {
                 event:
