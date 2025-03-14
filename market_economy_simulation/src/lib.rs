@@ -266,7 +266,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             self.entity_index_label.get_image(),
         );
 
-        self.performance_monitor.watch.start(3);
+        self.performance_monitor.watch.start(3, "Update data");
         {
             self.game_server.update();
 
@@ -287,7 +287,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         }
         self.performance_monitor.watch.stop(3);
 
-        self.performance_monitor.watch.start(4);
+        self.performance_monitor.watch.start(4, "Update animations");
         {
             self.animated_object_storage.update(renderer_interface, &dt);
         }
@@ -297,7 +297,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
     }
 
     fn input(&mut self, event: &winit::event::WindowEvent) -> bool {
-        self.performance_monitor.watch.start(2);
+        self.performance_monitor.watch.start(2, "Process user inputs");
         let res = match event {
             WindowEvent::KeyboardInput {
                 event:

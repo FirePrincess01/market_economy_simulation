@@ -568,11 +568,11 @@ impl Renderer {
         performance_monitor: &mut PerformanceMonitor,
         mouse_position: MousePosition,
     ) -> Result<(), wgpu::SurfaceError> {
-        performance_monitor.watch.start(0);
+        performance_monitor.watch.start(0, "Wait for next frame");
         let output = renderer_interface.get_current_texture()?;
         performance_monitor.watch.stop(0);
 
-        performance_monitor.watch.start(1);
+        performance_monitor.watch.start(1, "Draw");
 
         let view: wgpu::TextureView = output
             .texture
