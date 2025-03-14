@@ -16,7 +16,6 @@ mod performance_monitor;
 mod point_light_storage;
 mod renderer;
 mod settings;
-mod shape;
 mod world_mesh;
 
 use animated_object::wgpu_animated_object_renderer::{
@@ -299,7 +298,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         }
         self.performance_monitor.watch.stop(4);
 
-        self.performance_monitor.update(renderer_interface);
+        self.performance_monitor.update(renderer_interface, &self.font);
     }
 
     fn input(&mut self, event: &winit::event::WindowEvent) -> bool {

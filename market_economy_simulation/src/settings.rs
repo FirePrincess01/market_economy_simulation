@@ -30,8 +30,8 @@ impl Settings {
     pub fn new() -> Self {
         Self {
             enable_memory_mapped_read: true,
-            wait_for_render_loop_to_finish: true,
-            enable_vertical_sync: false,
+            wait_for_render_loop_to_finish: false,
+            enable_vertical_sync: true,
             map_size: 300*2,
             // max_point_light_instances: 65536,
             max_point_light_instances: 16348,

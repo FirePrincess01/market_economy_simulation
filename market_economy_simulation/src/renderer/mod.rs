@@ -28,7 +28,7 @@ pub struct RendererSettings {
 pub struct Renderer {
     settings: RendererSettings,
 
-    _pipeline_color: vertex_color_shader::Pipeline,
+    pipeline_color: vertex_color_shader::Pipeline,
     pipeline_lines: vertex_color_shader::Pipeline,
 
     pub texture_bind_group_layout: vertex_texture_shader::TextureBindGroupLayout,
@@ -203,7 +203,7 @@ impl Renderer {
         Self {
             settings,
 
-            _pipeline_color: pipeline_color,
+            pipeline_color,
             pipeline_lines,
 
             texture_bind_group_layout,
@@ -531,7 +531,19 @@ impl Renderer {
         });
 
         // performance monitor
-        self.pipeline_lines.draw(
+        self.pipeline_lines.draw_lines(
+            &mut render_pass,
+            &self.camera_uniform_orthographic_buffer,
+            performance_monitor,
+        );
+
+        self.pipeline_color.draw(
+            &mut render_pass,
+            &self.camera_uniform_orthographic_buffer,
+            performance_monitor,
+        );
+
+        self.pipeline_texture_gui.draw(
             &mut render_pass,
             &self.camera_uniform_orthographic_buffer,
             performance_monitor,
@@ -544,11 +556,7 @@ impl Renderer {
             textured_meshes,
         );
 
-        self.pipeline_texture_gui.draw(
-            &mut render_pass,
-            &self.camera_uniform_orthographic_buffer,
-            performance_monitor,
-        );
+
     }
 
     pub fn read_entity_index(&mut self) -> u32 {

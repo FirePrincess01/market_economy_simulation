@@ -1,8 +1,9 @@
 //! Contains the device buffers to render an object with this shader
 //!
 
+use wgpu_renderer::shape;
+
 use crate::deferred_light_sphere_shader::DeferredLightSphereShaderDraw;
-use crate::shape;
 
 use super::DeferredLightShaderDraw;
 use super::Instance;
@@ -48,10 +49,10 @@ impl Mesh {
 
     pub fn from_shape(
         device: &wgpu::Device,
-        shape: &shape::MeshData,
+        shape: &shape::MeshDataTriangles,
         instances: &[Instance],
     ) -> Self {
-        let shape = shape.triangulate();
+        let shape = shape;
 
         let vertices = &shape.positions;
         let indices = &shape.indices;

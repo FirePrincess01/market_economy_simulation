@@ -1,7 +1,7 @@
 //! Contains the device buffers to render an object with this shader
 //!
 
-use crate::shape;
+use wgpu_renderer::shape;
 
 use super::DeferredShaderDraw;
 use super::Instance;
@@ -20,7 +20,6 @@ pub struct Mesh {
     nr_instances: u32,
 }
 
-#[allow(dead_code)]
 impl Mesh {
     pub fn new(
         device: &wgpu::Device,
@@ -47,10 +46,10 @@ impl Mesh {
 
     pub fn from_shape(
         device: &wgpu::Device,
-        shape: &shape::MeshData,
+        shape: &shape::MeshDataTriangles,
         instances: &[Instance],
     ) -> Self {
-        let shape = shape.triangulate();
+        let shape = shape;
 
         let vertices = &shape.positions;
         let normals = &shape.normals;

@@ -1,10 +1,9 @@
-use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
+use wgpu_renderer::{shape::{self, MeshDataInterface}, wgpu_renderer::WgpuRendererInterface};
 
 use crate::{
     deferred_color_shader::{self, DeferredShaderDraw},
     deferred_light_shader::{self, DeferredLightShaderDraw},
     geometry,
-    shape::{self, MeshDataInterface},
 };
 
 pub struct Ant {
@@ -90,12 +89,12 @@ impl Ant {
 
         let sphere_mesh = deferred_color_shader::Mesh::from_shape(
             wgpu_renderer.device(),
-            sphere.data(),
+            sphere.triangles(),
             &[sphere_instance],
         );
         let sphere_light_mesh = deferred_light_shader::Mesh::from_shape(
             wgpu_renderer.device(),
-            sphere_light.data(),
+            sphere_light.triangles(),
             &[sphere_light_instance],
         );
 

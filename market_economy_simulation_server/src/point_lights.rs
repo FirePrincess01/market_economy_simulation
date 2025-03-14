@@ -57,7 +57,7 @@ impl PointLights {
                 let res = channel.send(GameLogicMessageLight::UpdatePointLight(elem.clone()));
                 match res {
                     Ok(_) => {}
-                    Err(err) => {
+                    Err(_err) => {
                         // println!("{}", err)
                     }
                 }
