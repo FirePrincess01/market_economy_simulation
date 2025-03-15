@@ -9,8 +9,7 @@ pub struct SlidingAverage {
 
 impl SlidingAverage {
     pub fn new(size: usize) -> Self {
-        let mut values = Vec::new();
-        values.resize(size, 0);
+        let mut values = vec![0; size];
 
         let average = 0;
         let index = 0;
