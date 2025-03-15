@@ -135,9 +135,9 @@ impl<const SIZE: usize> SortedTable<SIZE> {
         wgpu_renderer: &mut dyn WgpuRendererInterface,
         font: &rusttype::Font<'static>,
     ) {
-        if self.update_count % 1 == 0 {
-            let i = self.update_index % self.size;
-            self.update_index += 1;
+        // if self.update_count % 1 == 0 {
+        let i = self.update_index % self.size;
+        self.update_index += 1;
 
         // mesh_percent
         let average = 100.0 * self.averages[i].average() as f64 / 16666.0;
@@ -154,8 +154,8 @@ impl<const SIZE: usize> SortedTable<SIZE> {
             self.mesh_names[i]
                 .update_texture(wgpu_renderer.queue(), self.label_names[i].get_image());
         }
-        }
-        self.update_count += 1;
+        // }
+        // self.update_count += 1;
     }
 
     pub fn update_from_viewer_data(&mut self, data: &watch::WatchViewerData<SIZE>) {
