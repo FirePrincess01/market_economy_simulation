@@ -11,30 +11,31 @@ use wgpu_renderer::{
     wgpu_renderer::WgpuRendererInterface,
 };
 
-const WATCHPOINTS_SIZE: usize = 7;
 
-pub struct PerformanceMonitor {
-    pub watch: performance_monitor::Watch<WATCHPOINTS_SIZE>,
-    graph_host: performance_monitor::Graph,
+pub struct PerformanceMonitor<const SIZE: usize> {
+    graph_host: performance_monitor::Graph<SIZE>,
     graph_device: vertex_color_shader::Mesh,
 
     // label_30fps: wgpu_renderer::label::LabelMesh,
     label_60fps: wgpu_renderer::label::LabelMesh,
     // label_120fps: wgpu_renderer::label::LabelMesh,
 
-    table: sorted_table::SortedTable,
+    table: sorted_table::SortedTable<SIZE>,
 
     pub show: bool,
 }
 
-impl PerformanceMonitor {
+impl<const SIZE: usize> PerformanceMonitor<SIZE> {
     pub fn new(
         wgpu_renderer: &mut dyn WgpuRendererInterface,
         texture_bind_group_layout: &TextureBindGroupLayout,
         font: &rusttype::Font<'static>,
+        color_gradient: colorous::Gradient,
+        show: bool,
+        indicator: &'static str,
+
     ) -> Self {
-        let watch: performance_monitor::Watch<WATCHPOINTS_SIZE> = performance_monitor::Watch::new();
-        let graph_host = performance_monitor::Graph::new(WATCHPOINTS_SIZE);
+        let graph_host = performance_monitor::Graph::new(color_gradient);
 
         let graph_device = vertex_color_shader::Mesh::new(
             wgpu_renderer.device(),
@@ -48,7 +49,7 @@ impl PerformanceMonitor {
         );
 
         let scale = 14.0;
-        let label_60fps_host = wgpu_renderer::label::Label::new(font, scale, "60 fps");
+        let label_60fps_host = wgpu_renderer::label::Label::new(font, scale, indicator);
 
         let label_60fps = wgpu_renderer::label::LabelMesh::new(
             wgpu_renderer,
@@ -69,9 +70,8 @@ impl PerformanceMonitor {
             wgpu_renderer,
             texture_bind_group_layout,
             font,
-            WATCHPOINTS_SIZE,
             graph_host.get_nr_lines(),
-            &performance_monitor::Graph::color_gradient(WATCHPOINTS_SIZE),
+            &graph_host.color_gradient(),
             scale,
             cgmath::Vector3 {
                 x: graph_host.get_width() as f32 + 5.0,
@@ -81,32 +81,34 @@ impl PerformanceMonitor {
         );
 
         Self {
-            watch,
             graph_host,
             graph_device,
 
             label_60fps,
 
             table,
-            show: true,
+            show,
         }
     }
 
-    pub fn update(
+    pub fn update_from_data(
         &mut self,
         wgpu_renderer: &mut dyn WgpuRendererInterface,
         font: &rusttype::Font<'static>,
+        data: &watch::WatchViewerData<SIZE>,
     ) {
-        self.watch.update();
-        self.watch.update_viewer(&mut self.graph_host);
-        self.watch.update_viewer(&mut self.table);
+        self.graph_host.update_from_viewer_data(data);
+        self.table.update_from_viewer_data(data);
+
+        if self.show {
         self.graph_device
             .update_vertex_buffer(wgpu_renderer.queue(), self.graph_host.vertices.as_slice());
         self.table.update_device(wgpu_renderer, font);
+        }
     }
 }
 
-impl VertexColorShaderDraw for PerformanceMonitor {
+impl<const SIZE: usize> VertexColorShaderDraw for PerformanceMonitor<SIZE> {
     fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         if self.show {
             for elem in &self.table.mesh_colors {
@@ -116,7 +118,7 @@ impl VertexColorShaderDraw for PerformanceMonitor {
     }
 }
 
-impl VertexColorShaderDrawLines for PerformanceMonitor {
+impl<const SIZE: usize> VertexColorShaderDrawLines for PerformanceMonitor<SIZE> {
     fn draw_lines<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         if self.show {
             self.graph_device.draw_lines(render_pass);
@@ -124,7 +126,7 @@ impl VertexColorShaderDrawLines for PerformanceMonitor {
     }
 }
 
-impl VertexTextureShaderDraw for PerformanceMonitor {
+impl<const SIZE: usize> VertexTextureShaderDraw for PerformanceMonitor<SIZE> {
     fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         if self.show {
             self.label_60fps.draw(render_pass);

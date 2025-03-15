@@ -22,11 +22,12 @@ use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,
 };
 use market_economy_simulation_server::game_logic::game_logic_interface::{
-    GameLogicInterface, GameLogicMessageHeavy, GameLogicMessageRequest,
+    GameLogicInterface, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageRequest,
 };
 use point_light_storage::{PointLightIndex, PointLightInterface};
 use wgpu_renderer::{
     default_application::{DefaultApplication, DefaultApplicationInterface},
+    performance_monitor::watch,
     vertex_texture_shader,
     wgpu_renderer::WgpuRendererInterface,
 };
@@ -34,6 +35,8 @@ use winit::event::{ElementState, WindowEvent};
 
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
+
+const WATCH_POINTS_SIZE: usize = 7;
 
 struct MarketEconomySimulation {
     _settings: settings::Settings,
@@ -49,7 +52,9 @@ struct MarketEconomySimulation {
     animated_object_storage: WgpuAnimatedObjectStorage,
 
     // performance monitor
-    performance_monitor: performance_monitor::PerformanceMonitor,
+    watch_fps: watch::Watch<WATCH_POINTS_SIZE>,
+    performance_monitor_fps: performance_monitor::PerformanceMonitor<WATCH_POINTS_SIZE>,
+    performance_monitor_ups: performance_monitor::PerformanceMonitor<WATCH_POINTS_SIZE>,
 
     // show the entity index
     mouse_pos_y: u32,
@@ -100,10 +105,22 @@ impl MarketEconomySimulation {
         let mut animated_object_storage = WgpuAnimatedObjectStorage::new();
 
         // performance monitor
-        let performance_monitor = performance_monitor::PerformanceMonitor::new(
+        let watch_fps = watch::Watch::new();
+        let performance_monitor_fps = performance_monitor::PerformanceMonitor::new(
             renderer_interface,
             &renderer.texture_bind_group_layout,
             &font,
+            colorous::RAINBOW,
+            true,
+            "60 fps",
+        );
+        let performance_monitor_ups = performance_monitor::PerformanceMonitor::new(
+            renderer_interface,
+            &renderer.texture_bind_group_layout,
+            &font,
+            colorous::PLASMA,
+            false,
+            "60 ups",
         );
 
         // show the entity index
@@ -191,7 +208,9 @@ impl MarketEconomySimulation {
             // world_mesh,
             animated_object_storage,
 
-            performance_monitor,
+            watch_fps,
+            performance_monitor_fps,
+            performance_monitor_ups,
 
             mouse_pos_y,
             mouse_pos_x,
@@ -271,41 +290,62 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             self.entity_index_label.get_image(),
         );
 
-        self.performance_monitor.watch.start(3, "Update data");
+        self.game_server.update();
+        
+        self.watch_fps.start(3, "Update data");
         {
-            self.game_server.update();
 
             let light_messages = self.game_server.get_light_messages();
             for msg in light_messages.try_iter() {
                 match msg {
-                        market_economy_simulation_server::game_logic::game_logic_interface::GameLogicMessageLight::UpdatePointLight(point_light) => {
-                            let index = PointLightIndex{ instance_index: point_light.id as usize };
-                            self.point_light_storage.set_light(
-                                index,
-                                point_light.position,
-                                point_light.color,
-                                point_light.attenuation);
-                        },
+                    GameLogicMessageLight::UpdatePointLight(point_light) => {
+                        let index = PointLightIndex {
+                            instance_index: point_light.id as usize,
+                        };
+                        self.point_light_storage.set_light(
+                            index,
+                            point_light.position,
+                            point_light.color,
+                            point_light.attenuation,
+                        );
                     }
+                    GameLogicMessageLight::UpdateWatchPoints(watch_viewer_data) => {
+                        self.performance_monitor_ups.update_from_data(renderer_interface, &self.font, &watch_viewer_data);
+                    }
+                }
             }
             self.point_light_storage.update(renderer_interface);
         }
-        self.performance_monitor.watch.stop(3);
+        self.watch_fps.stop(3);
 
-        self.performance_monitor.watch.start(4, "Update animations");
+        self.watch_fps.start(4, "Update animations");
         {
             self.animated_object_storage.update(renderer_interface, &dt);
         }
-        self.performance_monitor.watch.stop(4);
+        self.watch_fps.stop(4);
 
-        self.performance_monitor.update(renderer_interface, &self.font);
+        self.watch_fps.update();
+        self.performance_monitor_fps
+            .update_from_data(renderer_interface, &self.font, &self.watch_fps.get_viewer_data());
     }
 
     fn input(&mut self, event: &winit::event::WindowEvent) -> bool {
-        self.performance_monitor
-            .watch
-            .start(2, "Process user inputs");
+        self.watch_fps.start(2, "Process user inputs");
         let res = match event {
+            WindowEvent::KeyboardInput {
+                event:
+                    winit::event::KeyEvent {
+                        physical_key:
+                            winit::keyboard::PhysicalKey::Code(winit::keyboard::KeyCode::F1),
+                        state: ElementState::Pressed,
+                        ..
+                    },
+                ..
+            } => {
+                self.performance_monitor_ups.show = false;
+                self.performance_monitor_fps.show = !self.performance_monitor_fps.show;
+                true
+            }
             WindowEvent::KeyboardInput {
                 event:
                     winit::event::KeyEvent {
@@ -316,7 +356,8 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
                     },
                 ..
             } => {
-                self.performance_monitor.show = !self.performance_monitor.show;
+                self.performance_monitor_fps.show = false;
+                self.performance_monitor_ups.show = !self.performance_monitor_ups.show;
                 true
             }
             WindowEvent::KeyboardInput {
@@ -342,7 +383,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             }
             _ => false,
         };
-        self.performance_monitor.watch.stop(2);
+        self.watch_fps.stop(2);
 
         res
     }
@@ -364,7 +405,8 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             &self.ant,
             &self.entity_index_mesh,
             &self.ambient_light_quad,
-            &mut self.performance_monitor,
+            &[&mut self.performance_monitor_fps, &mut self.performance_monitor_ups],
+            &mut self.watch_fps,
             deferred_color_shader::entity_buffer::MousePosition {
                 x: self.mouse_pos_x,
                 y: self.mouse_pos_y,

@@ -1,5 +1,5 @@
 use wgpu_renderer::{
-    performance_monitor::watch,
+    performance_monitor::watch::{self},
     shape::{self, MeshDataInterface},
     vertex_color_shader,
     vertex_texture_shader::TextureBindGroupLayout,
@@ -8,7 +8,7 @@ use wgpu_renderer::{
 
 use super::sliding_average::SlidingAverage;
 
-pub struct SortedTable {
+pub struct SortedTable<const SIZE: usize> {
     pub mesh_colors: Vec<vertex_color_shader::Mesh>,
     pub mesh_percent: Vec<wgpu_renderer::label::LabelMesh>,
     pub mesh_names: Vec<wgpu_renderer::label::LabelMesh>,
@@ -23,19 +23,21 @@ pub struct SortedTable {
     size: usize,
 
     update_count: usize,
+    update_index: usize,
 }
 
-impl SortedTable {
+impl<const SIZE: usize> SortedTable<SIZE> {
     pub fn new(
         wgpu_renderer: &mut dyn WgpuRendererInterface,
         texture_bind_group_layout: &TextureBindGroupLayout,
         font: &rusttype::Font<'static>,
-        size: usize,
         average_len: usize,
         color_gradient: &Vec<cgmath::Vector3<f32>>,
         scale: f32,
         position: cgmath::Vector3<f32>,
     ) -> Self {
+        let size = SIZE;
+
         let mut mesh_colors: Vec<vertex_color_shader::Mesh> = Vec::with_capacity(size);
 
         let mut averages: Vec<SlidingAverage> = Vec::with_capacity(size);
@@ -124,6 +126,7 @@ impl SortedTable {
             label_names,
             size,
             update_count: 0,
+            update_index: 0,
         }
     }
 
@@ -132,8 +135,9 @@ impl SortedTable {
         wgpu_renderer: &mut dyn WgpuRendererInterface,
         font: &rusttype::Font<'static>,
     ) {
-        let i = self.update_count % self.size; // do update only one at a time for performance improvement
-        self.update_count += 1;
+        if self.update_count % 1 == 0 {
+            let i = self.update_index % self.size;
+            self.update_index += 1;
 
         // mesh_percent
         let average = 100.0 * self.averages[i].average() as f64 / 16666.0;
@@ -150,16 +154,15 @@ impl SortedTable {
             self.mesh_names[i]
                 .update_texture(wgpu_renderer.queue(), self.label_names[i].get_image());
         }
+        }
+        self.update_count += 1;
     }
-}
 
-impl watch::Viewer for SortedTable {
-    fn update(
-        &mut self,
-        last_update_time: instant::Instant,
-        update_time: instant::Instant,
-        watch_points: &[watch::WatchPoint],
-    ) {
+    pub fn update_from_viewer_data(&mut self, data: &watch::WatchViewerData<SIZE>) {
+        let last_update_time = data.last_update_time;
+        let update_time = data.update_time;
+        let watch_points = &data.watch_points;
+
         for (i, watch_point) in watch_points.iter().enumerate() {
             let duration = (watch_point.stop - watch_point.start).as_micros();
 

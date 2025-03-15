@@ -14,10 +14,10 @@ use game_logic::game_logic_interface::{
     GameLogicInterface, GameLogicMessageCritical, GameLogicMessageHeavy, GameLogicMessageLight,
     GameLogicMessageRequest,
 };
-use game_logic::{GameLagic, GameLogicSettings};
+use game_logic::{GameLogic, GameLogicSettings};
 
 pub struct GameLogicSingleThreaded {
-    game_logic: GameLagic,
+    game_logic: GameLogic,
 
     channel_0_tx: mpsc::Sender<GameLogicMessageRequest>,
     channel_1_rx: mpsc::Receiver<GameLogicMessageHeavy>,
@@ -32,7 +32,7 @@ impl GameLogicSingleThreaded {
         let (channel_2_tx, channel_2_rx) = mpsc::channel();
         let (channel_3_tx, channel_3_rx) = mpsc::channel();
 
-        let game_logic = GameLagic::new(
+        let game_logic = GameLogic::new(
             settings,
             channel_0_rx,
             channel_1_tx,
@@ -89,7 +89,7 @@ impl GameLogicMultiThreaded {
         let (channel_3_tx, channel_3_rx) = mpsc::channel();
 
         let game_logic = thread::spawn(move || {
-            let mut game_logic = GameLagic::new(
+            let mut game_logic = GameLogic::new(
                 settings,
                 channel_0_rx,
                 channel_1_tx,
@@ -98,8 +98,16 @@ impl GameLogicMultiThreaded {
             );
 
             loop {
+                let start_time = instant::Instant::now();
                 game_logic.update();
-                thread::sleep(Duration::from_millis(20));
+                let stop_time = instant::Instant::now();
+
+                let time_passed = stop_time - start_time;
+
+                let interval = Duration::from_millis(16);
+                if time_passed < interval {
+                    thread::sleep(interval - time_passed);
+                }
             }
         });
 
@@ -153,9 +161,10 @@ impl GameLogicServer {
                 GameLogicExecution::SingleThreaded(GameLogicSingleThreaded::new(settings))
             }
             else {
-                server =
-                GameLogicExecution::Multithreaded(GameLogicMultiThreaded::new(settings))
-                // GameLogicExecution::SingleThreaded(GameLogicSingleThreaded::new())
+                server = match settings.enable_multithreading {
+                    true => GameLogicExecution::Multithreaded(GameLogicMultiThreaded::new(settings)),
+                    false => GameLogicExecution::SingleThreaded(GameLogicSingleThreaded::new(settings)),
+                }
             }
         }
 

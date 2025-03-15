@@ -16,6 +16,9 @@ pub struct Settings {
     // enables vertical sync, limiting the fps to the refresh rate of the display (60 fps)
     pub enable_vertical_sync: bool,
 
+    // enables multithreading if available (no available for the web)
+    pub enable_multithreading: bool,
+
     /// Size of the terrain map in both x and y dimension
     pub map_size: usize,
 
@@ -32,6 +35,7 @@ impl Settings {
             enable_memory_mapped_read: true,
             wait_for_render_loop_to_finish: false,
             enable_vertical_sync: true,
+            enable_multithreading: true,
             map_size: 300*2,
             // max_point_light_instances: 65536,
             max_point_light_instances: 16348,
@@ -52,6 +56,7 @@ impl Settings {
     ) -> market_economy_simulation_server::game_logic::GameLogicSettings {
         market_economy_simulation_server::game_logic::GameLogicSettings {
             map_size: self.map_size,
+            enable_multithreading: self.enable_multithreading,
         }
     }
 }

@@ -3,6 +3,7 @@ use std::sync::mpsc;
 use game_logic_interface::{
     GameLogicMessageCritical, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageRequest,
 };
+use wgpu_renderer::performance_monitor::watch;
 
 use crate::{point_lights, terrain};
 
@@ -10,9 +11,10 @@ pub mod game_logic_interface;
 
 pub struct GameLogicSettings {
     pub map_size: usize,
+    pub enable_multithreading: bool,
 }
 
-pub struct GameLagic {
+pub struct GameLogic {
     _settings: GameLogicSettings,
 
     channel_0_rx: mpsc::Receiver<GameLogicMessageRequest>,
@@ -22,9 +24,11 @@ pub struct GameLagic {
 
     terrain: terrain::Terrain,
     point_lights: point_lights::PointLights,
+
+    watch: watch::Watch<{ game_logic_interface::WATCH_POINT_SIZE }>,
 }
 
-impl GameLagic {
+impl GameLogic {
     pub fn new(
         settings: GameLogicSettings,
         channel_0_rx: mpsc::Receiver<GameLogicMessageRequest>,
@@ -37,6 +41,8 @@ impl GameLagic {
         let terrain = terrain::Terrain::new(size, size, 1.0);
         let point_lights = point_lights::PointLights::new(&terrain);
 
+        let watch = watch::Watch::new();
+
         Self {
             _settings: settings,
 
@@ -47,29 +53,45 @@ impl GameLagic {
 
             terrain,
             point_lights,
+
+            watch,
         }
     }
 
     pub(crate) fn update(&mut self) {
-        let res = self.channel_0_rx.try_recv();
-        match res {
-            Ok(message) => match message {
-                GameLogicMessageRequest::GetTerrain => {
-                    let res = self
-                        .channel_1_tx
-                        .send(GameLogicMessageHeavy::Terrain(self.terrain.clone()));
-                    match res {
-                        Ok(_) => {}
-                        Err(err) => println!("{}", err),
+        // update ups viewer
+        self.watch.update();
+        let _res = self
+        .channel_2_tx
+        .send(GameLogicMessageLight::UpdateWatchPoints(self.watch.get_viewer_data()));
+
+        self.watch.start(0, "Process Requests");
+        {
+            let res = self.channel_0_rx.try_recv();
+            match res {
+                Ok(message) => match message {
+                    GameLogicMessageRequest::GetTerrain => {
+                        let res = self
+                            .channel_1_tx
+                            .send(GameLogicMessageHeavy::Terrain(self.terrain.clone()));
+                        match res {
+                            Ok(_) => {}
+                            Err(err) => println!("{}", err),
+                        }
                     }
+                },
+                Err(_err) => {
+                    // no message found
                 }
-            },
-            Err(_err) => {
-                // no message found
             }
         }
+        self.watch.stop(0);
 
-        // point lights
-        self.point_lights.update(&self.channel_2_tx);
+        self.watch.start(1, "Update point lights");
+        {
+            // point lights
+            self.point_lights.update(&self.channel_2_tx);
+        }
+        self.watch.stop(1);
     }
 }

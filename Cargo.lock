@@ -1212,6 +1212,7 @@ dependencies = [
  "bytemuck",
  "cfg-if",
  "cgmath",
+ "colorous",
  "console_error_panic_hook",
  "console_log",
  "env_logger",
@@ -1239,7 +1240,9 @@ dependencies = [
  "cfg-if",
  "cgmath",
  "colorous",
+ "instant",
  "noise",
+ "wgpu_renderer",
 ]
 
 [[package]]

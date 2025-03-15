@@ -11,3 +11,5 @@ cfg-if = "1"
 noise = "0.9.0"
 cgmath = "0.18"
 colorous = "1.0.16"
+instant = { version = "0.1", features = [ "wasm-bindgen" ] }
+wgpu_renderer = { path = "../wgpu_renderer", features = ["watch"]}

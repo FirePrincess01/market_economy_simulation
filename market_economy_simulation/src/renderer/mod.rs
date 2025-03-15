@@ -11,6 +11,7 @@ use crate::deferred_terrain_shader::{self, DeferredTerrainShaderDraw};
 use crate::performance_monitor::PerformanceMonitor;
 use crate::point_light_storage::PointLightStorage;
 use camera_controller::CameraController;
+use wgpu_renderer::performance_monitor::{self, watch};
 use wgpu_renderer::vertex_color_shader::{self, VertexColorShaderDraw};
 use wgpu_renderer::vertex_texture_shader::{self, VertexTextureShaderDraw};
 use wgpu_renderer::wgpu_renderer::camera::{Camera, Projection};
@@ -506,7 +507,7 @@ impl Renderer {
         view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
         textured_meshes: &impl VertexTextureShaderDraw,
-        performance_monitor: &PerformanceMonitor,
+        performance_monitors: &[&mut PerformanceMonitor<{ super::WATCH_POINTS_SIZE }>],
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Forward Render Pass"),
@@ -531,23 +532,29 @@ impl Renderer {
         });
 
         // performance monitor
-        self.pipeline_lines.draw_lines(
-            &mut render_pass,
-            &self.camera_uniform_orthographic_buffer,
-            performance_monitor,
-        );
+        for performance_monitor in performance_monitors {
+            self.pipeline_lines.draw_lines(
+                &mut render_pass,
+                &self.camera_uniform_orthographic_buffer,
+                *performance_monitor,
+            );
+        }
 
-        self.pipeline_color.draw(
-            &mut render_pass,
-            &self.camera_uniform_orthographic_buffer,
-            performance_monitor,
-        );
+        for performance_monitor in performance_monitors {
+            self.pipeline_color.draw(
+                &mut render_pass,
+                &self.camera_uniform_orthographic_buffer,
+                *performance_monitor,
+            );
+        }
 
-        self.pipeline_texture_gui.draw(
-            &mut render_pass,
-            &self.camera_uniform_orthographic_buffer,
-            performance_monitor,
-        );
+        for performance_monitor in performance_monitors {
+            self.pipeline_texture_gui.draw(
+                &mut render_pass,
+                &self.camera_uniform_orthographic_buffer,
+                *performance_monitor,
+            );
+        }
 
         // textured meshes
         self.pipeline_texture_gui.draw(
@@ -555,8 +562,6 @@ impl Renderer {
             &self.camera_uniform_orthographic_buffer,
             textured_meshes,
         );
-
-
     }
 
     pub fn read_entity_index(&mut self) -> u32 {
@@ -580,14 +585,15 @@ impl Renderer {
         mesh_textured_gui: &impl VertexTextureShaderDraw,
         ambient_light_quad: &impl DeferredLightShaderDraw,
 
-        performance_monitor: &mut PerformanceMonitor,
+        performance_monitors: &[&mut PerformanceMonitor<{ super::WATCH_POINTS_SIZE }>],
+        watch_fps: &mut watch::Watch<{ super::WATCH_POINTS_SIZE }>,
         mouse_position: MousePosition,
     ) -> Result<(), wgpu::SurfaceError> {
-        performance_monitor.watch.start(0, "Wait for next frame");
+        watch_fps.start(0, "Wait for next frame");
         let output = renderer_interface.get_current_texture()?;
-        performance_monitor.watch.stop(0);
+        watch_fps.stop(0);
 
-        performance_monitor.watch.start(1, "Draw");
+        watch_fps.start(1, "Draw");
 
         let view: wgpu::TextureView = output
             .texture
@@ -625,7 +631,7 @@ impl Renderer {
             &view,
             &mut encoder,
             mesh_textured_gui,
-            performance_monitor,
+            performance_monitors,
         );
 
         // copy entity texture
@@ -647,7 +653,7 @@ impl Renderer {
             renderer_interface.device().poll(wgpu::Maintain::Poll);
         }
 
-        performance_monitor.watch.stop(1);
+        watch_fps.stop(1);
 
         Ok(())
     }

@@ -1,6 +1,10 @@
 use std::sync::mpsc;
 
+use wgpu_renderer::performance_monitor::watch;
+
 use crate::{point_lights, terrain};
+
+pub const WATCH_POINT_SIZE: usize = 7;
 
 pub enum GameLogicMessageRequest {
     GetTerrain, // Requests the terrain heightmap
@@ -12,6 +16,7 @@ pub enum GameLogicMessageHeavy {
 
 pub enum GameLogicMessageLight {
     UpdatePointLight(point_lights::PointLight), // updates the data of a point light
+    UpdateWatchPoints(watch::WatchViewerData<WATCH_POINT_SIZE>),
 }
 
 pub enum GameLogicMessageCritical {}
