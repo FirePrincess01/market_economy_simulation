@@ -1,7 +1,10 @@
 //! Manages the data on the gpu of all the point lights
 
 use market_economy_simulation_server::point_lights::Attenuation;
-use wgpu_renderer::{shape::{self, MeshDataInterface}, wgpu_renderer::WgpuRendererInterface};
+use wgpu_renderer::{
+    shape::{self, MeshDataInterface},
+    wgpu_renderer::WgpuRendererInterface,
+};
 
 use crate::{
     deferred_light_shader::{self, DeferredLightShaderDraw},

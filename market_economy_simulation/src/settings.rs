@@ -36,7 +36,7 @@ impl Settings {
             wait_for_render_loop_to_finish: false,
             enable_vertical_sync: true,
             enable_multithreading: true,
-            map_size: 300*2,
+            map_size: 300 * 2,
             // max_point_light_instances: 65536,
             max_point_light_instances: 16348,
             dbg_point_lights: false,

@@ -34,5 +34,3 @@ impl SlidingAverage {
         self.average = self.average - last_value + value;
     }
 }
-
-

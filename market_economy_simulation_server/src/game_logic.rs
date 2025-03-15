@@ -1,7 +1,8 @@
 use std::sync::mpsc;
 
 use game_logic_interface::{
-    GameLogicMessageCritical, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageMedium, GameLogicMessageRequest
+    GameLogicMessageCritical, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageMedium,
+    GameLogicMessageRequest,
 };
 use wgpu_renderer::performance_monitor::watch;
 
@@ -65,8 +66,10 @@ impl GameLogic {
         // update ups viewer
         self.watch.update();
         let _res = self
-        .channel_2_tx
-        .send(GameLogicMessageMedium::UpdateWatchPoints(self.watch.get_viewer_data()));
+            .channel_2_tx
+            .send(GameLogicMessageMedium::UpdateWatchPoints(
+                self.watch.get_viewer_data(),
+            ));
 
         self.watch.start(0, "Process Requests");
         {

@@ -20,7 +20,6 @@ pub enum GameLogicMessageMedium {
 
 pub enum GameLogicMessageLight {
     UpdatePointLight(point_lights::PointLight), // updates the data of a point light
-    
 }
 
 pub enum GameLogicMessageCritical {}

@@ -10,7 +10,6 @@ use wgpu_renderer::{
     wgpu_renderer::WgpuRendererInterface,
 };
 
-
 pub struct PerformanceMonitor<const SIZE: usize> {
     graph_host: performance_monitor::Graph<SIZE>,
     graph_device: vertex_color_shader::Mesh,
@@ -18,7 +17,6 @@ pub struct PerformanceMonitor<const SIZE: usize> {
     // label_30fps: wgpu_renderer::label::LabelMesh,
     label_60fps: wgpu_renderer::label::LabelMesh,
     // label_120fps: wgpu_renderer::label::LabelMesh,
-
     table: sorted_table::SortedTable<SIZE>,
 
     pub show: bool,
@@ -32,7 +30,6 @@ impl<const SIZE: usize> PerformanceMonitor<SIZE> {
         color_gradient: colorous::Gradient,
         show: bool,
         indicator: &'static str,
-
     ) -> Self {
         let graph_host = performance_monitor::Graph::new(color_gradient);
 
@@ -100,9 +97,9 @@ impl<const SIZE: usize> PerformanceMonitor<SIZE> {
         self.table.update_from_viewer_data(data);
 
         if self.show {
-        self.graph_device
-            .update_vertex_buffer(wgpu_renderer.queue(), self.graph_host.vertices.as_slice());
-        self.table.update_device(wgpu_renderer, font);
+            self.graph_device
+                .update_vertex_buffer(wgpu_renderer.queue(), self.graph_host.vertices.as_slice());
+            self.table.update_device(wgpu_renderer, font);
         }
     }
 }

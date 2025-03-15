@@ -1,4 +1,7 @@
-use wgpu_renderer::{shape::{self, MeshDataInterface}, wgpu_renderer::WgpuRendererInterface};
+use wgpu_renderer::{
+    shape::{self, MeshDataInterface},
+    wgpu_renderer::WgpuRendererInterface,
+};
 
 use crate::{
     deferred_color_shader::{self, DeferredShaderDraw},

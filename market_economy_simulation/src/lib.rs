@@ -294,7 +294,6 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
 
         self.watch_fps.start(3, "Update data");
         {
-
             let light_messages = self.game_server.get_light_messages();
             for msg in light_messages.try_iter() {
                 match msg {
@@ -332,8 +331,11 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         self.watch_fps.stop(4);
 
         self.watch_fps.update();
-        self.performance_monitor_fps
-            .update_from_data(renderer_interface, &self.font, &self.watch_fps.get_viewer_data());
+        self.performance_monitor_fps.update_from_data(
+            renderer_interface,
+            &self.font,
+            &self.watch_fps.get_viewer_data(),
+        );
     }
 
     fn input(&mut self, event: &winit::event::WindowEvent) -> bool {
@@ -412,7 +414,10 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             &self.ant,
             &self.entity_index_mesh,
             &self.ambient_light_quad,
-            &[&mut self.performance_monitor_fps, &mut self.performance_monitor_ups],
+            &[
+                &mut self.performance_monitor_fps,
+                &mut self.performance_monitor_ups,
+            ],
             &mut self.watch_fps,
             deferred_color_shader::entity_buffer::MousePosition {
                 x: self.mouse_pos_x,
