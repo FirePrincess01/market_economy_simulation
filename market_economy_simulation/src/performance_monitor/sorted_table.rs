@@ -1,5 +1,5 @@
 //! The % CPU usage table of the performance monitor
-//! 
+//!
 
 use wgpu_renderer::{
     performance_monitor::watch::{self},
