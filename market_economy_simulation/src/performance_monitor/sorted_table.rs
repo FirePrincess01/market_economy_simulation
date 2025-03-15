@@ -159,8 +159,8 @@ impl<const SIZE: usize> SortedTable<SIZE> {
     }
 
     pub fn update_from_viewer_data(&mut self, data: &watch::WatchViewerData<SIZE>) {
-        let last_update_time = data.last_update_time;
-        let update_time = data.update_time;
+        let _last_update_time = data.last_update_time;
+        let _update_time = data.update_time;
         let watch_points = &data.watch_points;
 
         for (i, watch_point) in watch_points.iter().enumerate() {

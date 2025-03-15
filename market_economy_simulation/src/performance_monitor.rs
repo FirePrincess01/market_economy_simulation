@@ -3,7 +3,6 @@ mod sorted_table;
 
 use wgpu_renderer::{
     performance_monitor::{self, watch},
-    shape::{self, MeshDataInterface},
     vertex_color_shader::{
         self, vertex_color_shader_draw::VertexColorShaderDrawLines, VertexColorShaderDraw,
     },

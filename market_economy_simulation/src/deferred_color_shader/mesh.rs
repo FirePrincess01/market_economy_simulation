@@ -70,7 +70,7 @@ impl Mesh {
         Self::new(device, &mesh_vertices, indices, instances)
     }
 
-    pub fn update_vertex_buffer(&mut self, queue: &wgpu::Queue, vertices: &[Vertex]) {
+    pub fn _update_vertex_buffer(&mut self, queue: &wgpu::Queue, vertices: &[Vertex]) {
         self.vertex_buffer.update(queue, vertices);
     }
 
