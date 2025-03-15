@@ -1,7 +1,7 @@
 use std::sync::mpsc;
 
 use game_logic_interface::{
-    GameLogicMessageCritical, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageRequest,
+    GameLogicMessageCritical, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageMedium, GameLogicMessageRequest
 };
 use wgpu_renderer::performance_monitor::watch;
 
@@ -19,8 +19,9 @@ pub struct GameLogic {
 
     channel_0_rx: mpsc::Receiver<GameLogicMessageRequest>,
     channel_1_tx: mpsc::Sender<GameLogicMessageHeavy>,
-    channel_2_tx: mpsc::Sender<GameLogicMessageLight>,
-    _channel_3_tx: mpsc::Sender<GameLogicMessageCritical>,
+    channel_2_tx: mpsc::Sender<GameLogicMessageMedium>,
+    channel_3_tx: mpsc::Sender<GameLogicMessageLight>,
+    _channel_4_tx: mpsc::Sender<GameLogicMessageCritical>,
 
     terrain: terrain::Terrain,
     point_lights: point_lights::PointLights,
@@ -33,8 +34,9 @@ impl GameLogic {
         settings: GameLogicSettings,
         channel_0_rx: mpsc::Receiver<GameLogicMessageRequest>,
         channel_1_tx: mpsc::Sender<GameLogicMessageHeavy>,
-        channel_2_tx: mpsc::Sender<GameLogicMessageLight>,
-        channel_3_tx: mpsc::Sender<GameLogicMessageCritical>,
+        channel_2_tx: mpsc::Sender<GameLogicMessageMedium>,
+        channel_3_tx: mpsc::Sender<GameLogicMessageLight>,
+        channel_4_tx: mpsc::Sender<GameLogicMessageCritical>,
     ) -> Self {
         let size = settings.map_size;
 
@@ -49,7 +51,8 @@ impl GameLogic {
             channel_0_rx,
             channel_1_tx,
             channel_2_tx,
-            _channel_3_tx: channel_3_tx,
+            channel_3_tx,
+            _channel_4_tx: channel_4_tx,
 
             terrain,
             point_lights,
@@ -63,7 +66,7 @@ impl GameLogic {
         self.watch.update();
         let _res = self
         .channel_2_tx
-        .send(GameLogicMessageLight::UpdateWatchPoints(self.watch.get_viewer_data()));
+        .send(GameLogicMessageMedium::UpdateWatchPoints(self.watch.get_viewer_data()));
 
         self.watch.start(0, "Process Requests");
         {
@@ -90,7 +93,7 @@ impl GameLogic {
         self.watch.start(1, "Update point lights");
         {
             // point lights
-            self.point_lights.update(&self.channel_2_tx);
+            self.point_lights.update(&self.channel_3_tx);
         }
         self.watch.stop(1);
     }

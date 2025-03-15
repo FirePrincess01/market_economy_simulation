@@ -49,8 +49,6 @@ impl Mesh {
         shape: &shape::MeshDataTriangles,
         instances: &[Instance],
     ) -> Self {
-        let shape = shape;
-
         let vertices = &shape.positions;
         let normals = &shape.normals;
         let indices = &shape.indices;

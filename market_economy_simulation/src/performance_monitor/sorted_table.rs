@@ -22,7 +22,7 @@ pub struct SortedTable<const SIZE: usize> {
 
     size: usize,
 
-    update_count: usize,
+    _update_count: usize,
     update_index: usize,
 }
 
@@ -32,7 +32,7 @@ impl<const SIZE: usize> SortedTable<SIZE> {
         texture_bind_group_layout: &TextureBindGroupLayout,
         font: &rusttype::Font<'static>,
         average_len: usize,
-        color_gradient: &Vec<cgmath::Vector3<f32>>,
+        color_gradient: &[cgmath::Vector3<f32>],
         scale: f32,
         position: cgmath::Vector3<f32>,
     ) -> Self {
@@ -49,6 +49,7 @@ impl<const SIZE: usize> SortedTable<SIZE> {
         let mut mesh_names: Vec<wgpu_renderer::label::LabelMesh> = Vec::with_capacity(size);
 
         // mesh_colors
+        #[allow(clippy::needless_range_loop)]
         for i in 0..size {
             let square = shape::Square::new(scale - 5.0);
             let mesh = vertex_color_shader::Mesh::from_shape(
@@ -125,7 +126,7 @@ impl<const SIZE: usize> SortedTable<SIZE> {
             label_percents,
             label_names,
             size,
-            update_count: 0,
+            _update_count: 0,
             update_index: 0,
         }
     }

@@ -291,7 +291,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         );
 
         self.game_server.update();
-        
+
         self.watch_fps.start(3, "Update data");
         {
 
@@ -309,11 +309,18 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
                             point_light.attenuation,
                         );
                     }
-                    GameLogicMessageLight::UpdateWatchPoints(watch_viewer_data) => {
+                }
+            }
+
+            let medium_messages = self.game_server.get_medium_messages();
+            for msg in medium_messages.try_iter() {
+                match msg {
+                    market_economy_simulation_server::game_logic::game_logic_interface::GameLogicMessageMedium::UpdateWatchPoints(watch_viewer_data) => {
                         self.performance_monitor_ups.update_from_data(renderer_interface, &self.font, &watch_viewer_data);
                     }
                 }
             }
+
             self.point_light_storage.update(renderer_interface);
         }
         self.watch_fps.stop(3);
