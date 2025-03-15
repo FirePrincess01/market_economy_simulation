@@ -114,7 +114,7 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
     // out.surface = vec4<f32>(in.color, 0.8);
     out.position =  vec4<f32>(in.position, 1.0);
     out.normal =  vec4<f32>(in.normal, 1.0);
-    out.albedo = vec4<f32>(in.color, 0.0);
+    out.albedo = vec4<f32>(in.color, 1.0);
     out.entity =  vec4<f32>(
         f32(entity0)/255.0, 
         f32(entity1)/255.0, 

@@ -12,17 +12,18 @@ use std::time::Duration;
 
 use game_logic::game_logic_interface::{
     GameLogicInterface, GameLogicMessageCritical, GameLogicMessageHeavy, GameLogicMessageLight,
-    GameLogicMessageRequest,
+    GameLogicMessageMedium, GameLogicMessageRequest,
 };
-use game_logic::{GameLagic, GameLogicSettings};
+use game_logic::{GameLogic, GameLogicSettings};
 
 pub struct GameLogicSingleThreaded {
-    game_logic: GameLagic,
+    game_logic: Box<GameLogic>,
 
     channel_0_tx: mpsc::Sender<GameLogicMessageRequest>,
     channel_1_rx: mpsc::Receiver<GameLogicMessageHeavy>,
-    channel_2_rx: mpsc::Receiver<GameLogicMessageLight>,
-    channel_3_rx: mpsc::Receiver<GameLogicMessageCritical>,
+    channel_2_rx: mpsc::Receiver<GameLogicMessageMedium>,
+    channel_3_rx: mpsc::Receiver<GameLogicMessageLight>,
+    channel_4_rx: mpsc::Receiver<GameLogicMessageCritical>,
 }
 
 impl GameLogicSingleThreaded {
@@ -31,14 +32,16 @@ impl GameLogicSingleThreaded {
         let (channel_1_tx, channel_1_rx) = mpsc::channel();
         let (channel_2_tx, channel_2_rx) = mpsc::channel();
         let (channel_3_tx, channel_3_rx) = mpsc::channel();
+        let (channel_4_tx, channel_4_rx) = mpsc::channel();
 
-        let game_logic = GameLagic::new(
+        let game_logic = Box::new(GameLogic::new(
             settings,
             channel_0_rx,
             channel_1_tx,
             channel_2_tx,
             channel_3_tx,
-        );
+            channel_4_tx,
+        ));
 
         Self {
             game_logic,
@@ -46,6 +49,7 @@ impl GameLogicSingleThreaded {
             channel_1_rx,
             channel_2_rx,
             channel_3_rx,
+            channel_4_rx,
         }
     }
 
@@ -59,12 +63,18 @@ impl GameLogicInterface for GameLogicSingleThreaded {
         &self.channel_1_rx
     }
 
-    fn get_light_messages(&self) -> &mpsc::Receiver<GameLogicMessageLight> {
+    fn get_medium_messages(
+        &self,
+    ) -> &mpsc::Receiver<game_logic::game_logic_interface::GameLogicMessageMedium> {
         &self.channel_2_rx
     }
 
-    fn get_critical_messages(&self) -> &mpsc::Receiver<GameLogicMessageCritical> {
+    fn get_light_messages(&self) -> &mpsc::Receiver<GameLogicMessageLight> {
         &self.channel_3_rx
+    }
+
+    fn get_critical_messages(&self) -> &mpsc::Receiver<GameLogicMessageCritical> {
+        &self.channel_4_rx
     }
 
     fn send_messages(&self) -> &mpsc::Sender<GameLogicMessageRequest> {
@@ -77,8 +87,9 @@ pub struct GameLogicMultiThreaded {
 
     channel_0_tx: mpsc::Sender<GameLogicMessageRequest>,
     channel_1_rx: mpsc::Receiver<GameLogicMessageHeavy>,
-    channel_2_rx: mpsc::Receiver<GameLogicMessageLight>,
-    channel_3_rx: mpsc::Receiver<GameLogicMessageCritical>,
+    channel_2_rx: mpsc::Receiver<GameLogicMessageMedium>,
+    channel_3_rx: mpsc::Receiver<GameLogicMessageLight>,
+    channel_4_rx: mpsc::Receiver<GameLogicMessageCritical>,
 }
 
 impl GameLogicMultiThreaded {
@@ -87,19 +98,29 @@ impl GameLogicMultiThreaded {
         let (channel_1_tx, channel_1_rx) = mpsc::channel();
         let (channel_2_tx, channel_2_rx) = mpsc::channel();
         let (channel_3_tx, channel_3_rx) = mpsc::channel();
+        let (channel_4_tx, channel_4_rx) = mpsc::channel();
 
         let game_logic = thread::spawn(move || {
-            let mut game_logic = GameLagic::new(
+            let mut game_logic = GameLogic::new(
                 settings,
                 channel_0_rx,
                 channel_1_tx,
                 channel_2_tx,
                 channel_3_tx,
+                channel_4_tx,
             );
 
             loop {
+                let start_time = instant::Instant::now();
                 game_logic.update();
-                thread::sleep(Duration::from_millis(20));
+                let stop_time = instant::Instant::now();
+
+                let time_passed = stop_time - start_time;
+
+                let interval = Duration::from_millis(16);
+                if time_passed < interval {
+                    thread::sleep(interval - time_passed);
+                }
             }
         });
 
@@ -109,6 +130,7 @@ impl GameLogicMultiThreaded {
             channel_1_rx,
             channel_2_rx,
             channel_3_rx,
+            channel_4_rx,
         }
     }
 }
@@ -118,12 +140,16 @@ impl GameLogicInterface for GameLogicMultiThreaded {
         &self.channel_1_rx
     }
 
-    fn get_light_messages(&self) -> &mpsc::Receiver<GameLogicMessageLight> {
+    fn get_medium_messages(&self) -> &mpsc::Receiver<GameLogicMessageMedium> {
         &self.channel_2_rx
     }
 
-    fn get_critical_messages(&self) -> &mpsc::Receiver<GameLogicMessageCritical> {
+    fn get_light_messages(&self) -> &mpsc::Receiver<GameLogicMessageLight> {
         &self.channel_3_rx
+    }
+
+    fn get_critical_messages(&self) -> &mpsc::Receiver<GameLogicMessageCritical> {
+        &self.channel_4_rx
     }
 
     fn send_messages(&self) -> &mpsc::Sender<GameLogicMessageRequest> {
@@ -132,9 +158,8 @@ impl GameLogicInterface for GameLogicMultiThreaded {
 }
 
 enum GameLogicExecution {
-    #[allow(dead_code)]
     SingleThreaded(GameLogicSingleThreaded),
-    #[allow(dead_code)]
+    #[allow(dead_code)] // unused in wasm
     Multithreaded(GameLogicMultiThreaded),
 }
 
@@ -153,9 +178,10 @@ impl GameLogicServer {
                 GameLogicExecution::SingleThreaded(GameLogicSingleThreaded::new(settings))
             }
             else {
-                server =
-                GameLogicExecution::Multithreaded(GameLogicMultiThreaded::new(settings))
-                // GameLogicExecution::SingleThreaded(GameLogicSingleThreaded::new())
+                server = match settings.enable_multithreading {
+                    true => GameLogicExecution::Multithreaded(GameLogicMultiThreaded::new(settings)),
+                    false => GameLogicExecution::SingleThreaded(GameLogicSingleThreaded::new(settings)),
+                }
             }
         }
 
@@ -182,6 +208,17 @@ impl GameLogicInterface for GameLogicServer {
             }
             GameLogicExecution::Multithreaded(game_logic_multi_threaded) => {
                 game_logic_multi_threaded.get_heavy_messages()
+            }
+        }
+    }
+
+    fn get_medium_messages(&self) -> &mpsc::Receiver<GameLogicMessageMedium> {
+        match &self.server {
+            GameLogicExecution::SingleThreaded(game_logic_single_threaded) => {
+                game_logic_single_threaded.get_medium_messages()
+            }
+            GameLogicExecution::Multithreaded(game_logic_multi_threaded) => {
+                game_logic_multi_threaded.get_medium_messages()
             }
         }
     }

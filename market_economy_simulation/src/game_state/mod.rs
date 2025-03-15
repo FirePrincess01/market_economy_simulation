@@ -28,7 +28,8 @@ impl GameState {
             position: [0.0, 0.0, 1.0],
             color: [0.1, 0.1, 0.1],
             entity: [725, 0, 0],
-            color_heighlights: [0.3, 0.05, 0.3],
+            // color_heighlights: [0.3, 0.05, 0.3],
+            color_highlights: [0.4, 0.4, 0.8],
         };
         let terrain_mesh = deferred_terrain_shader::Mesh::new(
             renderer.device(),

@@ -36,7 +36,7 @@ impl PointLights {
                     id: id as u32,
                     position,
                     color,
-                    attenuation: Attenuation::_200,
+                    attenuation: Attenuation::_100,
                 });
                 id += 1;
             }
@@ -57,7 +57,9 @@ impl PointLights {
                 let res = channel.send(GameLogicMessageLight::UpdatePointLight(elem.clone()));
                 match res {
                     Ok(_) => {}
-                    Err(err) => println!("{}", err),
+                    Err(_err) => {
+                        // println!("{}", err)
+                    }
                 }
             }
         }

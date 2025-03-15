@@ -11,7 +11,8 @@ use crate::deferred_terrain_shader::{self, DeferredTerrainShaderDraw};
 use crate::performance_monitor::PerformanceMonitor;
 use crate::point_light_storage::PointLightStorage;
 use camera_controller::CameraController;
-use wgpu_renderer::vertex_color_shader::{self, VertexColorShaderDraw};
+use wgpu_renderer::performance_monitor::watch;
+use wgpu_renderer::vertex_color_shader::{self};
 use wgpu_renderer::vertex_texture_shader::{self, VertexTextureShaderDraw};
 use wgpu_renderer::wgpu_renderer::camera::{Camera, Projection};
 use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
@@ -21,13 +22,14 @@ use crate::{deferred_animation_shader, deferred_light_shader, deferred_light_sph
 
 pub struct RendererSettings {
     pub enable_memory_mapped_read: bool,
-    pub wait_for_renderloop_to_finish: bool,
+    pub wait_for_render_loop_to_finish: bool,
+    pub is_vsync_enabled: bool,
 }
 
 pub struct Renderer {
     settings: RendererSettings,
 
-    _pipeline_color: vertex_color_shader::Pipeline,
+    pipeline_color: vertex_color_shader::Pipeline,
     pipeline_lines: vertex_color_shader::Pipeline,
 
     pub texture_bind_group_layout: vertex_texture_shader::TextureBindGroupLayout,
@@ -61,6 +63,9 @@ pub struct Renderer {
 
 impl Renderer {
     pub fn new(wgpu_renderer: &mut dyn WgpuRendererInterface, settings: RendererSettings) -> Self {
+        // enable vsync
+        wgpu_renderer.enable_vsync(settings.is_vsync_enabled);
+
         // wgpu renderer
         let surface_width = wgpu_renderer.surface_width();
         let surface_height = wgpu_renderer.surface_height();
@@ -199,7 +204,7 @@ impl Renderer {
         Self {
             settings,
 
-            _pipeline_color: pipeline_color,
+            pipeline_color,
             pipeline_lines,
 
             texture_bind_group_layout,
@@ -502,7 +507,7 @@ impl Renderer {
         view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
         textured_meshes: &impl VertexTextureShaderDraw,
-        performance_monitor: &impl VertexColorShaderDraw,
+        performance_monitors: &[&mut PerformanceMonitor<{ super::WATCH_POINTS_SIZE }>],
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Forward Render Pass"),
@@ -527,16 +532,36 @@ impl Renderer {
         });
 
         // performance monitor
-        self.pipeline_lines.bind(&mut render_pass);
-        self.camera_uniform_orthographic_buffer
-            .bind(&mut render_pass);
-        performance_monitor.draw(&mut render_pass);
+        for performance_monitor in performance_monitors {
+            self.pipeline_lines.draw_lines(
+                &mut render_pass,
+                &self.camera_uniform_orthographic_buffer,
+                *performance_monitor,
+            );
+        }
+
+        for performance_monitor in performance_monitors {
+            self.pipeline_color.draw(
+                &mut render_pass,
+                &self.camera_uniform_orthographic_buffer,
+                *performance_monitor,
+            );
+        }
+
+        for performance_monitor in performance_monitors {
+            self.pipeline_texture_gui.draw(
+                &mut render_pass,
+                &self.camera_uniform_orthographic_buffer,
+                *performance_monitor,
+            );
+        }
 
         // textured meshes
-        self.pipeline_texture_gui.bind(&mut render_pass);
-        self.camera_uniform_orthographic_buffer
-            .bind(&mut render_pass);
-        textured_meshes.draw(&mut render_pass);
+        self.pipeline_texture_gui.draw(
+            &mut render_pass,
+            &self.camera_uniform_orthographic_buffer,
+            textured_meshes,
+        );
     }
 
     pub fn read_entity_index(&mut self) -> u32 {
@@ -560,14 +585,15 @@ impl Renderer {
         mesh_textured_gui: &impl VertexTextureShaderDraw,
         ambient_light_quad: &impl DeferredLightShaderDraw,
 
-        performance_monitor: &mut PerformanceMonitor,
+        performance_monitors: &[&mut PerformanceMonitor<{ super::WATCH_POINTS_SIZE }>],
+        watch_fps: &mut watch::Watch<{ super::WATCH_POINTS_SIZE }>,
         mouse_position: MousePosition,
     ) -> Result<(), wgpu::SurfaceError> {
-        performance_monitor.watch.start(0);
+        watch_fps.start(0, "Wait for next frame");
         let output = renderer_interface.get_current_texture()?;
-        performance_monitor.watch.stop(0);
+        watch_fps.stop(0);
 
-        performance_monitor.watch.start(1);
+        watch_fps.start(1, "Draw");
 
         let view: wgpu::TextureView = output
             .texture
@@ -605,7 +631,7 @@ impl Renderer {
             &view,
             &mut encoder,
             mesh_textured_gui,
-            performance_monitor,
+            performance_monitors,
         );
 
         // copy entity texture
@@ -621,13 +647,13 @@ impl Renderer {
         self.entity_buffer.map_buffer_async();
 
         // wait to see how high the gpu load is
-        if self.settings.wait_for_renderloop_to_finish {
+        if self.settings.wait_for_render_loop_to_finish {
             renderer_interface.device().poll(wgpu::Maintain::Wait);
         } else {
             renderer_interface.device().poll(wgpu::Maintain::Poll);
         }
 
-        performance_monitor.watch.stop(1);
+        watch_fps.stop(1);
 
         Ok(())
     }

@@ -2,7 +2,9 @@
     "cSpell.words": [
         "cgmath",
         "collada",
+        "colorous",
         "heightmap",
-        "wgpu",
+        "vsync",
+        "wgpu"
     ]
 }

@@ -20,18 +20,25 @@ impl Terrain {
 
         for y in 0..size_y {
             for x in 0..size_x {
-                let mut height = (noise::NoiseFn::get(&perlin, [x as f64 / 32.0, y as f64 / 32.0])
-                    * 20.0)
+                let mut height =
+                    (noise::NoiseFn::get(&perlin, [x as f64 / 128.0, y as f64 / 128.0]) * 20.0)
+                        .max(0.0) as f32;
+                height += (noise::NoiseFn::get(&perlin, [x as f64 / 64.0, y as f64 / 64.0]) * 20.0)
                     .max(0.0) as f32;
-                height += (noise::NoiseFn::get(&perlin, [x as f64 / 16.0, y as f64 / 16.0]) * 10.0)
+                height += (noise::NoiseFn::get(&perlin, [x as f64 / 32.0, y as f64 / 32.0]) * 20.0)
                     .max(0.0) as f32;
-                height += (noise::NoiseFn::get(&perlin, [x as f64 / 8.0, y as f64 / 8.0]) * 5.0)
+                height += (noise::NoiseFn::get(&perlin, [x as f64 / 16.0, y as f64 / 16.0]) * 8.0)
                     .max(0.0) as f32;
-                height += (noise::NoiseFn::get(&perlin, [x as f64 / 4.0, y as f64 / 4.0]) * 2.0)
+                height += (noise::NoiseFn::get(&perlin, [x as f64 / 8.0, y as f64 / 8.0]) * 2.0)
+                    .max(0.0) as f32;
+                height += (noise::NoiseFn::get(&perlin, [x as f64 / 4.0, y as f64 / 4.0]) * 1.0)
                     .max(0.0) as f32;
 
                 // create canyon
-                height *= Terrain::canyon((x as f32 - size_x as f32 / 2.0) / 10.0);
+                height *= Terrain::canyon((x as f32 - size_x as f32 / 2.0) / 20.0);
+
+                height += (noise::NoiseFn::get(&perlin, [x as f64 / 4.0, y as f64 / 8.0]) * 0.5)
+                    .max(0.0) as f32;
 
                 heights[y * size_x + x] = height;
             }

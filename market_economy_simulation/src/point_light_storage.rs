@@ -1,12 +1,14 @@
 //! Manages the data on the gpu of all the point lights
 
 use market_economy_simulation_server::point_lights::Attenuation;
-use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
+use wgpu_renderer::{
+    shape::{self, MeshDataInterface},
+    wgpu_renderer::WgpuRendererInterface,
+};
 
 use crate::{
     deferred_light_shader::{self, DeferredLightShaderDraw},
     deferred_light_sphere_shader::DeferredLightSphereShaderDraw,
-    shape::{self, MeshDataInterface},
 };
 
 pub struct PointLightStorage {
@@ -29,7 +31,7 @@ impl PointLightStorage {
         dbg_point_lights: bool,
     ) -> Self {
         let sphere_raw = shape::UVSphere::new(1.0, 8);
-        let sphere = sphere_raw.data();
+        let sphere = sphere_raw.triangles();
 
         let mut instances: Vec<deferred_light_shader::Instance> = Vec::new();
         instances.resize(max_instances, deferred_light_shader::Instance::new());
