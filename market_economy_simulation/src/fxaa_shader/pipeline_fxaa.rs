@@ -24,7 +24,6 @@ impl Pipeline {
         post_processing_texture_bind_group_layout: &PostProcessingTextureBindGroupLayout,
         surface_format: wgpu::TextureFormat,
     ) -> Self {
-
         // Shader
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("FXAA Shader"),

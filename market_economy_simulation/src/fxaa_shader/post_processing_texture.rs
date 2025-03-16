@@ -61,4 +61,3 @@ impl PostProcessingTexture {
         render_pass.set_bind_group(1, &self.bind_group, &[]);
     }
 }
-

@@ -74,7 +74,8 @@ impl Renderer {
     pub fn new(wgpu_renderer: &mut dyn WgpuRendererInterface, settings: RendererSettings) -> Self {
         // enable vsync
         wgpu_renderer.enable_vsync(settings.enable_vertical_sync);
-        wgpu_renderer.request_window_size(settings.window_resolution.0, settings.window_resolution.1);
+        wgpu_renderer
+            .request_window_size(settings.window_resolution.0, settings.window_resolution.1);
 
         // wgpu renderer
         let surface_width = wgpu_renderer.surface_width();

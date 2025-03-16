@@ -38,7 +38,10 @@ impl GBufferTexture {
 
         let view = texture.create_view(&wgpu::TextureViewDescriptor::default());
 
-        Self { _texture: texture, view }
+        Self {
+            _texture: texture,
+            view,
+        }
     }
 }
 

@@ -44,7 +44,7 @@ impl Settings {
             enable_vertical_sync: true,
             enable_fxaa: true,
             window_resolution: (1920 / 2, 1080 / 2),
-            
+
             // game server settings
             map_size: 300 * 2,
             enable_multithreading: true,
