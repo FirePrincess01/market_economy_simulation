@@ -7,6 +7,7 @@ mod deferred_color_shader;
 mod deferred_light_shader;
 mod deferred_light_sphere_shader;
 mod deferred_terrain_shader;
+mod deferred_heightmap_shader;
 mod ecs;
 mod ecs2;
 mod fxaa_shader;

@@ -36,7 +36,7 @@ pub struct EntityBuffer {
 }
 
 impl EntityBuffer {
-    pub const FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Rgba8Unorm;
+    pub const FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::R32Uint;
 
     pub fn new(
         wgpu_renderer: &mut dyn WgpuRendererInterface,
