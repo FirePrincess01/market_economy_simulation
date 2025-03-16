@@ -4,6 +4,7 @@
 use wgpu_renderer::shape;
 
 use crate::deferred_light_sphere_shader::DeferredLightSphereShaderDraw;
+use crate::fxaa_shader::FxaaShaderDraw;
 
 use super::DeferredLightShaderDraw;
 use super::Instance;
@@ -89,6 +90,16 @@ impl DeferredLightShaderDraw for Mesh {
 
 impl DeferredLightSphereShaderDraw for Mesh {
     fn draw_sphere<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
+        self.vertex_buffer.bind(render_pass);
+        self.index_buffer.bind(render_pass);
+        self.instance_buffer.bind_slot(render_pass, 1);
+
+        render_pass.draw_indexed(0..self.index_buffer.size(), 0, 0..self.nr_instances);
+    }
+}
+
+impl FxaaShaderDraw for Mesh {
+    fn draw_fxaa<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         self.vertex_buffer.bind(render_pass);
         self.index_buffer.bind(render_pass);
         self.instance_buffer.bind_slot(render_pass, 1);

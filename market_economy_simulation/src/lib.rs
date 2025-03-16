@@ -9,6 +9,7 @@ mod deferred_light_sphere_shader;
 mod deferred_terrain_shader;
 mod ecs;
 mod ecs2;
+mod fxaa_shader;
 mod game_state;
 mod geometry;
 mod ground_plane;
