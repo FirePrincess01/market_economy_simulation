@@ -5,9 +5,8 @@ use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
 
 use crate::deferred_light_shader::GBufferBindGroupLayout;
 
-#[allow(unused)]
 pub struct GBufferTexture {
-    pub texture: wgpu::Texture,
+    pub _texture: wgpu::Texture,
     pub view: wgpu::TextureView,
 }
 
@@ -39,7 +38,7 @@ impl GBufferTexture {
 
         let view = texture.create_view(&wgpu::TextureViewDescriptor::default());
 
-        Self { texture, view }
+        Self { _texture: texture, view }
     }
 }
 

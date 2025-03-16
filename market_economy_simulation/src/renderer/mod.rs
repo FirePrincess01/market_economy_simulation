@@ -8,6 +8,7 @@ use crate::deferred_color_shader::entity_buffer::MousePosition;
 use crate::deferred_color_shader::{self, DeferredShaderDraw, EntityBuffer, GBuffer};
 use crate::deferred_light_shader::DeferredLightShaderDraw;
 use crate::deferred_terrain_shader::{self, DeferredTerrainShaderDraw};
+use crate::fxaa_shader::FxaaShaderDraw;
 use crate::performance_monitor::PerformanceMonitor;
 use crate::point_light_storage::PointLightStorage;
 use camera_controller::CameraController;
@@ -18,12 +19,16 @@ use wgpu_renderer::wgpu_renderer::camera::{Camera, Projection};
 use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
 use winit::event::{ElementState, MouseScrollDelta};
 
-use crate::{deferred_animation_shader, deferred_light_shader, deferred_light_sphere_shader};
+use crate::{
+    deferred_animation_shader, deferred_light_shader, deferred_light_sphere_shader, fxaa_shader,
+};
 
 pub struct RendererSettings {
     pub enable_memory_mapped_read: bool,
     pub wait_for_render_loop_to_finish: bool,
-    pub is_vsync_enabled: bool,
+    pub enable_vertical_sync: bool,
+    pub enable_fxaa: bool,
+    pub window_resolution: (u32, u32),
 }
 
 pub struct Renderer {
@@ -49,6 +54,10 @@ pub struct Renderer {
 
     pipeline_deferred_terrain: deferred_terrain_shader::Pipeline,
 
+    post_processing_bind_group_layout: fxaa_shader::PostProcessingTextureBindGroupLayout,
+    post_processing_texture: fxaa_shader::PostProcessingTexture,
+    pipeline_fxaa: fxaa_shader::Pipeline,
+
     // camera
     camera: Camera,
     camera_controller: CameraController,
@@ -64,7 +73,8 @@ pub struct Renderer {
 impl Renderer {
     pub fn new(wgpu_renderer: &mut dyn WgpuRendererInterface, settings: RendererSettings) -> Self {
         // enable vsync
-        wgpu_renderer.enable_vsync(settings.is_vsync_enabled);
+        wgpu_renderer.enable_vsync(settings.enable_vertical_sync);
+        wgpu_renderer.request_window_size(settings.window_resolution.0, settings.window_resolution.1);
 
         // wgpu renderer
         let surface_width = wgpu_renderer.surface_width();
@@ -164,6 +174,23 @@ impl Renderer {
             surface_format,
         );
 
+        // pipeline fxaa
+        let post_processing_bind_group_layout =
+            fxaa_shader::PostProcessingTextureBindGroupLayout::new(wgpu_renderer.device());
+        let post_processing_texture = fxaa_shader::PostProcessingTexture::new(
+            wgpu_renderer,
+            &post_processing_bind_group_layout,
+            surface_width,
+            surface_height,
+            surface_format,
+        );
+        let pipeline_fxaa = fxaa_shader::Pipeline::new(
+            wgpu_renderer.device(),
+            &camera_bind_group_layout,
+            &post_processing_bind_group_layout,
+            surface_format,
+        );
+
         // camera
         let position = cgmath::Point3::new(0.0, 0.0, 0.0);
         let yaw = cgmath::Deg(0.0);
@@ -224,6 +251,10 @@ impl Renderer {
 
             pipeline_deferred_terrain,
 
+            post_processing_bind_group_layout,
+            post_processing_texture,
+            pipeline_fxaa,
+
             camera,
             camera_controller,
             projection,
@@ -277,6 +308,15 @@ impl Renderer {
             new_size.width,
             new_size.height,
             self.settings.enable_memory_mapped_read,
+        );
+
+        let surface_format = renderer_interface.surface_format();
+        self.post_processing_texture = fxaa_shader::PostProcessingTexture::new(
+            renderer_interface,
+            &self.post_processing_bind_group_layout,
+            new_size.width,
+            new_size.height,
+            surface_format,
         );
 
         self.camera_uniform_orthographic
@@ -501,6 +541,41 @@ impl Renderer {
         );
     }
 
+    fn render_fxaa(
+        &self,
+        view: &wgpu::TextureView,
+        encoder: &mut wgpu::CommandEncoder,
+        mesh: &dyn FxaaShaderDraw,
+    ) {
+        let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            label: Some("FXAA Render Pass"),
+            color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                view,
+                resolve_target: None,
+                ops: wgpu::Operations {
+                    // load: wgpu::LoadOp::Load,
+                    load: wgpu::LoadOp::Clear(wgpu::Color {
+                        r: 0.00,
+                        g: 0.00,
+                        b: 0.00,
+                        a: 1.0,
+                    }),
+                    store: wgpu::StoreOp::default(),
+                },
+            })],
+            depth_stencil_attachment: None,
+            timestamp_writes: None,
+            occlusion_query_set: None,
+        });
+
+        self.pipeline_fxaa.draw(
+            &mut render_pass,
+            &self.camera_uniform_buffer,
+            &self.post_processing_texture,
+            mesh,
+        );
+    }
+
     fn render_forward(
         &self,
         renderer_interface: &mut dyn WgpuRendererInterface,
@@ -583,7 +658,7 @@ impl Renderer {
 
         ant_light_orbs: &(impl DeferredShaderDraw + DeferredLightShaderDraw),
         mesh_textured_gui: &impl VertexTextureShaderDraw,
-        ambient_light_quad: &impl DeferredLightShaderDraw,
+        ambient_light_quad: &deferred_light_shader::Mesh,
 
         performance_monitors: &[&mut PerformanceMonitor<{ super::WATCH_POINTS_SIZE }>],
         watch_fps: &mut watch::Watch<{ super::WATCH_POINTS_SIZE }>,
@@ -619,12 +694,20 @@ impl Renderer {
 
         self.render_light(
             renderer_interface,
-            &view,
+            if self.settings.enable_fxaa {
+                &self.post_processing_texture.view
+            } else {
+                &view
+            },
             &mut encoder,
             &[ant_light_orbs],
             ambient_light_quad,
             point_light_storage,
         );
+
+        if self.settings.enable_fxaa {
+            self.render_fxaa(&view, &mut encoder, ambient_light_quad);
+        }
 
         self.render_forward(
             renderer_interface,

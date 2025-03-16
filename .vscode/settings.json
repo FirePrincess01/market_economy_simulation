@@ -3,7 +3,9 @@
         "cgmath",
         "collada",
         "colorous",
+        "fxaa",
         "heightmap",
+        "luma",
         "vsync",
         "wgpu"
     ]

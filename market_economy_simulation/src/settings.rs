@@ -16,6 +16,12 @@ pub struct Settings {
     // enables vertical sync, limiting the fps to the refresh rate of the display (60 fps)
     pub enable_vertical_sync: bool,
 
+    // Fast approximate anti-aliasing. Enables an edge blurring post processing filter
+    pub enable_fxaa: bool,
+
+    // The resolution of the window
+    pub window_resolution: (u32, u32),
+
     // enables multithreading if available (no available for the web)
     pub enable_multithreading: bool,
 
@@ -32,11 +38,18 @@ pub struct Settings {
 impl Settings {
     pub fn new() -> Self {
         Self {
+            // render settings
             enable_memory_mapped_read: true,
             wait_for_render_loop_to_finish: false,
             enable_vertical_sync: true,
-            enable_multithreading: true,
+            enable_fxaa: true,
+            window_resolution: (1920 / 2, 1080 / 2),
+            
+            // game server settings
             map_size: 300 * 2,
+            enable_multithreading: true,
+
+            // miscellaneous
             // max_point_light_instances: 65536,
             max_point_light_instances: 16348,
             dbg_point_lights: false,
@@ -47,7 +60,9 @@ impl Settings {
         renderer::RendererSettings {
             enable_memory_mapped_read: self.enable_memory_mapped_read,
             wait_for_render_loop_to_finish: self.wait_for_render_loop_to_finish,
-            is_vsync_enabled: self.enable_vertical_sync,
+            enable_vertical_sync: self.enable_vertical_sync,
+            enable_fxaa: self.enable_fxaa,
+            window_resolution: self.window_resolution,
         }
     }
 

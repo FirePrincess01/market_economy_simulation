@@ -17,6 +17,7 @@ mod point_light_storage;
 mod renderer;
 mod settings;
 mod world_mesh;
+mod fxaa_shader;
 
 use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,
