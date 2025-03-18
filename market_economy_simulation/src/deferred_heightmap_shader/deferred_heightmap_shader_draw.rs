@@ -2,5 +2,5 @@
 //!
 
 pub trait DeferredHeightMapShaderDraw {
-    fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>);
+    fn draw<'a>(&'a mut self, render_pass: &mut wgpu::RenderPass<'a>);
 }

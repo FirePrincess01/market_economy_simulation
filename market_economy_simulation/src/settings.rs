@@ -62,6 +62,9 @@ impl Settings {
 
             terrain_tile_size: 256,
             terrain_size: (32, 32),
+
+            // terrain_tile_size: 8,
+            // terrain_size: (1, 1),
         }
     }
 

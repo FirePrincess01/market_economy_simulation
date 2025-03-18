@@ -6,7 +6,7 @@ use game_logic_interface::{
 };
 use wgpu_renderer::performance_monitor::watch;
 
-use crate::{point_lights, terrain};
+use crate::{heightmap_generator, point_lights, terrain};
 
 pub mod game_logic_interface;
 
@@ -24,6 +24,7 @@ pub struct GameLogic {
     channel_3_tx: mpsc::Sender<GameLogicMessageLight>,
     _channel_4_tx: mpsc::Sender<GameLogicMessageCritical>,
 
+    heightmap_generator: heightmap_generator::HeightMapGenerator,
     terrain: terrain::Terrain,
     point_lights: point_lights::PointLights,
 
@@ -41,6 +42,8 @@ impl GameLogic {
     ) -> Self {
         let size = settings.map_size;
 
+        let heightmap_generator = heightmap_generator::HeightMapGenerator::new();
+
         let terrain = terrain::Terrain::new(size, size, 1.0);
         let point_lights = point_lights::PointLights::new(&terrain);
 
@@ -55,6 +58,7 @@ impl GameLogic {
             channel_3_tx,
             _channel_4_tx: channel_4_tx,
 
+            heightmap_generator,
             terrain,
             point_lights,
 
@@ -76,10 +80,11 @@ impl GameLogic {
             let res = self.channel_0_rx.try_recv();
             match res {
                 Ok(message) => match message {
-                    GameLogicMessageRequest::GetTerrain => {
+                    GameLogicMessageRequest::GetTerrain(heightmap_details) => {
+                        let heightmap = self.heightmap_generator.generate(heightmap_details);
                         let res = self
                             .channel_1_tx
-                            .send(GameLogicMessageHeavy::Terrain(self.terrain.clone()));
+                            .send(GameLogicMessageHeavy::Terrain(heightmap));
                         match res {
                             Ok(_) => {}
                             Err(err) => println!("{}", err),

@@ -122,7 +122,7 @@ impl Pipeline {
         &self,
         render_pass: &mut wgpu::RenderPass<'a>,
         camera: &'a vertex_color_shader::CameraUniformBuffer,
-        mesh: &'a dyn DeferredHeightMapShaderDraw,
+        mesh: &'a mut dyn DeferredHeightMapShaderDraw,
     ) {
         render_pass.set_pipeline(&self.render_pipeline);
         camera.bind(render_pass);

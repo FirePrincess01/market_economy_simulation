@@ -5,6 +5,7 @@
 pub mod game_logic;
 pub mod point_lights;
 pub mod terrain;
+pub mod heightmap_generator;
 
 use std::sync::mpsc;
 use std::thread::{self};

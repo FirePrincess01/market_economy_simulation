@@ -379,9 +379,9 @@ impl Renderer {
         _view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
         meshes: &[&dyn DeferredShaderDraw],
-        deferred_terrain: &dyn DeferredTerrainShaderDraw,
+        // deferred_terrain: &dyn DeferredTerrainShaderDraw,
         ant_light_orbs: &dyn DeferredShaderDraw,
-        terrain_storage: &TerrainStorage,
+        terrain_storage: &mut TerrainStorage,
         animated_object_storage: &WgpuAnimatedObjectStorage,
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -685,10 +685,10 @@ impl Renderer {
         // deferred: & impl DeferredShaderDraw,
         // deferred_light: & impl DeferredLightShaderDraw,
         // deferred_combined: &(impl DeferredShaderDraw + DeferredLightShaderDraw),
-        deferred_terrain: &dyn DeferredTerrainShaderDraw,
+        // deferred_terrain: &dyn DeferredTerrainShaderDraw,
         animated_object_storage: &WgpuAnimatedObjectStorage,
         point_light_storage: &PointLightStorage,
-        terrain_storage: &TerrainStorage,
+        terrain_storage: &mut TerrainStorage,
 
         ant_light_orbs: &(impl DeferredShaderDraw + DeferredLightShaderDraw),
         mesh_textured_gui: &impl VertexTextureShaderDraw,
@@ -721,7 +721,7 @@ impl Renderer {
             &view,
             &mut encoder,
             &[],
-            deferred_terrain,
+            // deferred_terrain,
             ant_light_orbs,
             terrain_storage,
             animated_object_storage,

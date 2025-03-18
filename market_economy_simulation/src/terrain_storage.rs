@@ -1,9 +1,13 @@
 //! Manages the data on the gpu of the terrain
 //!
 
+use std::sync::mpsc;
+
 use cgmath::{MetricSpace, Zero};
+use market_economy_simulation_server::{game_logic::game_logic_interface::GameLogicMessageRequest, heightmap_generator};
 use wgpu_renderer::{
     shape::{self, MeshDataInterface},
+    vertex_heightmap_shader,
     wgpu_renderer::WgpuRendererInterface,
 };
 
@@ -27,6 +31,8 @@ pub struct TerrainStorage {
 
     instances: Vec<[HeightmapInstanceBuffer; LOD]>,
     height_textures: Vec<[Option<deferred_heightmap_shader::HeightmapTexture>; LOD]>,
+    height_texture_details: Vec<[heightmap_generator::HeightMapDetails; LOD]>,
+    height_textures_state: Vec<[HeightTextureState; LOD]>,
     texture_positions: Vec<cgmath::Vector3<f32>>,
 
     view_position: cgmath::Vector3<f32>,
@@ -35,6 +41,8 @@ pub struct TerrainStorage {
     height: usize,
     size: usize,
     tile_size: usize,
+
+    requests: Vec<heightmap_generator::HeightMapDetails>,
 }
 
 impl TerrainStorage {
@@ -113,90 +121,119 @@ impl TerrainStorage {
             height_textures.push(height_texture_array);
         }
 
-        // insert zero value at level 0
-        for i in 0..size {
-            {
-                let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> =
-                    Vec::with_capacity(texture_side_length * texture_side_length);
-                heightmap.resize(
-                    texture_side_length * texture_side_length,
-                    deferred_heightmap_shader::Heightmap::zero(),
-                );
+        let mut height_texture_details: Vec<[heightmap_generator::HeightMapDetails; LOD]> =
+            Vec::with_capacity(size);
+        for y in 0..height {
+            for x in 0..width {
+                let height_texture_details_array: [heightmap_generator::HeightMapDetails; LOD] =
+                    std::array::from_fn(|lod| {
+                        let a = 2u32.pow(lod as u32);
 
-                let height_texture = deferred_heightmap_shader::HeightmapTexture::new(
-                    renderer.device(),
-                    heightmap_bind_group_layout,
-                    &heightmap,
-                    width as u32,
-                    height as u32,
-                    Some("terrain"),
-                );
-
-                height_textures[i][0] = Some(height_texture);
-            }
-            {
-                let side_length = texture_side_length / 2;
-                let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> =
-                    Vec::with_capacity(side_length * side_length);
-                heightmap.resize(
-                    side_length * side_length,
-                    deferred_heightmap_shader::Heightmap::zero(),
-                );
-
-                let height_texture = deferred_heightmap_shader::HeightmapTexture::new(
-                    renderer.device(),
-                    heightmap_bind_group_layout,
-                    &heightmap,
-                    width as u32,
-                    height as u32,
-                    Some("terrain"),
-                );
-
-                height_textures[i][1] = Some(height_texture);
-            }
-
-            {
-                let side_length = texture_side_length / 4;
-                let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> =
-                    Vec::with_capacity(side_length * side_length);
-                heightmap.resize(
-                    side_length * side_length,
-                    deferred_heightmap_shader::Heightmap::zero(),
-                );
-
-                let height_texture = deferred_heightmap_shader::HeightmapTexture::new(
-                    renderer.device(),
-                    heightmap_bind_group_layout,
-                    &heightmap,
-                    width as u32,
-                    height as u32,
-                    Some("terrain"),
-                );
-
-                height_textures[i][2] = Some(height_texture);
-            }
-
-            {
-                let side_length = texture_side_length / 8;
-                let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> =
-                    Vec::with_capacity(side_length * side_length);
-                heightmap.resize(
-                    side_length * side_length,
-                    deferred_heightmap_shader::Heightmap::zero(),
-                );
-
-                let height_texture = deferred_heightmap_shader::HeightmapTexture::new(
-                    renderer.device(),
-                    heightmap_bind_group_layout,
-                    &heightmap,
-                    width as u32,
-                    height as u32,
-                    Some("terrain"),
-                );
-
-                height_textures[i][3] = Some(height_texture);
+                        heightmap_generator::HeightMapDetails {
+                            distance: a as usize,
+                            size_x: texture_side_length / a as usize,
+                            size_y: texture_side_length / a as usize,
+                            x: x * (texture_side_length - 1),
+                            y: y * (texture_side_length - 1),
+                            index: y * width + x,
+                            lod,
+                        }
+                    });
+                    height_texture_details.push(height_texture_details_array);
             }
         }
+
+        let mut height_textures_state: Vec<[HeightTextureState; LOD]> = Vec::with_capacity(size);
+        for i in 0..size {
+            let height_textures_state_array: [HeightTextureState; LOD] =
+                std::array::from_fn(|index| HeightTextureState::NotRequested);
+            height_textures_state.push(height_textures_state_array);
+        }
+
+        // insert zero value at level 0
+        // for i in 0..size {
+        //     {
+        //         let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> =
+        //             Vec::with_capacity(texture_side_length * texture_side_length);
+        //         heightmap.resize(
+        //             texture_side_length * texture_side_length,
+        //             deferred_heightmap_shader::Heightmap::zero(),
+        //         );
+
+        //         let height_texture = deferred_heightmap_shader::HeightmapTexture::new(
+        //             renderer.device(),
+        //             heightmap_bind_group_layout,
+        //             &heightmap,
+        //             width as u32,
+        //             height as u32,
+        //             Some("terrain"),
+        //         );
+
+        //         height_textures[i][0] = Some(height_texture);
+        //     }
+        //     {
+        //         let side_length = texture_side_length / 2;
+        //         let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> =
+        //             Vec::with_capacity(side_length * side_length);
+        //         heightmap.resize(
+        //             side_length * side_length,
+        //             deferred_heightmap_shader::Heightmap::zero(),
+        //         );
+
+        //         let height_texture = deferred_heightmap_shader::HeightmapTexture::new(
+        //             renderer.device(),
+        //             heightmap_bind_group_layout,
+        //             &heightmap,
+        //             width as u32,
+        //             height as u32,
+        //             Some("terrain"),
+        //         );
+
+        //         height_textures[i][1] = Some(height_texture);
+        //     }
+
+        //     {
+        //         let side_length = texture_side_length / 4;
+        //         let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> =
+        //             Vec::with_capacity(side_length * side_length);
+        //         heightmap.resize(
+        //             side_length * side_length,
+        //             deferred_heightmap_shader::Heightmap::zero(),
+        //         );
+
+        //         let height_texture = deferred_heightmap_shader::HeightmapTexture::new(
+        //             renderer.device(),
+        //             heightmap_bind_group_layout,
+        //             &heightmap,
+        //             width as u32,
+        //             height as u32,
+        //             Some("terrain"),
+        //         );
+
+        //         height_textures[i][2] = Some(height_texture);
+        //     }
+
+        //     {
+        //         let side_length = texture_side_length / 8;
+        //         let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> =
+        //             Vec::with_capacity(side_length * side_length);
+        //         heightmap.resize(
+        //             side_length * side_length,
+        //             deferred_heightmap_shader::Heightmap::zero(),
+        //         );
+
+        //         let height_texture = deferred_heightmap_shader::HeightmapTexture::new(
+        //             renderer.device(),
+        //             heightmap_bind_group_layout,
+        //             &heightmap,
+        //             width as u32,
+        //             height as u32,
+        //             Some("terrain"),
+        //         );
+
+        //         height_textures[i][3] = Some(height_texture);
+        //     }
+        // }
 
         let view_position: cgmath::Vector3<f32> = cgmath::Vector3::zero();
 
@@ -208,12 +245,15 @@ impl TerrainStorage {
             texture,
             instances,
             height_textures,
+            height_texture_details,
+            height_textures_state,
             texture_positions,
             view_position,
             size,
             width,
             height,
             tile_size,
+            requests: Vec::new(),
         }
     }
 
@@ -238,28 +278,83 @@ impl TerrainStorage {
         self.view_position = *view_position;
     }
 
-    pub fn update(&mut self) {}
+    pub fn submit_requests(&mut self, sender: &mpsc::Sender<GameLogicMessageRequest>) {
+        for elem in &self.requests {
+            sender.send(GameLogicMessageRequest::GetTerrain(elem.clone()));
+        }
+
+        self.requests.clear();
+    }
+
+    pub(crate) fn update_height_map(
+        &mut self,
+        renderer: &mut dyn WgpuRendererInterface,
+        heightmap_bind_group_layout: &deferred_heightmap_shader::HeightmapBindGroupLayout,
+        height_map: market_economy_simulation_server::heightmap_generator::HeightMap,
+    ) {
+        let distance = height_map.details.distance;
+        let size_x = height_map.details.size_x;
+        let size_y = height_map.details.size_y;
+        let p_x = height_map.details.x;
+        let p_y = height_map.details.y;
+
+        let size = size_x * size_y;
+
+        // create host data
+        let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> = Vec::with_capacity(size);
+
+        assert_eq!(height_map.heights.len(), size);
+
+        for elem in height_map.heights {
+            heightmap.push(vertex_heightmap_shader::Heightmap { height: elem });
+        }
+
+        // create device data
+        let height_texture = deferred_heightmap_shader::HeightmapTexture::new(
+            renderer,
+            heightmap_bind_group_layout,
+            &heightmap,
+            size_x as u32,
+            size_y as u32,
+            Some("terrain"),
+        );
+
+        // set result
+        let index = height_map.details.index;
+        let lod = height_map.details.lod;
+        self.height_textures[index][lod] = Some(height_texture);
+        self.height_textures_state[index][lod] = HeightTextureState::Available;
+    }
 }
 
 impl DeferredHeightMapShaderDraw for TerrainStorage {
-    fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
+    fn draw<'a>(&'a mut self, render_pass: &mut wgpu::RenderPass<'a>) {
         for i in 0..self.size {
             // get data at index
-            let height_texture = &self.height_textures[i];
             let position = &self.texture_positions[i];
-            let instances = &self.instances[i];
 
             // level of detail
             let lod = Self::calculate_lod_index(self.view_position, *position, self.tile_size);
             let mesh = &self.mesh[lod];
-            let height_texture = &height_texture[lod];
-            let instance = &instances[lod];
-
             let texture = &self.texture;
+            let height_texture = &self.height_textures[i][lod];
+            let instance = &self.instances[i][lod];
 
             // draw
-            if let Some(height_texture) = height_texture {
-                mesh.draw(render_pass, &height_texture, &texture, instance);
+            match self.height_textures_state[i][lod] {
+                HeightTextureState::NotRequested => {
+                    self.requests.push(self.height_texture_details[i][lod].clone());
+                    self.height_textures_state[i][lod] = HeightTextureState::IsRequested;
+                }
+                HeightTextureState::IsRequested => {
+                    // nothing to do, waiting for a result
+                }
+                HeightTextureState::Available => {
+                    // draw
+                    if let Some(height_texture) = height_texture {
+                        mesh.draw(render_pass, &height_texture, &texture, instance);
+                    }
+                }
             }
         }
     }
@@ -280,4 +375,10 @@ impl TextureLod {
 
         return &self.texture[0];
     }
+}
+
+enum HeightTextureState {
+    NotRequested,
+    IsRequested,
+    Available,
 }

@@ -38,14 +38,18 @@ fn vs_main(
 ) -> VertexOutput {
 
     let dim: vec2<u32> = textureDimensions(t_heightmap);
-    let index = vec2<u32>(vertex_index % dim.x, vertex_index / dim.y);
+    // let index = vec2<u32>(vertex_index % dim.x, vertex_index / dim.y);
+    let index = vec2<u32>(u32(model.position.x), u32(model.position.y));
     let distance = instance.distance;
     let tex_coords = vec2<f32>(model.position.x * distance, model.position.y * distance);
 
     let heights = get_neighborhood(index);
 
+    let pos_rgb: vec4<f32> = textureLoad(t_heightmap, index, 0);
+    let posz = pos_rgb.r;
+
     // calculate position
-    let vertex_position = vec3<f32>(model.position.x * distance, model.position.y *distance, heights.m);
+    let vertex_position = vec3<f32>(model.position.x * distance, model.position.y *distance, posz);
     let position = instance.position + vertex_position;
 
     // normal calculation, use negative derivatives
