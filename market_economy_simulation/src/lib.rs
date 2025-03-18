@@ -19,6 +19,7 @@ mod point_light_storage;
 mod renderer;
 mod settings;
 mod world_mesh;
+mod terrain_storage;
 
 use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,

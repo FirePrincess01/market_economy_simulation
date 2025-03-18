@@ -7,15 +7,18 @@ struct CameraUniform {
 @group(0) @binding(0)
 var<uniform> camera: CameraUniform;
 
+@group(2) @binding(0)
+var t_heightmap: texture_2d<f32>;
+
 struct VertexInput {
     @location(0) position: vec3<f32>,
-    @location(1) normal: vec3<f32>,
 }
 
 struct InstanceInput {
     @location(5) position: vec3<f32>,
-    @location(6) color: vec3<f32>,
+    @location(6) color: vec3<f32>, 
     @location(7) entity: vec3<u32>,
+    @location(8) distance: f32,
 }
 
 struct VertexOutput {
@@ -24,22 +27,39 @@ struct VertexOutput {
     @location(1) position: vec3<f32>,
     @location(2) normal: vec3<f32>,
     @location(3) entity: vec3<u32>,
+    @location(4) tex_coords: vec2<f32>,
 };
 
 @vertex 
 fn vs_main(
+    @builtin(vertex_index) vertex_index: u32,
     model: VertexInput,
     instance: InstanceInput,
 ) -> VertexOutput {
 
-    let position = instance.position + model.position;
+    let dim: vec2<u32> = textureDimensions(t_heightmap);
+    let index = vec2<u32>(vertex_index % dim.x, vertex_index / dim.y);
+    let tex_coords = vec2<f32>(f32(dim.x), f32(dim.y));
+    let distance = instance.distance;
+
+    let heights = get_neighborhood(index);
+
+    // calculate position
+    let vertex_position = vec3<f32>(model.position.x, model.position.y , heights.m);
+    let position = instance.position + vertex_position;
+
+    // normal calculation, use negative derivatives
+    let normal_x = (heights.w - heights.e) / 2.0;
+    let normal_y = (heights.s - heights.n) / 2.0;
+    let normal = vec3<f32>(normal_x, normal_y, distance);
 
     var out: VertexOutput;
     out.clip_position = camera.view_proj * vec4<f32>(position, 1.0);
     out.color = instance.color;
     out.position = position;
-    out.normal = model.normal;
+    out.normal = normal;
     out.entity = instance.entity;
+    out.tex_coords = tex_coords;
 
     return out;
 }
@@ -73,4 +93,38 @@ fn fs_main(in: VertexOutput) -> FragmentOutput {
         f32(entity3)/255.0);
 
     return out;
+}
+
+// structure for getting the neighboring values of the height texture
+struct Neighborhood {
+    m: f32,
+    n: f32,
+    e: f32,
+    s: f32,
+    w: f32,
+}
+
+fn get_neighborhood(uv: vec2<u32>) -> Neighborhood
+{
+    let m = get_height(uv, 0, 0);
+    let n = get_height(uv, 0, 1);
+    let e = get_height(uv, 1, 0);
+    let s = get_height(uv, 0, -1);
+    let w = get_height(uv, -1, 0);
+
+    return Neighborhood(
+        m,
+        n,
+        e,
+        s,
+        w,
+    );
+}
+
+fn get_height(uv: vec2<u32>, u_offset: i32, v_offset: i32) -> f32
+{
+    let u: u32 = u32(i32(uv.x) + u_offset);
+    let v: u32 = u32(i32(uv.y) + v_offset);
+
+    return textureLoad(t_heightmap, vec2(u, v), 0).r; 
 }
