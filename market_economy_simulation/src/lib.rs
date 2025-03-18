@@ -4,10 +4,10 @@ mod base_factory;
 mod create_entities;
 mod deferred_animation_shader;
 mod deferred_color_shader;
+mod deferred_heightmap_shader;
 mod deferred_light_shader;
 mod deferred_light_sphere_shader;
 mod deferred_terrain_shader;
-mod deferred_heightmap_shader;
 mod ecs;
 mod ecs2;
 mod fxaa_shader;
@@ -18,8 +18,8 @@ mod performance_monitor;
 mod point_light_storage;
 mod renderer;
 mod settings;
-mod world_mesh;
 mod terrain_storage;
+mod world_mesh;
 
 use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,
@@ -74,6 +74,8 @@ struct MarketEconomySimulation {
 
     ambient_light_quad: deferred_light_shader::Mesh, // Quad running the global ambient light shader
     point_light_storage: point_light_storage::PointLightStorage,
+
+    terrain_storage: terrain_storage::TerrainStorage,
 }
 
 impl MarketEconomySimulation {
@@ -199,6 +201,14 @@ impl MarketEconomySimulation {
             settings.dbg_point_lights,
         );
 
+        let terrain_storage = terrain_storage::TerrainStorage::new(
+            renderer_interface,
+            &renderer.texture_bind_group_layout,
+            &renderer.heightmap_bind_group_layout,
+            2,
+            2,
+        );
+
         Self {
             _settings: settings,
 
@@ -229,6 +239,8 @@ impl MarketEconomySimulation {
 
             ambient_light_quad,
             point_light_storage,
+
+            terrain_storage
         }
     }
 }
@@ -324,6 +336,8 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             }
 
             self.point_light_storage.update(renderer_interface);
+
+            self.terrain_storage.update();
         }
         self.watch_fps.stop(3);
 
@@ -414,6 +428,8 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             &self.game_state.terrain_mesh,
             &self.animated_object_storage,
             &self.point_light_storage,
+            &self.terrain_storage,
+
             &self.ant,
             &self.entity_index_mesh,
             &self.ambient_light_quad,

@@ -19,7 +19,7 @@ pub struct Pipeline {
 
 impl Pipeline {
 
-    fn new(
+    pub fn new(
         device: &wgpu::Device,
         camera_bind_group_layout: &CameraBindGroupLayout,
         texture_bind_group_layout: &TextureBindGroupLayout,

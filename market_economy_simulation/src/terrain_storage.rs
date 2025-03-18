@@ -14,7 +14,7 @@ const LOD: usize = 4;
 type HeightmapInstanceBuffer =
     deferred_heightmap_shader::InstanceBuffer<deferred_heightmap_shader::Instance>;
 
-struct TerrainStorage {
+pub struct TerrainStorage {
     mesh: [deferred_heightmap_shader::Mesh; LOD],
     texture: deferred_heightmap_shader::Texture,
 
@@ -30,7 +30,7 @@ struct TerrainStorage {
 }
 
 impl TerrainStorage {
-    fn new(
+    pub fn new(
         renderer: &mut dyn WgpuRendererInterface,
         texture_bind_group_layout: &deferred_heightmap_shader::TextureBindGroupLayout,
         heightmap_bind_group_layout: &deferred_heightmap_shader::HeightmapBindGroupLayout,
@@ -136,6 +136,10 @@ impl TerrainStorage {
 
     pub fn update_view_position(&mut self, view_position: &cgmath::Vector3<f32>) {
         self.view_position = *view_position;
+    }
+
+    pub fn update(&mut self) {
+        
     }
 }
 

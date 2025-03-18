@@ -11,6 +11,7 @@ use crate::deferred_terrain_shader::{self, DeferredTerrainShaderDraw};
 use crate::fxaa_shader::FxaaShaderDraw;
 use crate::performance_monitor::PerformanceMonitor;
 use crate::point_light_storage::PointLightStorage;
+use crate::terrain_storage::TerrainStorage;
 use camera_controller::CameraController;
 use wgpu_renderer::performance_monitor::watch;
 use wgpu_renderer::vertex_color_shader::{self};
@@ -20,7 +21,8 @@ use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
 use winit::event::{ElementState, MouseScrollDelta};
 
 use crate::{
-    deferred_animation_shader, deferred_light_shader, deferred_light_sphere_shader, fxaa_shader,
+    deferred_animation_shader, deferred_heightmap_shader, deferred_light_shader,
+    deferred_light_sphere_shader, fxaa_shader,
 };
 
 pub struct RendererSettings {
@@ -53,6 +55,9 @@ pub struct Renderer {
     pipeline_deferred_animated: deferred_animation_shader::Pipeline,
 
     pipeline_deferred_terrain: deferred_terrain_shader::Pipeline,
+
+    pub heightmap_bind_group_layout: deferred_heightmap_shader::HeightmapBindGroupLayout,
+    pipeline_deferred_heightmap: deferred_heightmap_shader::Pipeline,
 
     post_processing_bind_group_layout: fxaa_shader::PostProcessingTextureBindGroupLayout,
     post_processing_texture: fxaa_shader::PostProcessingTexture,
@@ -175,6 +180,17 @@ impl Renderer {
             surface_format,
         );
 
+        // pipeline deferred heightmap
+        let heightmap_bind_group_layout =
+            deferred_heightmap_shader::HeightmapBindGroupLayout::new(wgpu_renderer.device());
+        let pipeline_deferred_heightmap = deferred_heightmap_shader::Pipeline::new(
+            wgpu_renderer.device(),
+            &camera_bind_group_layout,
+            &texture_bind_group_layout,
+            &heightmap_bind_group_layout,
+            surface_format,
+        );
+
         // pipeline fxaa
         let post_processing_bind_group_layout =
             fxaa_shader::PostProcessingTextureBindGroupLayout::new(wgpu_renderer.device());
@@ -251,6 +267,9 @@ impl Renderer {
             pipeline_deferred_animated,
 
             pipeline_deferred_terrain,
+
+            heightmap_bind_group_layout,
+            pipeline_deferred_heightmap,
 
             post_processing_bind_group_layout,
             post_processing_texture,
@@ -656,6 +675,7 @@ impl Renderer {
         deferred_terrain: &dyn DeferredTerrainShaderDraw,
         animated_object_storage: &WgpuAnimatedObjectStorage,
         point_light_storage: &PointLightStorage,
+        terrain_storage: &TerrainStorage,
 
         ant_light_orbs: &(impl DeferredShaderDraw + DeferredLightShaderDraw),
         mesh_textured_gui: &impl VertexTextureShaderDraw,
