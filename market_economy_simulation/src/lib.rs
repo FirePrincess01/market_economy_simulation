@@ -202,11 +202,10 @@ impl MarketEconomySimulation {
         );
 
         let terrain_storage = terrain_storage::TerrainStorage::new(
+            settings.get_terrain_settings(),
             renderer_interface,
             &renderer.texture_bind_group_layout,
             &renderer.heightmap_bind_group_layout,
-            2,
-            2,
         );
 
         Self {
@@ -337,6 +336,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
 
             self.point_light_storage.update(renderer_interface);
 
+            self.terrain_storage.update_view_position(&self.renderer.get_view_position());
             self.terrain_storage.update();
         }
         self.watch_fps.stop(3);

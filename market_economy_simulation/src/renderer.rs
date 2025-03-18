@@ -366,6 +366,12 @@ impl Renderer {
         self.camera_controller.process_scroll(delta);
     }
 
+    pub fn get_view_position(&self) -> cgmath::Vector3<f32> {
+        let pos = self.camera.position;
+
+        cgmath::Vector3::new(pos.x, pos.y, pos.z)
+    }
+
     #[allow(clippy::too_many_arguments)]
     fn render_deferred(
         &self,
@@ -375,6 +381,7 @@ impl Renderer {
         meshes: &[&dyn DeferredShaderDraw],
         deferred_terrain: &dyn DeferredTerrainShaderDraw,
         ant_light_orbs: &dyn DeferredShaderDraw,
+        terrain_storage: &TerrainStorage,
         animated_object_storage: &WgpuAnimatedObjectStorage,
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -475,10 +482,16 @@ impl Renderer {
         );
 
         // terrain
-        self.pipeline_deferred_terrain.draw(
+        // self.pipeline_deferred_terrain.draw(
+        //     &mut render_pass,
+        //     &self.camera_uniform_buffer,
+        //     deferred_terrain,
+        // );
+
+        self.pipeline_deferred_heightmap.draw(
             &mut render_pass,
             &self.camera_uniform_buffer,
-            deferred_terrain,
+            terrain_storage,
         );
 
         // other
@@ -710,6 +723,7 @@ impl Renderer {
             &[],
             deferred_terrain,
             ant_light_orbs,
+            terrain_storage,
             animated_object_storage,
         );
 

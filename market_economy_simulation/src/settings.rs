@@ -33,6 +33,12 @@ pub struct Settings {
 
     // Draws a sphere around the point lights for debugging purposes
     pub dbg_point_lights: bool,
+
+    // The side length of one tile of the terrain in points
+    pub terrain_tile_size: usize,
+
+    // The number of tiles of the terrain in in width and height
+    pub terrain_size: (usize, usize),
 }
 
 impl Settings {
@@ -41,18 +47,21 @@ impl Settings {
             // render settings
             enable_memory_mapped_read: true,
             wait_for_render_loop_to_finish: false,
-            enable_vertical_sync: true,
+            enable_vertical_sync: false,
             enable_fxaa: true,
             window_resolution: (1920 / 2, 1080 / 2),
 
             // game server settings
-            map_size: 300 * 2,
+            map_size: 10,
             enable_multithreading: true,
 
             // miscellaneous
             // max_point_light_instances: 65536,
             max_point_light_instances: 16348,
             dbg_point_lights: false,
+
+            terrain_tile_size: 256,
+            terrain_size: (32, 32),
         }
     }
 
@@ -72,6 +81,13 @@ impl Settings {
         market_economy_simulation_server::game_logic::GameLogicSettings {
             map_size: self.map_size,
             enable_multithreading: self.enable_multithreading,
+        }
+    }
+
+    pub fn get_terrain_settings(&self) -> crate::terrain_storage::TerrainSettings {
+        crate::terrain_storage::TerrainSettings {
+            terrain_tile_size: self.terrain_tile_size,
+            terrain_size: self.terrain_size,
         }
     }
 }

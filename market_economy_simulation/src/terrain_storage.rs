@@ -14,7 +14,14 @@ const LOD: usize = 4;
 type HeightmapInstanceBuffer =
     deferred_heightmap_shader::InstanceBuffer<deferred_heightmap_shader::Instance>;
 
+pub struct TerrainSettings {
+    pub terrain_tile_size: usize,
+    pub terrain_size: (usize, usize),
+}
+
 pub struct TerrainStorage {
+    settings: TerrainSettings,
+
     mesh: [deferred_heightmap_shader::Mesh; LOD],
     texture: deferred_heightmap_shader::Texture,
 
@@ -27,51 +34,62 @@ pub struct TerrainStorage {
     width: usize,
     height: usize,
     size: usize,
+    tile_size: usize,
 }
 
 impl TerrainStorage {
     pub fn new(
+        settings: TerrainSettings,
         renderer: &mut dyn WgpuRendererInterface,
         texture_bind_group_layout: &deferred_heightmap_shader::TextureBindGroupLayout,
         heightmap_bind_group_layout: &deferred_heightmap_shader::HeightmapBindGroupLayout,
-        width: usize,
-        height: usize,
     ) -> Self {
+        let width = settings.terrain_size.0;
+        let height = settings.terrain_size.1;
         let size: usize = width * height;
-        let texture_side_length = 32;
+        let texture_side_length = settings.terrain_tile_size + 1;
 
         // mesh
         let mesh: [deferred_heightmap_shader::Mesh; LOD] = std::array::from_fn(|index| {
             let a = 2u32.pow(index as u32);
 
-            let grid = shape::Grid::new(a as f32, texture_side_length);
+            let grid = shape::Grid::new(1.0, settings.terrain_tile_size / (a as usize) + 1);
             let gird_triangles = grid.triangles();
             deferred_heightmap_shader::Mesh::from_shape(renderer.device(), gird_triangles)
         });
 
         // texture
         let texture_bytes = include_bytes!("../res/tile.png");
+        // let texture_bytes = include_bytes!("../res/pony2.png");
         let texture_image = image::load_from_memory(texture_bytes).unwrap();
         let texture_rgba = texture_image.to_rgba8();
 
-        let texture = deferred_heightmap_shader::Texture::new(
+        let texture = deferred_heightmap_shader::Texture::new_with_mipmaps(
             renderer,
             &texture_bind_group_layout,
             &texture_rgba,
             Some("tile.png"),
+            9,
         )
         .unwrap();
 
+        // position
+        let offset_y = (texture_side_length - 1) * height / 2;
+        let offset_x = (texture_side_length - 1) * width / 2;
         let mut texture_positions: Vec<cgmath::Vector3<f32>> = Vec::with_capacity(size);
         for y in 0..height {
             for x in 0..width {
-                let pos = cgmath::Vector3::new((x * width) as f32, (y * height) as f32, 0.0);
+                let pos = cgmath::Vector3::new(
+                    (x * (texture_side_length - 1)) as f32 - offset_x as f32,
+                    (y * (texture_side_length - 1)) as f32 - offset_y as f32,
+                    0.0,
+                );
                 texture_positions.push(pos);
             }
         }
 
         let mut instances: Vec<[HeightmapInstanceBuffer; LOD]> = Vec::with_capacity(size);
-        for i in 0..texture_side_length {
+        for i in 0..size {
             let instance_array: [HeightmapInstanceBuffer; LOD] = std::array::from_fn(|index| {
                 let a = 2u32.pow(index as u32);
 
@@ -88,33 +106,104 @@ impl TerrainStorage {
         }
 
         let mut height_textures: Vec<[Option<deferred_heightmap_shader::HeightmapTexture>; LOD]> =
-            Vec::with_capacity(texture_side_length);
-        for i in 0..texture_side_length {
+            Vec::with_capacity(size);
+        for i in 0..size {
             let height_texture_array: [Option<deferred_heightmap_shader::HeightmapTexture>; LOD] =
                 std::array::from_fn(|index| None);
             height_textures.push(height_texture_array);
         }
 
         // insert zero value at level 0
-        for i in 0..texture_side_length {
-            let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> = Vec::with_capacity(texture_side_length * texture_side_length);
-            heightmap.resize(texture_side_length * texture_side_length, deferred_heightmap_shader::Heightmap::zero());
+        for i in 0..size {
+            {
+                let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> =
+                    Vec::with_capacity(texture_side_length * texture_side_length);
+                heightmap.resize(
+                    texture_side_length * texture_side_length,
+                    deferred_heightmap_shader::Heightmap::zero(),
+                );
 
-            let height_texture = deferred_heightmap_shader::HeightmapTexture::new(
-                renderer.device(),
-                heightmap_bind_group_layout,
-                &heightmap,
-                width as u32,
-                height as u32,
-                Some("terrain"),
-            );
+                let height_texture = deferred_heightmap_shader::HeightmapTexture::new(
+                    renderer.device(),
+                    heightmap_bind_group_layout,
+                    &heightmap,
+                    width as u32,
+                    height as u32,
+                    Some("terrain"),
+                );
 
-            height_textures[i][0] = Some(height_texture);
+                height_textures[i][0] = Some(height_texture);
+            }
+            {
+                let side_length = texture_side_length / 2;
+                let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> =
+                    Vec::with_capacity(side_length * side_length);
+                heightmap.resize(
+                    side_length * side_length,
+                    deferred_heightmap_shader::Heightmap::zero(),
+                );
+
+                let height_texture = deferred_heightmap_shader::HeightmapTexture::new(
+                    renderer.device(),
+                    heightmap_bind_group_layout,
+                    &heightmap,
+                    width as u32,
+                    height as u32,
+                    Some("terrain"),
+                );
+
+                height_textures[i][1] = Some(height_texture);
+            }
+
+            {
+                let side_length = texture_side_length / 4;
+                let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> =
+                    Vec::with_capacity(side_length * side_length);
+                heightmap.resize(
+                    side_length * side_length,
+                    deferred_heightmap_shader::Heightmap::zero(),
+                );
+
+                let height_texture = deferred_heightmap_shader::HeightmapTexture::new(
+                    renderer.device(),
+                    heightmap_bind_group_layout,
+                    &heightmap,
+                    width as u32,
+                    height as u32,
+                    Some("terrain"),
+                );
+
+                height_textures[i][2] = Some(height_texture);
+            }
+
+            {
+                let side_length = texture_side_length / 8;
+                let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> =
+                    Vec::with_capacity(side_length * side_length);
+                heightmap.resize(
+                    side_length * side_length,
+                    deferred_heightmap_shader::Heightmap::zero(),
+                );
+
+                let height_texture = deferred_heightmap_shader::HeightmapTexture::new(
+                    renderer.device(),
+                    heightmap_bind_group_layout,
+                    &heightmap,
+                    width as u32,
+                    height as u32,
+                    Some("terrain"),
+                );
+
+                height_textures[i][3] = Some(height_texture);
+            }
         }
 
         let view_position: cgmath::Vector3<f32> = cgmath::Vector3::zero();
 
+        let tile_size = settings.terrain_tile_size;
+
         Self {
+            settings,
             mesh,
             texture,
             instances,
@@ -124,23 +213,32 @@ impl TerrainStorage {
             size,
             width,
             height,
+            tile_size,
         }
     }
 
     fn calculate_lod_index(
-        view_postion: cgmath::Vector3<f32>,
+        view_position: cgmath::Vector3<f32>,
         position: cgmath::Vector3<f32>,
+        tile_size: usize,
     ) -> usize {
-        0
+        let distance = view_position.distance(position);
+        if distance > tile_size as f32 * 6.0 {
+            3
+        } else if distance > tile_size as f32 * 4.0 {
+            2
+        } else if distance > tile_size as f32 * 2.0 {
+            1
+        } else {
+            0
+        }
     }
 
     pub fn update_view_position(&mut self, view_position: &cgmath::Vector3<f32>) {
         self.view_position = *view_position;
     }
 
-    pub fn update(&mut self) {
-        
-    }
+    pub fn update(&mut self) {}
 }
 
 impl DeferredHeightMapShaderDraw for TerrainStorage {
@@ -152,7 +250,7 @@ impl DeferredHeightMapShaderDraw for TerrainStorage {
             let instances = &self.instances[i];
 
             // level of detail
-            let lod = Self::calculate_lod_index(self.view_position, *position);
+            let lod = Self::calculate_lod_index(self.view_position, *position, self.tile_size);
             let mesh = &self.mesh[lod];
             let height_texture = &height_texture[lod];
             let instance = &instances[lod];

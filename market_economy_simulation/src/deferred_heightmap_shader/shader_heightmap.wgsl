@@ -17,7 +17,7 @@ struct VertexInput {
 struct InstanceInput {
     @location(5) position: vec3<f32>,
     @location(6) color: vec3<f32>, 
-    @location(7) entity: vec3<u32>,
+    @location(7) entity: u32,
     @location(8) distance: f32,
 }
 
@@ -26,7 +26,7 @@ struct VertexOutput {
     @location(0) color: vec3<f32>,
     @location(1) position: vec3<f32>,
     @location(2) normal: vec3<f32>,
-    @location(3) entity: vec3<u32>,
+    @location(3) entity: u32,
     @location(4) tex_coords: vec2<f32>,
 };
 
@@ -39,19 +39,19 @@ fn vs_main(
 
     let dim: vec2<u32> = textureDimensions(t_heightmap);
     let index = vec2<u32>(vertex_index % dim.x, vertex_index / dim.y);
-    let tex_coords = vec2<f32>(f32(dim.x), f32(dim.y));
     let distance = instance.distance;
+    let tex_coords = vec2<f32>(model.position.x * distance, model.position.y * distance);
 
     let heights = get_neighborhood(index);
 
     // calculate position
-    let vertex_position = vec3<f32>(model.position.x, model.position.y , heights.m);
+    let vertex_position = vec3<f32>(model.position.x * distance, model.position.y *distance, heights.m);
     let position = instance.position + vertex_position;
 
     // normal calculation, use negative derivatives
     let normal_x = (heights.w - heights.e) / 2.0;
     let normal_y = (heights.s - heights.n) / 2.0;
-    let normal = vec3<f32>(normal_x, normal_y, distance);
+    let normal = normalize(vec3<f32>(normal_x, normal_y, distance));
 
     var out: VertexOutput;
     out.clip_position = camera.view_proj * vec4<f32>(position, 1.0);
@@ -65,6 +65,11 @@ fn vs_main(
 }
 
 // Fragment shader
+@group(1) @binding(0)
+var t_texture: texture_2d<f32>;
+@group(1) @binding(1)
+var s_texture: sampler;
+
 struct FragmentOutput {
     // @location(0) surface: vec4<f32>,
     @location(0) position: vec4<f32>,
@@ -76,16 +81,19 @@ struct FragmentOutput {
 @fragment
 fn fs_main(in: VertexOutput) -> FragmentOutput {
 
-    var entity0 = (in.entity[0] >> 0u) & 0xffu;
-    var entity1 = (in.entity[0] >> 8u) & 0xffu;
-    var entity2 = (in.entity[0] >> 16u) & 0xffu;
-    var entity3 = (in.entity[0] >> 24u) & 0xffu;
+    var entity0 = (in.entity >> 0u) & 0xffu;
+    var entity1 = (in.entity >> 8u) & 0xffu;
+    var entity2 = (in.entity >> 16u) & 0xffu;
+    var entity3 = (in.entity >> 24u) & 0xffu;
+
+    let color = textureSample(t_texture, s_texture, in.tex_coords);
 
     var out: FragmentOutput;
     // out.surface = vec4<f32>(in.color, 1.0);
     out.position =  vec4<f32>(in.position, 1.0);
     out.normal =  vec4<f32>(in.normal, 1.0);
-    out.albedo = vec4<f32>(in.color, 1.0);
+    // out.albedo = vec4<f32>(color.xyz, 0.5);
+    out.albedo = color;
     out.entity =  vec4<f32>(
         f32(entity0)/255.0, 
         f32(entity1)/255.0, 
