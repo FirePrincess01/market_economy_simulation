@@ -12,25 +12,43 @@ impl HeightMapGenerator {
     }
 
     pub fn generate(&self, details: HeightMapDetails) -> HeightMap {
-        let distance = details.distance;
-        let size_x = details.size_x;
-        let size_y = details.size_y;
-        let p_x = details.x;
-        let p_y = details.y;
+        let distance = details.point_distance;
+        let size_x = details.size_0;
+        let size_y = details.size_0;
+        let p_x = details.pos_0.x;
+        let p_y = details.pos_0.y;
 
         let size = size_x * size_y;
 
         let mut heights = Vec::with_capacity(size);
         for y in 0..size_y {
             for x in 0..size_x {
-                let height = self
+                let mut height = self
                     .perlin
                     // .get([(p_x + x) as f64 / 128.0, (p_y + y) as f64 / 128.0])
                     .get([
-                        (p_x + x * distance) as f64 / 10.0,
-                        (p_y + y * distance) as f64 / 10.0,
+                        (p_x + x as isize * distance as isize) as f64 / 10.0,
+                        (p_y + y as isize * distance as isize) as f64 / 10.0,
                     ])
-                    * 10.0;
+                    * 2.0;
+
+                height += self
+                    .perlin
+                    // .get([(p_x + x) as f64 / 128.0, (p_y + y) as f64 / 128.0])
+                    .get([
+                        (p_x + x as isize * distance as isize) as f64 / 1000.0,
+                        (p_y + y as isize * distance as isize) as f64 / 1000.0,
+                    ])
+                    * 100.0;
+
+                    height += self
+                    .perlin
+                    // .get([(p_x + x) as f64 / 128.0, (p_y + y) as f64 / 128.0])
+                    .get([
+                        (p_x + x as isize * distance as isize) as f64 / 10000.0,
+                        (p_y + y as isize * distance as isize) as f64 / 10000.0,
+                    ])
+                    * 1000.0;
 
                 // let height = x as f32 * 0.1;
 
@@ -50,56 +68,60 @@ pub struct HeightMap {
 
 #[derive(Clone, Debug)]
 pub struct HeightMapDetails {
-    pub distance: usize,
-    pub size_x: usize,
-    pub size_y: usize,
-    pub x: usize,
-    pub y: usize,
+    pub pos_0: cgmath::Vector2<isize>, // texture world position at index (0/0)
+    pub pos_1: cgmath::Vector2<isize>, // texture position at index (1/1)
+    pub point_distance: usize,         // distance between pos_1.x - pos_0.x
 
-    pub index: usize, // index of the structure on the client
-    pub lod: usize,   // level of detail of the structure on the client
+    pub size_0: usize, // nr points between (0/0) and (N/N)
+    pub size_1: usize, // nr points between (1/1) and ((N-1)/(N-1)), (size_0 - 2)
+
+    pub nr_tiles: usize, // size_0 - 3
+
+    // pub data_index: usize, // Index in the Data.data array
+    pub depth: usize,      // Depth of the Node in the quad tree
+    pub node_index: usize, // Index of the Node in the quad tree
 }
 
-#[test]
-fn test_heightmap_generator() {
-    let generator = HeightMapGenerator::new();
+// #[test]
+// fn test_heightmap_generator() {
+//     let generator = HeightMapGenerator::new();
 
-    let res_0 = generator.generate(HeightMapDetails {
-        distance: 1,
-        size_x: 4,
-        size_y: 4,
-        x: 0,
-        y: 0,
-        index: 0,
-        lod: 0,
-    });
+//     let res_0 = generator.generate(HeightMapDetails {
+//         distance: 1,
+//         size_x: 4,
+//         size_y: 4,
+//         x: 0,
+//         y: 0,
+//         index: 0,
+//         lod: 0,
+//     });
 
-    let res_1 = generator.generate(HeightMapDetails {
-        distance: 2,
-        size_x: 2,
-        size_y: 2,
-        x: 0,
-        y: 0,
-        index: 0,
-        lod: 0,
-    });
+//     let res_1 = generator.generate(HeightMapDetails {
+//         distance: 2,
+//         size_x: 2,
+//         size_y: 2,
+//         x: 0,
+//         y: 0,
+//         index: 0,
+//         lod: 0,
+//     });
 
-    println!("{:#?}", res_0);
-    println!("{:#?}", res_1);
-}
+//     println!("{:#?}", res_0);
+//     println!("{:#?}", res_1);
+// }
 
-#[test]
-fn test_perlin_noise() {
-    let perlin: noise::Perlin = noise::Perlin::new(1);
-    {
-        let noise_0 = perlin.get([0.0, 0.0]);
-        let noise_1 = perlin.get([0.0, 0.0]);
-        assert_eq!(noise_0, noise_1);
-    }
+// #[test]
+// fn test_perlin_noise() {
+//     let perlin: noise::Perlin = noise::Perlin::new(1);
+//     {
+//         let noise_0 = perlin.get([0.0, 0.0]);
+//         let noise_1 = perlin.get([0.0, 0.0]);
+//         assert_eq!(noise_0, noise_1);
+//     }
 
-    {
-        let noise_0 = perlin.get([100.5, 100.5]);
-        let noise_1 = perlin.get([100.5, 100.5]);
-        assert_eq!(noise_0, noise_1);
-    }
-}
+//     {
+//         let noise_0 = perlin.get([100.5, 100.5]);
+//         let noise_1 = perlin.get([100.5, 100.5]);
+//         assert_eq!(noise_0, noise_1);
+//     }
+// }

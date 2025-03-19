@@ -115,6 +115,19 @@ impl Mesh {
             0..1,
         );
     }
+
+    pub fn bind<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
+        self.vertex_buffer.bind(render_pass);
+        self.index_buffer.bind(render_pass);
+    }
+
+    pub fn draw_indexed<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
+        render_pass.draw_indexed(
+            0..self.index_buffer.size(),
+            0,
+            0..1,
+        );
+    }
 }
 
 // impl DeferredHeightMapShaderDraw for Mesh {

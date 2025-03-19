@@ -1,7 +1,7 @@
 //! Global settings of the application
 //!
 
-use crate::renderer;
+use crate::{renderer, terrain_storage::terrain_storage_v2::TerrainSettings};
 
 pub struct Settings {
     /// On mobile, memory mapped read may may have extremely bad performance.
@@ -34,11 +34,17 @@ pub struct Settings {
     // Draws a sphere around the point lights for debugging purposes
     pub dbg_point_lights: bool,
 
-    // The side length of one tile of the terrain in points
-    pub terrain_tile_size: usize,
+    // // The side length of one tile of the terrain in points
+    // pub terrain_tile_size: usize,
 
-    // The number of tiles of the terrain in in width and height
-    pub terrain_size: (usize, usize),
+    // // The number of tiles of the terrain in in width and height
+    // pub terrain_size: (usize, usize),
+
+    // The number of tiles in the terrain
+    pub nr_tiles: usize,
+
+    // The maximum depth of the lod quad tree
+    pub max_depth: usize,
 }
 
 impl Settings {
@@ -60,11 +66,14 @@ impl Settings {
             max_point_light_instances: 16348,
             dbg_point_lights: false,
 
-            terrain_tile_size: 256,
-            terrain_size: (32, 32),
+            // terrain_tile_size: 256,
+            // terrain_size: (32, 32),
 
             // terrain_tile_size: 8,
-            // terrain_size: (1, 1),
+            // terrain_size: (4, 4),
+
+            nr_tiles: 128,
+            max_depth: 8,
         }
     }
 
@@ -87,10 +96,10 @@ impl Settings {
         }
     }
 
-    pub fn get_terrain_settings(&self) -> crate::terrain_storage::TerrainSettings {
-        crate::terrain_storage::TerrainSettings {
-            terrain_tile_size: self.terrain_tile_size,
-            terrain_size: self.terrain_size,
+    pub fn get_terrain_settings(&self) -> TerrainSettings {
+        TerrainSettings {
+            nr_tiles: self.nr_tiles,
+            max_depth: self.max_depth,
         }
     }
 }

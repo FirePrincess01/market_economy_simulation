@@ -42,6 +42,7 @@ fn vs_main(
     let index = vec2<u32>(u32(model.position.x), u32(model.position.y));
     let distance = instance.distance;
     let tex_coords = vec2<f32>(model.position.x * distance, model.position.y * distance);
+    // let tex_coords = vec2<f32>(model.position.x, model.position.y);
 
     let heights = get_neighborhood(index);
 
