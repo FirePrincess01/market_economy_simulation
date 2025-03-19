@@ -23,40 +23,58 @@ impl HeightMapGenerator {
         let mut heights = Vec::with_capacity(size);
         for y in 0..size_y {
             for x in 0..size_x {
-                let mut height = self
-                    .perlin
-                    // .get([(p_x + x) as f64 / 128.0, (p_y + y) as f64 / 128.0])
-                    .get([
-                        (p_x + x as isize * distance as isize) as f64 / 10.0,
-                        (p_y + y as isize * distance as isize) as f64 / 10.0,
-                    ])
-                    * 2.0;
+                let mut height = (self.perlin.get([
+                    (p_x + x as isize * distance as isize) as f64 / 128.0,
+                    (p_y + y as isize * distance as isize) as f64 / 128.0,
+                ]) * 20.0)
+                    .max(0.0);
 
-                height += self
-                    .perlin
-                    // .get([(p_x + x) as f64 / 128.0, (p_y + y) as f64 / 128.0])
-                    .get([
-                        (p_x + x as isize * distance as isize) as f64 / 1000.0,
-                        (p_y + y as isize * distance as isize) as f64 / 1000.0,
-                    ])
-                    * 100.0;
+                height += (self.perlin.get([
+                    (p_x + x as isize * distance as isize) as f64 / 64.0,
+                    (p_y + y as isize * distance as isize) as f64 / 64.0,
+                ]) * 20.0)
+                    .max(0.0);
 
-                    height += self
-                    .perlin
-                    // .get([(p_x + x) as f64 / 128.0, (p_y + y) as f64 / 128.0])
-                    .get([
-                        (p_x + x as isize * distance as isize) as f64 / 10000.0,
-                        (p_y + y as isize * distance as isize) as f64 / 10000.0,
-                    ])
-                    * 1000.0;
+                height += (self.perlin.get([
+                    (p_x + x as isize * distance as isize) as f64 / 32.0,
+                    (p_y + y as isize * distance as isize) as f64 / 32.0,
+                ]) * 20.0)
+                    .max(0.0);
 
-                // let height = x as f32 * 0.1;
+                height += (self.perlin.get([
+                    (p_x + x as isize * distance as isize) as f64 / 16.0,
+                    (p_y + y as isize * distance as isize) as f64 / 16.0,
+                ]) * 8.0)
+                    .max(0.0);
+
+                height += (self.perlin.get([
+                    (p_x + x as isize * distance as isize) as f64 / 8.0,
+                    (p_y + y as isize * distance as isize) as f64 / 8.0,
+                ]) * 2.0)
+                    .max(0.0);
+
+                // create canyon
+                let a = Self::depth_to_distance(7, 8);
+                height *= Self::canyon(
+                    (p_x + x as isize * distance as isize - a as isize / 2) as f32 / 20.0,
+                ) as f64;
 
                 heights.push(height as f32);
             }
         }
 
         HeightMap { heights, details }
+    }
+
+    fn canyon(x: f32) -> f32 {
+        1.0 - 1.0 / (1.0 + x * x * x * x * x * x)
+    }
+
+    pub fn depth_to_distance(depth: usize, max_depth: usize) -> usize {
+        let exponent = max_depth - 1 - depth;
+        let distance = 2usize.pow(exponent as u32);
+
+        distance
     }
 }
 

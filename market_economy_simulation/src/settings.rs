@@ -73,7 +73,7 @@ impl Settings {
             // terrain_size: (4, 4),
 
             nr_tiles: 128,
-            max_depth: 8,
+            max_depth: 6,
         }
     }
 

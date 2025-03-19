@@ -28,7 +28,7 @@ impl LodQuadTree {
         let a = nr_tiles * distance;
 
         let square = Square {
-            pos_0: cgmath::Vector2 { x: 0, y: 0 },
+            pos_0: cgmath::Vector2 { x: 0 - a as isize / 2, y: 0 - a as isize / 2},
             a,
         };
 
@@ -75,9 +75,9 @@ impl LodQuadTree {
     ) {
         let distance = square.middle_vec3() - view_position;
         let distance_squared = distance.dot(distance);
-        let a = square.a;
+        let a_squared = square.a * square.a;
 
-        let is_in_range = distance_squared / 8 < (a * a) as isize;
+        let is_in_range = distance_squared < a_squared as isize * 8;
 
         if depth < self.max_depth-1 && is_in_range {
             if self.nodes[node].first_child.is_none() {

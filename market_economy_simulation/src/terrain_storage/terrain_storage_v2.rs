@@ -125,10 +125,12 @@ impl TerrainStorageV2 {
         assert_eq!(nr_tiles, self.nr_tiles);
 
         // create host data
-        let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> = Vec::with_capacity(size_0 * size_0);
+        let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> =
+            Vec::with_capacity(size_0 * size_0);
         assert_eq!(height_map.heights.len(), size_0 * size_0);
         for elem in height_map.heights {
             heightmap.push(vertex_heightmap_shader::Heightmap { height: elem });
+            // heightmap.push(vertex_heightmap_shader::Heightmap { height: 0.0 });
         }
 
         let heightmap_details = TerrainTextureDetails {
