@@ -11,10 +11,12 @@ use wgpu_renderer::vertex_color_shader;
 use wgpu_renderer::wgpu_renderer::depth_texture;
 
 /// A general purpose shader using vertices, colors and an instance matrix
+#[allow(unused)]
 pub struct Pipeline {
     render_pipeline: wgpu::RenderPipeline,
 }
 
+#[allow(unused)]
 impl Pipeline {
     pub fn _new_lines(
         device: &wgpu::Device,

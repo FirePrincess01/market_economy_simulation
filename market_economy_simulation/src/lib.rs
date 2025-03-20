@@ -157,28 +157,10 @@ impl MarketEconomySimulation {
         animated_object_renderer.create_from_glb(glb_bin);
 
         // create game server
-        let mut game_logic =
+        let game_logic =
             market_economy_simulation_server::GameLogicServer::new(settings.get_server_settings());
 
-        // game_server
-        //     .send_messages()
-        //     .send(GameLogicMessageRequest::GetTerrain)
-        //     .unwrap();
-        // game_server.update();
-
-        // // get base values from game server
-        // #[allow(clippy::needless_late_init)]
-        // let terrain_server: market_economy_simulation_server::terrain::Terrain;
-        // let msg: GameLogicMessageHeavy = game_server.get_heavy_messages().recv().unwrap();
-        // match msg {
-        //     GameLogicMessageHeavy::Terrain(terrain) => {
-        //         terrain_server = terrain;
-        //     }
-        // }
-
-        // // create the game state
-        // let game_state = game_state::GameState::new(renderer_interface, terrain_server);
-
+        // create ant
         let ant = ant::Ant::new(renderer_interface);
 
         let ambient_light_quad_vertices = geometry::Quad::new(2.0);

@@ -28,6 +28,7 @@ pub struct Mesh {
     // nr_instances: u32,
 }
 
+#[allow(unused)]
 impl Mesh {
     pub fn new(
         device: &wgpu::Device,

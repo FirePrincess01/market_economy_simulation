@@ -28,7 +28,7 @@ pub struct TerrainSettings {
 }
 
 pub struct TerrainStorage {
-    settings: TerrainSettings,
+    _settings: TerrainSettings,
 
     mesh: deferred_heightmap_shader::Mesh,
     texture: deferred_heightmap_shader::Texture,
@@ -91,7 +91,7 @@ impl TerrainStorage {
         let requests = Vec::new();
 
         Self {
-            settings,
+            _settings: settings,
             mesh,
             texture,
             heightmap_textures,

@@ -10,6 +10,7 @@ pub struct Instance {
     pub distance: f32,
 }
 
+#[allow(unused)]
 impl Instance {
     pub fn new() -> Self {
         Self {

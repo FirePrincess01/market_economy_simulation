@@ -54,8 +54,6 @@ pub struct Renderer {
     pub animation_bind_group_layout: deferred_animation_shader::AnimationBindGroupLayout,
     pipeline_deferred_animated: deferred_animation_shader::Pipeline,
 
-    pipeline_deferred_terrain: deferred_terrain_shader::Pipeline,
-
     pub heightmap_bind_group_layout: deferred_heightmap_shader::HeightmapBindGroupLayout,
     pipeline_deferred_heightmap: deferred_heightmap_shader::Pipeline,
 
@@ -173,13 +171,6 @@ impl Renderer {
             surface_format,
         );
 
-        // pipeline deferred terrain
-        let pipeline_deferred_terrain = deferred_terrain_shader::Pipeline::new(
-            wgpu_renderer.device(),
-            &camera_bind_group_layout,
-            surface_format,
-        );
-
         // pipeline deferred heightmap
         let heightmap_bind_group_layout =
             deferred_heightmap_shader::HeightmapBindGroupLayout::new(wgpu_renderer.device());
@@ -265,8 +256,6 @@ impl Renderer {
 
             animation_bind_group_layout,
             pipeline_deferred_animated,
-
-            pipeline_deferred_terrain,
 
             heightmap_bind_group_layout,
             pipeline_deferred_heightmap,
@@ -379,7 +368,6 @@ impl Renderer {
         _view: &wgpu::TextureView,
         encoder: &mut wgpu::CommandEncoder,
         meshes: &[&dyn DeferredShaderDraw],
-        // deferred_terrain: &dyn DeferredTerrainShaderDraw,
         ant_light_orbs: &dyn DeferredShaderDraw,
         terrain_storage: &mut TerrainStorage,
         animated_object_storage: &WgpuAnimatedObjectStorage,
@@ -482,12 +470,6 @@ impl Renderer {
         );
 
         // terrain
-        // self.pipeline_deferred_terrain.draw(
-        //     &mut render_pass,
-        //     &self.camera_uniform_buffer,
-        //     deferred_terrain,
-        // );
-
         self.pipeline_deferred_heightmap.draw(
             &mut render_pass,
             &self.camera_uniform_buffer,
@@ -685,7 +667,6 @@ impl Renderer {
         // deferred: & impl DeferredShaderDraw,
         // deferred_light: & impl DeferredLightShaderDraw,
         // deferred_combined: &(impl DeferredShaderDraw + DeferredLightShaderDraw),
-        // deferred_terrain: &dyn DeferredTerrainShaderDraw,
         animated_object_storage: &WgpuAnimatedObjectStorage,
         point_light_storage: &PointLightStorage,
         terrain_storage: &mut TerrainStorage,
@@ -721,7 +702,6 @@ impl Renderer {
             &view,
             &mut encoder,
             &[],
-            // deferred_terrain,
             ant_light_orbs,
             terrain_storage,
             animated_object_storage,
