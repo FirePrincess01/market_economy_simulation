@@ -55,7 +55,7 @@ impl TerrainStorage {
     ) -> Self {
         let max_depth = settings.max_depth;
         let nr_tiles = settings.nr_tiles;
-        let size_0 = nr_tiles + 3;
+        let _size_0 = nr_tiles + 3;
         let size_1 = nr_tiles + 1;
 
         // mesh

@@ -7,7 +7,7 @@ use crate::animated_object::wgpu_animated_object_renderer::WgpuAnimatedObjectSto
 use crate::deferred_color_shader::entity_buffer::MousePosition;
 use crate::deferred_color_shader::{self, DeferredShaderDraw, EntityBuffer, GBuffer};
 use crate::deferred_light_shader::DeferredLightShaderDraw;
-use crate::deferred_terrain_shader::{self, DeferredTerrainShaderDraw};
+use crate::deferred_terrain_shader::{DeferredTerrainShaderDraw};
 use crate::fxaa_shader::FxaaShaderDraw;
 use crate::performance_monitor::PerformanceMonitor;
 use crate::point_light_storage::PointLightStorage;

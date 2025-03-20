@@ -25,7 +25,7 @@ use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,
 };
 use market_economy_simulation_server::game_logic::game_logic_interface::{
-    GameLogicInterface, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageMedium, GameLogicMessageRequest
+    GameLogicInterface, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageMedium
 };
 use point_light_storage::{PointLightIndex, PointLightInterface};
 use terrain_storage::TerrainStorage;

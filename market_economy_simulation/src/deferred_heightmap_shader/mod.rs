@@ -32,8 +32,6 @@ pub use super::deferred_color_shader::EntityBuffer;
 pub use crate::deferred_color_shader::GBuffer;
 
 pub use wgpu_renderer::vertex_color_shader::CameraBindGroupLayout;
-pub use wgpu_renderer::vertex_color_shader::CameraUniform;
-pub use wgpu_renderer::vertex_color_shader::CameraUniformBuffer;
 
 
 

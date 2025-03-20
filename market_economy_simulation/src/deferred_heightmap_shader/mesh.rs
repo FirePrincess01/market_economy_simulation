@@ -3,10 +3,6 @@
 
 use wgpu_renderer::shape;
 
-use super::DeferredHeightMapShaderDraw;
-use super::Heightmap;
-use super::Heightmap2D;
-use super::HeightmapBindGroupLayout;
 use super::Instance;
 use super::Vertex;
 

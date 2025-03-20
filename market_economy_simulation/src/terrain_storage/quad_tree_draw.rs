@@ -61,7 +61,7 @@ where
         self.requests.push(details);
     }
 
-    fn do_work(&mut self, index: usize, square: super::lod_quad_tree::Square, depth: usize) {
+    fn do_work(&mut self, index: usize, _square: super::lod_quad_tree::Square, _depth: usize) {
         (self.draw_function)(index)
     }
 }
