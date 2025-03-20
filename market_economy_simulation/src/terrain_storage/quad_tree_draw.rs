@@ -1,7 +1,6 @@
 //! Object to traverse the lod quad tree and draw every leaf
 //!
 
-
 use super::{
     lod_quad_tree::QuadTreeInterface,
     terrain_texture_details::{depth_to_distance, TerrainTextureDetails},

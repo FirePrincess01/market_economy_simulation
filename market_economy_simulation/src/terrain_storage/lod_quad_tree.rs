@@ -143,7 +143,9 @@ impl LodQuadTree {
         }
 
         // work with data
-        if let Some(data_index) = self.nodes[node].data { data_interface.do_work(data_index, square, depth) }
+        if let Some(data_index) = self.nodes[node].data {
+            data_interface.do_work(data_index, square, depth)
+        }
     }
 }
 
