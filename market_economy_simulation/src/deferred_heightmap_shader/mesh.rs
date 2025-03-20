@@ -3,13 +3,9 @@
 
 use wgpu_renderer::shape;
 
-use super::Instance;
 use super::Vertex;
 
-use super::HeightmapTexture;
 use super::IndexBuffer;
-use super::InstanceBuffer;
-use super::Texture;
 use super::VertexBuffer;
 
 pub struct Mesh {
@@ -19,11 +15,7 @@ pub struct Mesh {
 
 #[allow(unused)]
 impl Mesh {
-    pub fn new(
-        device: &wgpu::Device,
-        vertices: &[Vertex],
-        indices: &[u32],
-    ) -> Self {
+    pub fn new(device: &wgpu::Device, vertices: &[Vertex], indices: &[u32]) -> Self {
         let vertex_buffer = VertexBuffer::new(device, vertices);
         let index_buffer = IndexBuffer::new(device, indices);
         Self {
@@ -32,10 +24,7 @@ impl Mesh {
         }
     }
 
-    pub fn from_shape(
-        device: &wgpu::Device,
-        shape: &shape::MeshDataTriangles,
-    ) -> Self {
+    pub fn from_shape(device: &wgpu::Device, shape: &shape::MeshDataTriangles) -> Self {
         let vertices = &shape.positions;
         let normals = &shape.normals;
         let indices = &shape.indices;
