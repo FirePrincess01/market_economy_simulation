@@ -2,7 +2,7 @@ use std::sync::mpsc;
 
 use wgpu_renderer::performance_monitor::watch;
 
-use crate::{heightmap_generator::{HeightMap, HeightMapDetails}, point_lights, terrain};
+use crate::{heightmap_generator::{HeightMap, HeightMapDetails}, point_lights};
 
 pub const WATCH_POINT_SIZE: usize = 7;
 

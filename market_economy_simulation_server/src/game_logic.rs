@@ -25,7 +25,7 @@ pub struct GameLogic {
     _channel_4_tx: mpsc::Sender<GameLogicMessageCritical>,
 
     heightmap_generator: heightmap_generator::HeightMapGenerator,
-    terrain: terrain::Terrain,
+    // terrain: terrain::Terrain,
     point_lights: point_lights::PointLights,
 
     watch: watch::Watch<{ game_logic_interface::WATCH_POINT_SIZE }>,
@@ -59,7 +59,7 @@ impl GameLogic {
             _channel_4_tx: channel_4_tx,
 
             heightmap_generator,
-            terrain,
+            // terrain,
             point_lights,
 
             watch,
