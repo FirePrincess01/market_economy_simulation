@@ -4,6 +4,12 @@ pub struct HeightMapGenerator {
     perlin: noise::Perlin,
 }
 
+impl Default for HeightMapGenerator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl HeightMapGenerator {
     pub fn new() -> Self {
         let perlin: noise::Perlin = noise::Perlin::new(1);
