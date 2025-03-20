@@ -1,4 +1,4 @@
-//! A general purpose pipeline using vertices, textures, a heightmap and instances
+//! Deferred shader drawing a terrain hight map
 //!
 
 mod deferred_heightmap_shader_draw;

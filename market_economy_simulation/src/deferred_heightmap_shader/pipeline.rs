@@ -1,4 +1,4 @@
-//! Deferred shader drawing colored objects
+//! Deferred shader drawing a terrain hight map
 //!
 
 use super::CameraBindGroupLayout;
@@ -12,7 +12,6 @@ use super::Vertex;
 use wgpu_renderer::vertex_color_shader;
 use wgpu_renderer::wgpu_renderer::depth_texture;
 
-/// A general purpose shader using vertices, colors and an instance matrix
 pub struct Pipeline {
     render_pipeline: wgpu::RenderPipeline,
 }

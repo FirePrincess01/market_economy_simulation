@@ -12,16 +12,9 @@ use super::InstanceBuffer;
 use super::Texture;
 use super::VertexBuffer;
 
-/// A general purpose shader using vertices, colors and an instance matrix
 pub struct Mesh {
     vertex_buffer: VertexBuffer<Vertex>,
-    // texture_index: usize,
-    // heightmap_texture: HeightmapTexture,
     index_buffer: IndexBuffer<u32>,
-    // instance_buffer: InstanceBuffer<Instance>,
-
-    // max_instances: u32,
-    // nr_instances: u32,
 }
 
 #[allow(unused)]
@@ -30,39 +23,18 @@ impl Mesh {
         device: &wgpu::Device,
         vertices: &[Vertex],
         indices: &[u32],
-        // instances: &[Instance],
     ) -> Self {
         let vertex_buffer = VertexBuffer::new(device, vertices);
-        // let heightmap_texture = HeightmapTexture::new(
-        //     device,
-        //     heightmap_bind_group_layout,
-        //     heightmap2d.data,
-        //     heightmap2d.width,
-        //     heightmap2d.height,
-        //     Some("Heightmap Texture"),
-        // );
         let index_buffer = IndexBuffer::new(device, indices);
-
-        // let instance_buffer = InstanceBuffer::new(device, instances);
-
-        // let max_instances = instances.len() as u32;
-        // let nr_instances = instances.len() as u32;
-
         Self {
             vertex_buffer,
-            // texture_index,
-            // heightmap_texture,
             index_buffer,
-            // instance_buffer,
-            // max_instances,
-            // nr_instances,
         }
     }
 
     pub fn from_shape(
         device: &wgpu::Device,
         shape: &shape::MeshDataTriangles,
-        // instances: &[Instance],
     ) -> Self {
         let vertices = &shape.positions;
         let normals = &shape.normals;
@@ -99,21 +71,21 @@ impl Mesh {
     //     self.nr_instances = u32::min(instances.len() as u32, self.max_instances);
     // }
 
-    pub fn draw<'a>(
-        &'a self,
-        render_pass: &mut wgpu::RenderPass<'a>,
-        heightmap_texture: &'a HeightmapTexture,
-        texture: &'a Texture,
-        instance: &'a InstanceBuffer<Instance>,
-    ) {
-        self.vertex_buffer.bind(render_pass);
-        heightmap_texture.bind(render_pass);
-        texture.bind(render_pass);
-        self.index_buffer.bind(render_pass);
-        instance.bind_slot(render_pass, 1);
+    // pub fn draw<'a>(
+    //     &'a self,
+    //     render_pass: &mut wgpu::RenderPass<'a>,
+    //     heightmap_texture: &'a HeightmapTexture,
+    //     texture: &'a Texture,
+    //     instance: &'a InstanceBuffer<Instance>,
+    // ) {
+    //     self.vertex_buffer.bind(render_pass);
+    //     heightmap_texture.bind(render_pass);
+    //     texture.bind(render_pass);
+    //     self.index_buffer.bind(render_pass);
+    //     instance.bind_slot(render_pass, 1);
 
-        render_pass.draw_indexed(0..self.index_buffer.size(), 0, 0..1);
-    }
+    //     render_pass.draw_indexed(0..self.index_buffer.size(), 0, 0..1);
+    // }
 
     pub fn bind<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         self.vertex_buffer.bind(render_pass);

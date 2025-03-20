@@ -1,3 +1,5 @@
+//! Provides a function to generate single tiles of the heightmap
+
 use noise::NoiseFn;
 
 pub struct HeightMapGenerator {
@@ -103,47 +105,3 @@ pub struct HeightMapDetails {
     pub depth: usize,      // Depth of the Node in the quad tree
     pub node_index: usize, // Index of the Node in the quad tree
 }
-
-// #[test]
-// fn test_heightmap_generator() {
-//     let generator = HeightMapGenerator::new();
-
-//     let res_0 = generator.generate(HeightMapDetails {
-//         distance: 1,
-//         size_x: 4,
-//         size_y: 4,
-//         x: 0,
-//         y: 0,
-//         index: 0,
-//         lod: 0,
-//     });
-
-//     let res_1 = generator.generate(HeightMapDetails {
-//         distance: 2,
-//         size_x: 2,
-//         size_y: 2,
-//         x: 0,
-//         y: 0,
-//         index: 0,
-//         lod: 0,
-//     });
-
-//     println!("{:#?}", res_0);
-//     println!("{:#?}", res_1);
-// }
-
-// #[test]
-// fn test_perlin_noise() {
-//     let perlin: noise::Perlin = noise::Perlin::new(1);
-//     {
-//         let noise_0 = perlin.get([0.0, 0.0]);
-//         let noise_1 = perlin.get([0.0, 0.0]);
-//         assert_eq!(noise_0, noise_1);
-//     }
-
-//     {
-//         let noise_0 = perlin.get([100.5, 100.5]);
-//         let noise_1 = perlin.get([100.5, 100.5]);
-//         assert_eq!(noise_0, noise_1);
-//     }
-// }

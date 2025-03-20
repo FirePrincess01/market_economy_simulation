@@ -69,7 +69,6 @@ struct MarketEconomySimulation {
     entity_index_mesh: wgpu_renderer::label::LabelMesh,
 
     game_logic: market_economy_simulation_server::GameLogicServer,
-    // game_state: game_state::GameState,
     ant: ant::Ant,
 
     ambient_light_quad: deferred_light_shader::Mesh, // Quad running the global ambient light shader
@@ -177,17 +176,18 @@ impl MarketEconomySimulation {
             &[ambient_light_quad_instance],
         );
 
+        // point light storage
         let point_light_storage = point_light_storage::PointLightStorage::new(
             renderer_interface,
             settings.max_point_light_instances,
             settings.dbg_point_lights,
         );
 
+        // terrain storage
         let terrain_storage = TerrainStorage::new(
             settings.get_terrain_settings(),
             renderer_interface,
             &renderer.texture_bind_group_layout,
-            // &renderer.heightmap_bind_group_layout,
         );
 
         Self {
@@ -424,8 +424,6 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         // render current frame
         self.renderer.render(
             renderer_interface,
-            // &self.world_mesh,
-            // &self.game_state.terrain_mesh,
             &self.animated_object_storage,
             &self.point_light_storage,
             &mut self.terrain_storage,
