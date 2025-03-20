@@ -34,12 +34,6 @@ pub struct Settings {
     // Draws a sphere around the point lights for debugging purposes
     pub dbg_point_lights: bool,
 
-    // // The side length of one tile of the terrain in points
-    // pub terrain_tile_size: usize,
-
-    // // The number of tiles of the terrain in in width and height
-    // pub terrain_size: (usize, usize),
-
     // The number of tiles in the terrain
     pub nr_tiles: usize,
 
@@ -66,14 +60,9 @@ impl Settings {
             max_point_light_instances: 16348,
             dbg_point_lights: false,
 
-            // terrain_tile_size: 256,
-            // terrain_size: (32, 32),
-
-            // terrain_tile_size: 8,
-            // terrain_size: (4, 4),
-
+            // maximum for the web
             nr_tiles: 128,
-            max_depth: 6,
+            max_depth: 7,
         }
     }
 
