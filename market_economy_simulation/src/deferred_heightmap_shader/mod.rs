@@ -1,4 +1,4 @@
-//! Deferred shader drawing a terrain hight map
+//! Deferred shader drawing a terrain height map
 //!
 
 mod deferred_heightmap_shader_draw;
