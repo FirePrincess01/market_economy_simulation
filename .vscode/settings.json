@@ -6,6 +6,7 @@
         "fxaa",
         "heightmap",
         "luma",
+        "Perlin",
         "vsync",
         "wgpu"
     ]

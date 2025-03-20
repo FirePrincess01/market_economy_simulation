@@ -1,7 +1,7 @@
 //! Global settings of the application
 //!
 
-use crate::renderer;
+use crate::{renderer, terrain_storage::TerrainSettings};
 
 pub struct Settings {
     /// On mobile, memory mapped read may may have extremely bad performance.
@@ -33,6 +33,12 @@ pub struct Settings {
 
     // Draws a sphere around the point lights for debugging purposes
     pub dbg_point_lights: bool,
+
+    // The number of tiles in the terrain
+    pub nr_tiles: usize,
+
+    // The maximum depth of the lod quad tree
+    pub max_depth: usize,
 }
 
 impl Settings {
@@ -41,18 +47,22 @@ impl Settings {
             // render settings
             enable_memory_mapped_read: true,
             wait_for_render_loop_to_finish: false,
-            enable_vertical_sync: true,
+            enable_vertical_sync: false,
             enable_fxaa: true,
             window_resolution: (1920 / 2, 1080 / 2),
 
             // game server settings
-            map_size: 300 * 2,
+            map_size: 10,
             enable_multithreading: true,
 
             // miscellaneous
             // max_point_light_instances: 65536,
             max_point_light_instances: 16348,
             dbg_point_lights: false,
+
+            // maximum for the web
+            nr_tiles: 128,
+            max_depth: 7,
         }
     }
 
@@ -72,6 +82,13 @@ impl Settings {
         market_economy_simulation_server::game_logic::GameLogicSettings {
             map_size: self.map_size,
             enable_multithreading: self.enable_multithreading,
+        }
+    }
+
+    pub fn get_terrain_settings(&self) -> TerrainSettings {
+        TerrainSettings {
+            nr_tiles: self.nr_tiles,
+            max_depth: self.max_depth,
         }
     }
 }

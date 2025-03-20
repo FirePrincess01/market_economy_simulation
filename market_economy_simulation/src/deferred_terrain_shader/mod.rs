@@ -16,7 +16,7 @@ mod vertex;
 pub use deferred_terrain_shader_draw::DeferredTerrainShaderDraw;
 pub use instance::Instance;
 pub use mesh::Mesh;
-pub use pipeline::Pipeline;
+// pub use pipeline::Pipeline;
 pub use vertex::Vertex;
 
 // pub use super::deferred_color_shader::Instance;

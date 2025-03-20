@@ -2,7 +2,7 @@ use cgmath::InnerSpace;
 
 use crate::deferred_terrain_shader;
 
-pub fn create_vertices(
+pub fn _create_vertices(
     terrain: &market_economy_simulation_server::terrain::Terrain,
 ) -> (Vec<deferred_terrain_shader::Vertex>, Vec<u32>) {
     let mut vertices: Vec<deferred_terrain_shader::Vertex> = Vec::new();

@@ -4,6 +4,7 @@ mod base_factory;
 mod create_entities;
 mod deferred_animation_shader;
 mod deferred_color_shader;
+mod deferred_heightmap_shader;
 mod deferred_light_shader;
 mod deferred_light_sphere_shader;
 mod deferred_terrain_shader;
@@ -17,15 +18,17 @@ mod performance_monitor;
 mod point_light_storage;
 mod renderer;
 mod settings;
+mod terrain_storage;
 mod world_mesh;
 
 use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,
 };
 use market_economy_simulation_server::game_logic::game_logic_interface::{
-    GameLogicInterface, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageRequest,
+    GameLogicInterface, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageMedium,
 };
 use point_light_storage::{PointLightIndex, PointLightInterface};
+use terrain_storage::TerrainStorage;
 use wgpu_renderer::{
     default_application::{DefaultApplication, DefaultApplicationInterface},
     performance_monitor::watch,
@@ -65,13 +68,13 @@ struct MarketEconomySimulation {
     entity_index_label: wgpu_renderer::label::Label,
     entity_index_mesh: wgpu_renderer::label::LabelMesh,
 
-    game_server: market_economy_simulation_server::GameLogicServer,
-    game_state: game_state::GameState,
-
+    game_logic: market_economy_simulation_server::GameLogicServer,
     ant: ant::Ant,
 
     ambient_light_quad: deferred_light_shader::Mesh, // Quad running the global ambient light shader
     point_light_storage: point_light_storage::PointLightStorage,
+
+    terrain_storage: TerrainStorage,
 }
 
 impl MarketEconomySimulation {
@@ -152,28 +155,10 @@ impl MarketEconomySimulation {
         animated_object_renderer.create_from_glb(glb_bin);
 
         // create game server
-        let mut game_server =
+        let game_logic =
             market_economy_simulation_server::GameLogicServer::new(settings.get_server_settings());
 
-        game_server
-            .send_messages()
-            .send(GameLogicMessageRequest::GetTerrain)
-            .unwrap();
-        game_server.update();
-
-        // get base values from game server
-        #[allow(clippy::needless_late_init)]
-        let terrain_server: market_economy_simulation_server::terrain::Terrain;
-        let msg: GameLogicMessageHeavy = game_server.get_heavy_messages().recv().unwrap();
-        match msg {
-            GameLogicMessageHeavy::Terrain(terrain) => {
-                terrain_server = terrain;
-            }
-        }
-
-        // create the game state
-        let game_state = game_state::GameState::new(renderer_interface, terrain_server);
-
+        // create ant
         let ant = ant::Ant::new(renderer_interface);
 
         let ambient_light_quad_vertices = geometry::Quad::new(2.0);
@@ -191,10 +176,18 @@ impl MarketEconomySimulation {
             &[ambient_light_quad_instance],
         );
 
+        // point light storage
         let point_light_storage = point_light_storage::PointLightStorage::new(
             renderer_interface,
             settings.max_point_light_instances,
             settings.dbg_point_lights,
+        );
+
+        // terrain storage
+        let terrain_storage = TerrainStorage::new(
+            settings.get_terrain_settings(),
+            renderer_interface,
+            &renderer.texture_bind_group_layout,
         );
 
         Self {
@@ -220,13 +213,14 @@ impl MarketEconomySimulation {
             entity_index_label,
             entity_index_mesh,
 
-            game_server,
-            game_state,
+            game_logic,
 
             ant,
 
             ambient_light_quad,
             point_light_storage,
+
+            terrain_storage,
         }
     }
 }
@@ -291,11 +285,11 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             self.entity_index_label.get_image(),
         );
 
-        self.game_server.update();
+        self.game_logic.update();
 
         self.watch_fps.start(3, "Update data");
         {
-            let light_messages = self.game_server.get_light_messages();
+            let light_messages = self.game_logic.get_light_messages();
             for msg in light_messages.try_iter() {
                 match msg {
                     GameLogicMessageLight::UpdatePointLight(point_light) => {
@@ -312,16 +306,38 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
                 }
             }
 
-            let medium_messages = self.game_server.get_medium_messages();
+            let medium_messages = self.game_logic.get_medium_messages();
             for msg in medium_messages.try_iter() {
                 match msg {
-                    market_economy_simulation_server::game_logic::game_logic_interface::GameLogicMessageMedium::UpdateWatchPoints(watch_viewer_data) => {
-                        self.performance_monitor_ups.update_from_data(renderer_interface, &self.font, &watch_viewer_data);
+                    GameLogicMessageMedium::UpdateWatchPoints(watch_viewer_data) => {
+                        self.performance_monitor_ups.update_from_data(
+                            renderer_interface,
+                            &self.font,
+                            &watch_viewer_data,
+                        );
+                    }
+                }
+            }
+
+            let heavy_messages = self.game_logic.get_heavy_messages();
+            for msg in heavy_messages.try_iter() {
+                match msg {
+                    GameLogicMessageHeavy::Terrain(height_map) => {
+                        self.terrain_storage.update_height_map(
+                            renderer_interface,
+                            &self.renderer.heightmap_bind_group_layout,
+                            height_map,
+                        );
                     }
                 }
             }
 
             self.point_light_storage.update(renderer_interface);
+
+            self.terrain_storage
+                .update_view_position(&self.renderer.get_view_position());
+            self.terrain_storage
+                .submit_requests(self.game_logic.send_messages());
         }
         self.watch_fps.stop(3);
 
@@ -408,10 +424,9 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         // render current frame
         self.renderer.render(
             renderer_interface,
-            // &self.world_mesh,
-            &self.game_state.terrain_mesh,
             &self.animated_object_storage,
             &self.point_light_storage,
+            &mut self.terrain_storage,
             &self.ant,
             &self.entity_index_mesh,
             &self.ambient_light_quad,

@@ -65,7 +65,12 @@ impl Mesh {
             });
         }
 
-        Self::new(device, &mesh_vertices, indices, instances)
+        let mut indices_u16: Vec<u16> = Vec::with_capacity(indices.len());
+        for elem in indices {
+            indices_u16.push(*elem as u16);
+        }
+
+        Self::new(device, &mesh_vertices, &indices_u16, instances)
     }
 
     pub fn update_vertex_buffer(&mut self, queue: &wgpu::Queue, vertices: &[Vertex]) {

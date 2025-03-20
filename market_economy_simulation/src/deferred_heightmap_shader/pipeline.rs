@@ -1,71 +1,49 @@
-//! Deferred shader drawing colored objects
+//! Deferred shader drawing a terrain height map
 //!
 
-use super::super::deferred_color_shader::CameraBindGroupLayout;
-use super::super::deferred_color_shader::EntityBuffer;
-use super::super::deferred_color_shader::GBuffer;
-use super::DeferredTerrainShaderDraw;
+use super::CameraBindGroupLayout;
+use super::DeferredHeightMapShaderDraw;
+use super::EntityBuffer;
+use super::GBuffer;
+use super::HeightmapBindGroupLayout;
 use super::Instance;
+use super::TextureBindGroupLayout;
 use super::Vertex;
 use wgpu_renderer::vertex_color_shader;
 use wgpu_renderer::wgpu_renderer::depth_texture;
 
-/// A general purpose shader using vertices, colors and an instance matrix
-#[allow(unused)]
 pub struct Pipeline {
     render_pipeline: wgpu::RenderPipeline,
 }
 
-#[allow(unused)]
 impl Pipeline {
-    pub fn _new_lines(
-        device: &wgpu::Device,
-        camera_bind_group_layout: &CameraBindGroupLayout,
-        surface_format: wgpu::TextureFormat,
-    ) -> Self {
-        Self::new_parameterized(
-            device,
-            camera_bind_group_layout,
-            surface_format,
-            wgpu::PrimitiveTopology::LineList,
-        )
-    }
-
     pub fn new(
         device: &wgpu::Device,
         camera_bind_group_layout: &CameraBindGroupLayout,
-        surface_format: wgpu::TextureFormat,
-    ) -> Self {
-        Self::new_parameterized(
-            device,
-            camera_bind_group_layout,
-            surface_format,
-            wgpu::PrimitiveTopology::TriangleList,
-        )
-    }
-
-    fn new_parameterized(
-        device: &wgpu::Device,
-        camera_bind_group_layout: &CameraBindGroupLayout,
+        texture_bind_group_layout: &TextureBindGroupLayout,
+        heightmap_bind_group_layout: &HeightmapBindGroupLayout,
         _surface_format: wgpu::TextureFormat,
-        topology: wgpu::PrimitiveTopology,
     ) -> Self {
         // Shader
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some("Shader"),
-            source: wgpu::ShaderSource::Wgsl(include_str!("shader.wgsl").into()),
+            source: wgpu::ShaderSource::Wgsl(include_str!("shader_heightmap.wgsl").into()),
         });
 
         // Pipeline
         let render_pipeline_layout =
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
-                label: Some("Render Pipeline Layout"),
-                bind_group_layouts: &[camera_bind_group_layout.get()],
+                label: Some("Deferred Heightmap Render Pipeline Layout"),
+                bind_group_layouts: &[
+                    camera_bind_group_layout.get(),
+                    texture_bind_group_layout.get(),
+                    heightmap_bind_group_layout.get(),
+                ],
                 push_constant_ranges: &[],
             });
 
         let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-            label: Some("Deferred Terrain Render Pipeline"),
+            label: Some("Deferred Heightmap Render Pipeline"),
             layout: Some(&render_pipeline_layout),
             vertex: wgpu::VertexState {
                 module: &shader,
@@ -107,7 +85,7 @@ impl Pipeline {
                 compilation_options: wgpu::PipelineCompilationOptions::default(),
             }),
             primitive: wgpu::PrimitiveState {
-                topology, // wgpu::PrimitiveTopology::TriangleList,
+                topology: wgpu::PrimitiveTopology::TriangleList, // wgpu::PrimitiveTopology::TriangleList,
                 strip_index_format: None,
                 front_face: wgpu::FrontFace::Ccw, // counter-clockwise direction
                 cull_mode: Some(wgpu::Face::Back),
@@ -142,7 +120,7 @@ impl Pipeline {
         &self,
         render_pass: &mut wgpu::RenderPass<'a>,
         camera: &'a vertex_color_shader::CameraUniformBuffer,
-        mesh: &'a dyn DeferredTerrainShaderDraw,
+        mesh: &'a mut dyn DeferredHeightMapShaderDraw,
     ) {
         render_pass.set_pipeline(&self.render_pipeline);
         camera.bind(render_pass);

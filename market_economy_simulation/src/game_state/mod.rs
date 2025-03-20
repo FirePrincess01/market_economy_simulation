@@ -7,6 +7,7 @@ use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
 
 use crate::deferred_terrain_shader;
 
+#[allow(unused)]
 pub struct GameState {
     // values form the game server
     _terrain_server: market_economy_simulation_server::terrain::Terrain,
@@ -19,11 +20,11 @@ pub struct GameState {
 }
 
 impl GameState {
-    pub fn new(
+    pub fn _new(
         renderer: &mut dyn WgpuRendererInterface,
         terrain_server: market_economy_simulation_server::terrain::Terrain,
     ) -> Self {
-        let (terrain_vertices, terrain_indices) = terrain::create_vertices(&terrain_server);
+        let (terrain_vertices, terrain_indices) = terrain::_create_vertices(&terrain_server);
         let terrain_instance = deferred_terrain_shader::Instance {
             position: [0.0, 0.0, 1.0],
             color: [0.1, 0.1, 0.1],

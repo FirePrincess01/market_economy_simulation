@@ -2,16 +2,19 @@ use std::sync::mpsc;
 
 use wgpu_renderer::performance_monitor::watch;
 
-use crate::{point_lights, terrain};
+use crate::{
+    heightmap_generator::{HeightMap, HeightMapDetails},
+    point_lights,
+};
 
 pub const WATCH_POINT_SIZE: usize = 7;
 
 pub enum GameLogicMessageRequest {
-    GetTerrain, // Requests the terrain heightmap
+    GetTerrain(HeightMapDetails), // Requests the terrain heightmap
 }
 
 pub enum GameLogicMessageHeavy {
-    Terrain(terrain::Terrain), // The terrain heightmap data
+    Terrain(HeightMap), // The terrain heightmap data
 }
 
 pub enum GameLogicMessageMedium {

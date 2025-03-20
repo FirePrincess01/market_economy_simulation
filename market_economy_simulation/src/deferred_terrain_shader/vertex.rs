@@ -9,6 +9,7 @@ pub struct Vertex {
     pub barycentric_coordinate: [f32; 3],
 }
 
+#[allow(unused)]
 impl Vertex {
     pub fn _zero() -> Self {
         Self {

@@ -3,6 +3,7 @@
 //! if this feature may ever be implemented
 
 pub mod game_logic;
+pub mod heightmap_generator;
 pub mod point_lights;
 pub mod terrain;
 
