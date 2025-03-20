@@ -1,6 +1,4 @@
-
-
-
+//! Info for terrain data generation
 
 #[derive(Clone, Debug)]
 pub struct TerrainTextureDetails {

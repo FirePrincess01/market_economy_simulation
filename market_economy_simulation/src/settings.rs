@@ -1,7 +1,7 @@
 //! Global settings of the application
 //!
 
-use crate::{renderer, terrain_storage::terrain_storage_v2::TerrainSettings};
+use crate::{renderer, terrain_storage::TerrainSettings};
 
 pub struct Settings {
     /// On mobile, memory mapped read may may have extremely bad performance.

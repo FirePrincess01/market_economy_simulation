@@ -11,7 +11,7 @@ use crate::deferred_terrain_shader::{self, DeferredTerrainShaderDraw};
 use crate::fxaa_shader::FxaaShaderDraw;
 use crate::performance_monitor::PerformanceMonitor;
 use crate::point_light_storage::PointLightStorage;
-use crate::terrain_storage::terrain_storage_v2::TerrainStorageV2;
+use crate::terrain_storage::TerrainStorage;
 use camera_controller::CameraController;
 use wgpu_renderer::performance_monitor::watch;
 use wgpu_renderer::vertex_color_shader::{self};
@@ -381,7 +381,7 @@ impl Renderer {
         meshes: &[&dyn DeferredShaderDraw],
         // deferred_terrain: &dyn DeferredTerrainShaderDraw,
         ant_light_orbs: &dyn DeferredShaderDraw,
-        terrain_storage: &mut TerrainStorageV2,
+        terrain_storage: &mut TerrainStorage,
         animated_object_storage: &WgpuAnimatedObjectStorage,
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -688,7 +688,7 @@ impl Renderer {
         // deferred_terrain: &dyn DeferredTerrainShaderDraw,
         animated_object_storage: &WgpuAnimatedObjectStorage,
         point_light_storage: &PointLightStorage,
-        terrain_storage: &mut TerrainStorageV2,
+        terrain_storage: &mut TerrainStorage,
 
         ant_light_orbs: &(impl DeferredShaderDraw + DeferredLightShaderDraw),
         mesh_textured_gui: &impl VertexTextureShaderDraw,

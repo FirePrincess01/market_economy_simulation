@@ -28,7 +28,7 @@ use market_economy_simulation_server::game_logic::game_logic_interface::{
     GameLogicInterface, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageMedium, GameLogicMessageRequest
 };
 use point_light_storage::{PointLightIndex, PointLightInterface};
-use terrain_storage::terrain_storage_v2::TerrainStorageV2;
+use terrain_storage::TerrainStorage;
 use wgpu_renderer::{
     default_application::{DefaultApplication, DefaultApplicationInterface},
     performance_monitor::watch,
@@ -76,7 +76,7 @@ struct MarketEconomySimulation {
     ambient_light_quad: deferred_light_shader::Mesh, // Quad running the global ambient light shader
     point_light_storage: point_light_storage::PointLightStorage,
 
-    terrain_storage: TerrainStorageV2,
+    terrain_storage: TerrainStorage,
 }
 
 impl MarketEconomySimulation {
@@ -202,7 +202,7 @@ impl MarketEconomySimulation {
             settings.dbg_point_lights,
         );
 
-        let terrain_storage = TerrainStorageV2::new(
+        let terrain_storage = TerrainStorage::new(
             settings.get_terrain_settings(),
             renderer_interface,
             &renderer.texture_bind_group_layout,
