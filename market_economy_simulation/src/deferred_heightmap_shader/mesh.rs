@@ -73,9 +73,9 @@ impl Mesh {
         let len = vertices.iter().len();
         let mut mesh_vertices = Vec::with_capacity(len);
 
-        for i in 0..len {
+        for elem in vertices {
             mesh_vertices.push(Vertex {
-                position: vertices[i].into(),
+                position: (*elem).into(),
             });
         }
 

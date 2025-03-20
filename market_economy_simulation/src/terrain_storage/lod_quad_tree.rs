@@ -21,7 +21,6 @@ pub struct LodQuadTree {
 impl LodQuadTree {
     pub fn new(max_depth: usize, nr_tiles: usize) -> Self {
         let nodes = Vec::new();
-        let max_depth = max_depth;
         let root = 0;
 
         let distance = depth_to_distance(0, max_depth);
@@ -87,7 +86,7 @@ impl LodQuadTree {
                 let first_child = self.nodes.len();
 
                 self.nodes.push(QuadNode::new());
-                data_interface.request_data(first_child + 0, square.quadrant_sw(), depth + 1);
+                data_interface.request_data(first_child, square.quadrant_sw(), depth + 1);
 
                 self.nodes.push(QuadNode::new());
                 data_interface.request_data(first_child + 1, square.quadrant_se(), depth + 1);
@@ -104,7 +103,7 @@ impl LodQuadTree {
             // check children
             let first_child_index = self.nodes[node].first_child.unwrap();
 
-            let data_available = self.nodes[first_child_index + 0].data.is_some()
+            let data_available = self.nodes[first_child_index].data.is_some()
                 && self.nodes[first_child_index + 1].data.is_some()
                 && self.nodes[first_child_index + 2].data.is_some()
                 && self.nodes[first_child_index + 3].data.is_some();
@@ -112,7 +111,7 @@ impl LodQuadTree {
             if data_available {
                 // traverse children
                 self.traverse(
-                    first_child_index + 0,
+                    first_child_index,
                     square.quadrant_sw(),
                     view_position,
                     depth + 1,
@@ -144,10 +143,7 @@ impl LodQuadTree {
         }
 
         // work with data
-        match self.nodes[node].data {
-            Some(data_index) => data_interface.do_work(data_index, square, depth),
-            None => {}
-        }
+        if let Some(data_index) = self.nodes[node].data { data_interface.do_work(data_index, square, depth) }
     }
 }
 

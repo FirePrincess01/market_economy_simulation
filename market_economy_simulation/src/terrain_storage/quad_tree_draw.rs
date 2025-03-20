@@ -1,7 +1,6 @@
 //! Object to traverse the lod quad tree and draw every leaf
 //!
 
-use std::usize;
 
 use super::{
     lod_quad_tree::QuadTreeInterface,

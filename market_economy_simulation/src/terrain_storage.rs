@@ -69,7 +69,7 @@ impl TerrainStorage {
         let texture_rgba = texture_image.to_rgba8();
         let texture = deferred_heightmap_shader::Texture::new_with_mipmaps(
             renderer,
-            &texture_bind_group_layout,
+            texture_bind_group_layout,
             &texture_rgba,
             Some("tile.png"),
             9,

@@ -17,9 +17,9 @@ pub struct TerrainTextureDetails {
 
 pub fn depth_to_distance(depth: usize, max_depth: usize) -> usize {
     let exponent = max_depth - 1 - depth;
-    let distance = 2usize.pow(exponent as u32);
+    
 
-    distance
+    2usize.pow(exponent as u32)
 }
 
 #[test]
