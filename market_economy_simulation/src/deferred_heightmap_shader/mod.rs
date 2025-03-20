@@ -23,7 +23,6 @@ pub use super::vertex_texture_shader::Texture;
 pub use super::vertex_texture_shader::TextureBindGroupLayout;
 
 pub use wgpu_renderer::vertex_heightmap_shader::Heightmap;
-pub use wgpu_renderer::vertex_heightmap_shader::Heightmap2D;
 pub use wgpu_renderer::vertex_heightmap_shader::HeightmapBindGroupLayout;
 pub use wgpu_renderer::vertex_heightmap_shader::HeightmapTexture;
 
