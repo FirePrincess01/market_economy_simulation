@@ -25,7 +25,7 @@ use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,
 };
 use market_economy_simulation_server::game_logic::game_logic_interface::{
-    GameLogicInterface, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageMedium
+    GameLogicInterface, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageMedium,
 };
 use point_light_storage::{PointLightIndex, PointLightInterface};
 use terrain_storage::TerrainStorage;
@@ -70,7 +70,6 @@ struct MarketEconomySimulation {
 
     game_logic: market_economy_simulation_server::GameLogicServer,
     // game_state: game_state::GameState,
-
     ant: ant::Ant,
 
     ambient_light_quad: deferred_light_shader::Mesh, // Quad running the global ambient light shader
@@ -221,7 +220,7 @@ impl MarketEconomySimulation {
             ambient_light_quad,
             point_light_storage,
 
-            terrain_storage
+            terrain_storage,
         }
     }
 }
@@ -311,7 +310,11 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             for msg in medium_messages.try_iter() {
                 match msg {
                     GameLogicMessageMedium::UpdateWatchPoints(watch_viewer_data) => {
-                        self.performance_monitor_ups.update_from_data(renderer_interface, &self.font, &watch_viewer_data);
+                        self.performance_monitor_ups.update_from_data(
+                            renderer_interface,
+                            &self.font,
+                            &watch_viewer_data,
+                        );
                     }
                 }
             }
@@ -320,15 +323,21 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             for msg in heavy_messages.try_iter() {
                 match msg {
                     GameLogicMessageHeavy::Terrain(height_map) => {
-                        self.terrain_storage.update_height_map(renderer_interface, &self.renderer.heightmap_bind_group_layout, height_map);
-                    },
+                        self.terrain_storage.update_height_map(
+                            renderer_interface,
+                            &self.renderer.heightmap_bind_group_layout,
+                            height_map,
+                        );
+                    }
                 }
             }
 
             self.point_light_storage.update(renderer_interface);
 
-            self.terrain_storage.update_view_position(&self.renderer.get_view_position());
-            self.terrain_storage.submit_requests(self.game_logic.send_messages());
+            self.terrain_storage
+                .update_view_position(&self.renderer.get_view_position());
+            self.terrain_storage
+                .submit_requests(self.game_logic.send_messages());
         }
         self.watch_fps.stop(3);
 
@@ -420,7 +429,6 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             &self.animated_object_storage,
             &self.point_light_storage,
             &mut self.terrain_storage,
-
             &self.ant,
             &self.entity_index_mesh,
             &self.ambient_light_quad,

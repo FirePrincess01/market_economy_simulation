@@ -17,7 +17,7 @@ impl Instance {
             position: [0.0, 0.0, 0.0],
             color: [0.0, 0.0, 0.0],
             entity: 0,
-            distance: 0.0
+            distance: 0.0,
         }
     }
 

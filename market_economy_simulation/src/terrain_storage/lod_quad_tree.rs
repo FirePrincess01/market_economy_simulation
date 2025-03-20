@@ -28,7 +28,10 @@ impl LodQuadTree {
         let a = nr_tiles * distance;
 
         let square = Square {
-            pos_0: cgmath::Vector2 { x: 0 - a as isize / 2, y: 0 - a as isize / 2},
+            pos_0: cgmath::Vector2 {
+                x: 0 - a as isize / 2,
+                y: 0 - a as isize / 2,
+            },
             a,
         };
 
@@ -39,7 +42,6 @@ impl LodQuadTree {
             square,
         }
     }
-
 
     pub fn traverse_leaves(
         &mut self,
@@ -79,22 +81,22 @@ impl LodQuadTree {
 
         let is_in_range = distance_squared < a_squared as isize * 8;
 
-        if depth < self.max_depth-1 && is_in_range {
+        if depth < self.max_depth - 1 && is_in_range {
             if self.nodes[node].first_child.is_none() {
                 // create children
                 let first_child = self.nodes.len();
 
                 self.nodes.push(QuadNode::new());
-                data_interface.request_data(first_child + 0, square.quadrant_sw(), depth+1);
+                data_interface.request_data(first_child + 0, square.quadrant_sw(), depth + 1);
 
                 self.nodes.push(QuadNode::new());
-                data_interface.request_data(first_child + 1, square.quadrant_se(), depth+1);
+                data_interface.request_data(first_child + 1, square.quadrant_se(), depth + 1);
 
                 self.nodes.push(QuadNode::new());
-                data_interface.request_data(first_child + 2, square.quadrant_ne(), depth+1);
+                data_interface.request_data(first_child + 2, square.quadrant_ne(), depth + 1);
 
                 self.nodes.push(QuadNode::new());
-                data_interface.request_data(first_child + 3, square.quadrant_nw(), depth+1);
+                data_interface.request_data(first_child + 3, square.quadrant_nw(), depth + 1);
 
                 self.nodes[node].first_child = Some(first_child);
             }
@@ -102,11 +104,10 @@ impl LodQuadTree {
             // check children
             let first_child_index = self.nodes[node].first_child.unwrap();
 
-            let data_available = 
-                self.nodes[first_child_index + 0].data.is_some() &&
-                self.nodes[first_child_index + 1].data.is_some() &&
-                self.nodes[first_child_index + 2].data.is_some() &&
-                self.nodes[first_child_index + 3].data.is_some();
+            let data_available = self.nodes[first_child_index + 0].data.is_some()
+                && self.nodes[first_child_index + 1].data.is_some()
+                && self.nodes[first_child_index + 2].data.is_some()
+                && self.nodes[first_child_index + 3].data.is_some();
 
             if data_available {
                 // traverse children
@@ -145,9 +146,8 @@ impl LodQuadTree {
         // work with data
         match self.nodes[node].data {
             Some(data_index) => data_interface.do_work(data_index, square, depth),
-            None => {},
+            None => {}
         }
-        
     }
 }
 
@@ -254,7 +254,6 @@ impl Square {
 //     mesh: MeshBuffer,
 //     texture: TextureBuffer,
 
-
 //     quad_tree: LodQuadTree,
 //     quad_tree_data: QuadTreeData,
 
@@ -276,7 +275,6 @@ impl Square {
 //             .traverse_leaves(view_position, quad_tree_data);
 //     }
 // }
-
 
 // struct QuadTreeData {
 //     height_maps: Vec<HeightmapBuffer>,

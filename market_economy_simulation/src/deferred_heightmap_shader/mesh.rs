@@ -99,18 +99,20 @@ impl Mesh {
     //     self.nr_instances = u32::min(instances.len() as u32, self.max_instances);
     // }
 
-    pub fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>, heightmap_texture: &'a HeightmapTexture, texture: &'a Texture, instance: &'a InstanceBuffer<Instance>) {
+    pub fn draw<'a>(
+        &'a self,
+        render_pass: &mut wgpu::RenderPass<'a>,
+        heightmap_texture: &'a HeightmapTexture,
+        texture: &'a Texture,
+        instance: &'a InstanceBuffer<Instance>,
+    ) {
         self.vertex_buffer.bind(render_pass);
         heightmap_texture.bind(render_pass);
         texture.bind(render_pass);
         self.index_buffer.bind(render_pass);
         instance.bind_slot(render_pass, 1);
 
-        render_pass.draw_indexed(
-            0..self.index_buffer.size(),
-            0,
-            0..1,
-        );
+        render_pass.draw_indexed(0..self.index_buffer.size(), 0, 0..1);
     }
 
     pub fn bind<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
@@ -119,11 +121,7 @@ impl Mesh {
     }
 
     pub fn draw_indexed<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
-        render_pass.draw_indexed(
-            0..self.index_buffer.size(),
-            0,
-            0..1,
-        );
+        render_pass.draw_indexed(0..self.index_buffer.size(), 0, 0..1);
     }
 }
 

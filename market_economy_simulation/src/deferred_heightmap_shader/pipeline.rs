@@ -5,10 +5,10 @@ use super::CameraBindGroupLayout;
 use super::DeferredHeightMapShaderDraw;
 use super::EntityBuffer;
 use super::GBuffer;
-use super::Instance;
-use super::Vertex;
-use super::TextureBindGroupLayout;
 use super::HeightmapBindGroupLayout;
+use super::Instance;
+use super::TextureBindGroupLayout;
+use super::Vertex;
 use wgpu_renderer::vertex_color_shader;
 use wgpu_renderer::wgpu_renderer::depth_texture;
 
@@ -18,7 +18,6 @@ pub struct Pipeline {
 }
 
 impl Pipeline {
-
     pub fn new(
         device: &wgpu::Device,
         camera_bind_group_layout: &CameraBindGroupLayout,
