@@ -20,7 +20,7 @@ use wgpu_renderer::{
     wgpu_renderer::WgpuRendererInterface,
 };
 
-use crate::deferred_heightmap_shader::{self, DeferredHeightMapShaderDraw};
+use crate::{deferred_heightmap_shader::{self, DeferredHeightMapShaderDraw}, selector};
 
 pub struct TerrainSettings {
     pub nr_tiles: usize,
@@ -34,7 +34,8 @@ pub struct TerrainStorage {
     texture: deferred_heightmap_shader::Texture,
     heightmap_textures: Vec<deferred_heightmap_shader::HeightmapTexture>,
     instances: Vec<deferred_heightmap_shader::InstanceBuffer<deferred_heightmap_shader::Instance>>,
-    heightmap_details: Vec<TerrainTextureDetails>,
+    pub height_map_details: Vec<TerrainTextureDetails>,
+    pub height_maps: Vec<Vec<f32>>,
 
     lod_quad_tree: lod_quad_tree::LodQuadTree,
 
@@ -80,6 +81,7 @@ impl TerrainStorage {
         let heightmap_textures = Vec::new();
         let instances = Vec::new();
         let heightmap_details = Vec::new();
+        let height_maps = Vec::new();
 
         // lod_quad_tree
         let lod_quad_tree = LodQuadTree::new(max_depth, nr_tiles);
@@ -96,7 +98,8 @@ impl TerrainStorage {
             texture,
             heightmap_textures,
             instances,
-            heightmap_details,
+            height_map_details: heightmap_details,
+            height_maps,
             lod_quad_tree,
             view_position,
             max_depth,
@@ -129,8 +132,8 @@ impl TerrainStorage {
         let mut heightmap: Vec<deferred_heightmap_shader::Heightmap> =
             Vec::with_capacity(size_0 * size_0);
         assert_eq!(height_map.heights.len(), size_0 * size_0);
-        for elem in height_map.heights {
-            heightmap.push(vertex_heightmap_shader::Heightmap { height: elem });
+        for elem in &height_map.heights {
+            heightmap.push(vertex_heightmap_shader::Heightmap { height: *elem });
             // heightmap.push(vertex_heightmap_shader::Heightmap { height: 0.0 });
         }
 
@@ -155,6 +158,7 @@ impl TerrainStorage {
             Some("terrain"),
         );
 
+        let data_index = self.heightmap_textures.len();
         let instance = deferred_heightmap_shader::Instance {
             position: [
                 (pos_1.x - point_distance as isize) as f32,
@@ -162,20 +166,20 @@ impl TerrainStorage {
                 0.0,
             ],
             color: [0.2, 0.2, 0.8],
-            entity: node_index as u32,
+            entity: data_index as u32 | selector::ENTITY_TERRAIN_BIT,
             distance: point_distance as f32,
         };
         let instance_buffer =
             deferred_heightmap_shader::InstanceBuffer::new(renderer.device(), &[instance]);
 
         // save device data
-        let data_index = self.heightmap_textures.len();
         assert_eq!(self.instances.len(), data_index);
-        assert_eq!(self.heightmap_details.len(), data_index);
+        assert_eq!(self.height_map_details.len(), data_index);
 
         self.heightmap_textures.push(height_texture);
         self.instances.push(instance_buffer);
-        self.heightmap_details.push(heightmap_details);
+        self.height_map_details.push(heightmap_details);
+        self.height_maps.push(height_map.heights);
 
         // make node data available
         self.lod_quad_tree.set_data_index(node_index, data_index);

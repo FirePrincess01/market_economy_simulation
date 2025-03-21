@@ -355,9 +355,11 @@ impl Renderer {
     }
 
     pub fn get_view_position(&self) -> cgmath::Vector3<f32> {
-        let pos = self.camera.position;
+        self.camera.get_view_position()
+    }
 
-        cgmath::Vector3::new(pos.x, pos.y, pos.z)
+    pub fn get_view_direction(&self) -> cgmath::Vector3<f32> {
+        self.camera.get_view_direction()
     }
 
     #[allow(clippy::too_many_arguments)]

@@ -17,10 +17,10 @@ mod ground_plane;
 mod performance_monitor;
 mod point_light_storage;
 mod renderer;
+mod selector;
 mod settings;
 mod terrain_storage;
 mod world_mesh;
-mod selector;
 
 use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,
@@ -29,6 +29,7 @@ use market_economy_simulation_server::game_logic::game_logic_interface::{
     GameLogicInterface, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageMedium,
 };
 use point_light_storage::{PointLightIndex, PointLightInterface};
+use selector::Selector;
 use terrain_storage::TerrainStorage;
 use wgpu_renderer::{
     default_application::{DefaultApplication, DefaultApplicationInterface},
@@ -76,6 +77,8 @@ struct MarketEconomySimulation {
     point_light_storage: point_light_storage::PointLightStorage,
 
     terrain_storage: TerrainStorage,
+
+    selector: Selector,
 }
 
 impl MarketEconomySimulation {
@@ -191,6 +194,9 @@ impl MarketEconomySimulation {
             &renderer.texture_bind_group_layout,
         );
 
+        // selector
+        let selector = Selector::new();
+
         Self {
             _settings: settings,
 
@@ -222,6 +228,8 @@ impl MarketEconomySimulation {
             point_light_storage,
 
             terrain_storage,
+
+            selector,
         }
     }
 }
@@ -342,11 +350,23 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         }
         self.watch_fps.stop(3);
 
-        self.watch_fps.start(4, "Update animations");
+        self.watch_fps.start(4, "Select entity");
+        self.selector
+            .update_view_position(self.renderer.get_view_position());
+        self.selector
+            .update_view_direction(self.renderer.get_view_direction());
+        self.selector.update_entity(self.entity_index);
+        let res = self.selector.find_selection(
+            &self.terrain_storage.height_map_details,
+            &self.terrain_storage.height_maps,
+        );
+        self.watch_fps.stop(4);
+
+        self.watch_fps.start(5, "Update animations");
         {
             self.animated_object_storage.update(renderer_interface, &dt);
         }
-        self.watch_fps.stop(4);
+        self.watch_fps.stop(5);
 
         self.watch_fps.update();
         self.performance_monitor_fps.update_from_data(
