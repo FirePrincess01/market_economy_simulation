@@ -351,23 +351,26 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         self.watch_fps.stop(3);
 
         self.watch_fps.start(4, "Select entity");
-        self.selector
-            .update_view_position(self.renderer.get_view_position());
-        self.selector
-            .update_view_direction(self.renderer.get_view_direction());
-        self.selector.update_entity(self.entity_index);
-        let res = self.selector.find_selection(
-            &self.terrain_storage.height_map_details,
-            &self.terrain_storage.height_maps,
-        );
-        if let Some(res) = res {
-            match res {
-                selector::Result::Terrain(triangle) => {
-                    println!("{:?}", triangle.p);
-                },
+        {
+            self.selector.update_entity(self.entity_index);
+            self.selector.update_view(
+                &self.renderer.camera,
+                &self.renderer.projection,
+                &cgmath::Vector2::new(self.mouse_pos_x, self.mouse_pos_y),
+            );
+
+            let res = self.selector.find_selection(
+                &self.terrain_storage.height_map_details,
+                &self.terrain_storage.height_maps,
+            );
+            if let Some(res) = res {
+                match res {
+                    selector::Result::Terrain(triangle) => {
+                        println!("{:?}", triangle.p);
+                    }
+                }
             }
         }
-
         self.watch_fps.stop(4);
 
         self.watch_fps.start(5, "Update animations");

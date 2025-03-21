@@ -61,9 +61,9 @@ pub struct Renderer {
     pipeline_fxaa: fxaa_shader::Pipeline,
 
     // camera
-    camera: Camera,
+    pub camera: Camera,
     camera_controller: CameraController,
-    projection: Projection,
+    pub projection: Projection,
 
     camera_uniform: vertex_color_shader::CameraUniform,
     camera_uniform_buffer: vertex_color_shader::CameraUniformBuffer,

@@ -1,45 +1,65 @@
 //! Selects entities with the mouse
 
+mod mouse_selector;
 mod ray_triangle_intersection;
 mod terrain_selector;
 
-use cgmath::Zero;
+use cgmath::{Angle, Zero};
+use mouse_selector::MouseSelector;
 use terrain_selector::TerrainSelector;
+use wgpu_renderer::wgpu_renderer::camera::{Camera, Projection};
 
 use crate::terrain_storage::terrain_texture_details::TerrainTextureDetails;
 
 pub struct Selector {
     terrain_selector: TerrainSelector,
+    mouse_selector: MouseSelector,
 
+    // view
     view_position: cgmath::Vector3<f32>,
-    view_direction: cgmath::Vector3<f32>,
+    mouse_direction: cgmath::Vector3<f32>,
 
+    // entity
     entity: u32,
 }
 
 pub const ENTITY_TERRAIN_BIT: u32 = 1 << 31;
 
 impl Selector {
-    pub fn new() -> Self {
-
+    pub fn new()
+    -> Self {
         Self {
+            mouse_selector: MouseSelector::new(),
             terrain_selector: TerrainSelector::new(),
-            view_position:  cgmath::Vector3::zero(),
-            view_direction: cgmath::Vector3::zero(),
+            view_position: cgmath::Vector3::zero(),
+
+            mouse_direction: cgmath::Vector3::zero(),
+
             entity: 0,
         }
     }
 
-    pub fn update_view_position(&mut self, view_position: cgmath::Vector3<f32>) {
-        self.view_position = view_position;
-    }
-
-    pub fn update_view_direction(&mut self, view_direction: cgmath::Vector3<f32>) {
-        self.view_direction = view_direction;
-    }
-
     pub fn update_entity(&mut self, entity: u32) {
         self.entity = entity;
+    }
+
+    pub fn update_view(
+        &mut self,
+        camera: &Camera,
+        projection: &Projection,
+        mouse_position: &cgmath::Vector2<u32>,
+    ) {
+        let mouse_direction = self.mouse_selector.get_mouse_direction(
+            projection.width,
+            projection.height,
+            (projection.fovy / 2.0).tan() * 1.5,
+            mouse_position,
+            camera.yaw,
+            camera.pitch,
+        );
+
+        self.mouse_direction = mouse_direction;
+        self.view_position = camera.get_view_position();
     }
 
     pub fn find_selection(
@@ -58,7 +78,7 @@ impl Selector {
                 height_map_detail,
                 height_map,
                 &self.view_position,
-                &self.view_direction,
+                &self.mouse_direction,
             );
 
             if let Some(triangle) = res {
