@@ -1,8 +1,6 @@
 //! Determines the coordinate
 //!
 
-use cgmath::Zero;
-
 use crate::terrain_storage::terrain_texture_details;
 
 use super::{
@@ -14,9 +12,9 @@ pub struct TerrainSelector {}
 
 impl TerrainSelector {
     pub fn new() -> Self {
-        Self {  }
+        Self {}
     }
-    
+
     pub fn find_intersection(
         &self,
         height_map_detail: &terrain_texture_details::TerrainTextureDetails,

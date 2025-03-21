@@ -180,20 +180,24 @@ pub fn get_intersection_from_ray(orig: &Vec3, dir: &Vec3, t: f32) -> Vec3 {
 /// ### Result
 /// Intersection P  
 ///
+#[allow(dead_code)]
 pub fn get_intersection_from_triangle(v0: &Vec3, v1: &Vec3, v2: &Vec3, u: f32, v: f32) -> Vec3 {
     ((1.0 - u - v) * v0) + (u * v1) + (v * v2)
 }
 
 // ############## Testing ##################
 
+#[allow(dead_code)]
 fn is_less(v0: Vec3, v1: &Vec3) -> bool {
     v0.x < v1.x && v0.y < v1.y && v0.z < v1.z
 }
 
+#[allow(dead_code)]
 fn is_greater(v0: Vec3, v1: &Vec3) -> bool {
     v0.x > v1.x && v0.y > v1.y && v0.z > v1.z
 }
 
+#[allow(dead_code)]
 fn is_equal(v0: &Vec3, v1: &Vec3) -> bool {
     let eps = 0.001;
     let eps = Vec3::new(eps, eps, eps);

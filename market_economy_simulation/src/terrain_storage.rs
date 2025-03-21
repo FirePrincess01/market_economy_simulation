@@ -20,7 +20,10 @@ use wgpu_renderer::{
     wgpu_renderer::WgpuRendererInterface,
 };
 
-use crate::{deferred_heightmap_shader::{self, DeferredHeightMapShaderDraw}, selector};
+use crate::{
+    deferred_heightmap_shader::{self, DeferredHeightMapShaderDraw},
+    selector,
+};
 
 pub struct TerrainSettings {
     pub nr_tiles: usize,

@@ -142,7 +142,11 @@ impl MarketEconomySimulation {
             renderer_interface,
             &renderer.texture_bind_group_layout,
             &font,
-            cgmath::Vector3 { x: 20.0, y: 120.0, z: 0.0 }
+            cgmath::Vector3 {
+                x: 20.0,
+                y: 120.0,
+                z: 0.0,
+            },
         );
 
         // create ant
@@ -285,7 +289,8 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         self.renderer.update(renderer_interface, dt);
 
         // update entity index label
-        self.debug_overlay.update_entity(renderer_interface, &self.font, self.entity_index);
+        self.debug_overlay
+            .update_entity(renderer_interface, &self.font, self.entity_index);
 
         self.game_logic.update();
 
@@ -359,7 +364,11 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             if let Some(res) = res {
                 match res {
                     selector::Result::Terrain(triangle) => {
-                        self.debug_overlay.update_coord(renderer_interface, &self.font, &triangle.p);
+                        self.debug_overlay.update_coord(
+                            renderer_interface,
+                            &self.font,
+                            &triangle.p,
+                        );
                     }
                 }
             }

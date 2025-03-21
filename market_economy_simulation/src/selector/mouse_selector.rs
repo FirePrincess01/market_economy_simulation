@@ -1,7 +1,5 @@
 //! Calculates the mouse direction on the screen
 
-use cgmath::Zero;
-
 pub struct MouseSelector {}
 
 impl MouseSelector {
@@ -9,7 +7,8 @@ impl MouseSelector {
         Self {}
     }
 
-    pub fn get_mouse_direction(&self,
+    pub fn get_mouse_direction(
+        &self,
         surface_width: u32,
         surface_height: u32,
         fovy_half_tan: f32,
@@ -34,7 +33,8 @@ impl MouseSelector {
         let cam_trans = cgmath::Matrix3::from_angle_y(-camera_yaw)
             * cgmath::Matrix3::from_angle_z(camera_pitch);
 
-        let mouse_direction = cam_trans * cgmath::Vector3::new(mouse_pos_x, mouse_pos_y, mouse_pos_z);
+        let mouse_direction =
+            cam_trans * cgmath::Vector3::new(mouse_pos_x, mouse_pos_y, mouse_pos_z);
 
         mouse_direction
     }

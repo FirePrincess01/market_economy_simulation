@@ -39,7 +39,7 @@ impl<const SIZE: usize> PerformanceMonitor<SIZE> {
             graph_host.vertices.as_slice(),
             graph_host.colors.as_slice(),
             graph_host.indices.as_slice(),
-            &[vertex_color_shader::Instance::zero()]
+            &[vertex_color_shader::Instance::zero()],
         );
 
         let scale = 14.0;

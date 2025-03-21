@@ -358,7 +358,7 @@ impl Renderer {
         self.camera.get_view_position()
     }
 
-    pub fn get_view_direction(&self) -> cgmath::Vector3<f32> {
+    pub fn _get_view_direction(&self) -> cgmath::Vector3<f32> {
         self.camera.get_view_direction()
     }
 

@@ -26,8 +26,7 @@ pub struct Selector {
 pub const ENTITY_TERRAIN_BIT: u32 = 1 << 31;
 
 impl Selector {
-    pub fn new()
-    -> Self {
+    pub fn new() -> Self {
         Self {
             mouse_selector: MouseSelector::new(),
             terrain_selector: TerrainSelector::new(),
@@ -90,6 +89,7 @@ impl Selector {
     }
 }
 
+#[allow(dead_code)]
 pub struct Triangle {
     /// First Vertex
     pub v0: cgmath::Vector3<f32>,
