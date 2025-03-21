@@ -46,7 +46,7 @@ impl Settings {
         Self {
             // render settings
             enable_memory_mapped_read: true,
-            wait_for_render_loop_to_finish: false,
+            wait_for_render_loop_to_finish: true,
             enable_vertical_sync: false,
             enable_fxaa: true,
             window_resolution: (1920 / 2, 1080 / 2),
@@ -61,8 +61,11 @@ impl Settings {
             dbg_point_lights: false,
 
             // maximum for the web
+            // nr_tiles: 128,
+            // max_depth: 7,
+
             nr_tiles: 128,
-            max_depth: 7,
+            max_depth: 1,
         }
     }
 

@@ -47,10 +47,10 @@ impl Selector {
         height_map_details: &[TerrainTextureDetails],
         height_maps: &[Vec<f32>],
     ) -> Option<Result> {
-        let entity_bit_mask = self.entity & 0x000000FF;
-        let entity_index = (self.entity & 0xffffff) as usize;
+        let entity_bit_mask = self.entity & 0xFF000000;
+        let entity_index = (self.entity & 0x00FFFFFF) as usize;
 
-        if (entity_bit_mask & ENTITY_TERRAIN_BIT) > 0 {
+        if entity_bit_mask == ENTITY_TERRAIN_BIT {
             let height_map_detail = &height_map_details[entity_index];
             let height_map = &height_maps[entity_index];
 
@@ -72,26 +72,26 @@ impl Selector {
 
 pub struct Triangle {
     /// First Vertex
-    v0: cgmath::Vector3<f32>,
+    pub v0: cgmath::Vector3<f32>,
     /// Second Vertex
-    v1: cgmath::Vector3<f32>,
+    pub v1: cgmath::Vector3<f32>,
     /// Thrid Vertex
-    v2: cgmath::Vector3<f32>,
+    pub v2: cgmath::Vector3<f32>,
 
     /// View position
-    orig: cgmath::Vector3<f32>,
+    pub orig: cgmath::Vector3<f32>,
     /// View direction
-    dir: cgmath::Vector3<f32>,
+    pub dir: cgmath::Vector3<f32>,
 
     /// Distance form the origin to the intersection point p
-    distance: f32,
+    pub distance: f32,
     /// Barycentric coordinate 0 inside the triangle
-    u: f32,
+    pub u: f32,
     /// Barycentric coordinate 1 inside the triangle
-    v: f32,
+    pub v: f32,
 
     /// Point of the intersection
-    p: cgmath::Vector3<f32>,
+    pub p: cgmath::Vector3<f32>,
 }
 
 pub enum Result {

@@ -360,6 +360,14 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             &self.terrain_storage.height_map_details,
             &self.terrain_storage.height_maps,
         );
+        if let Some(res) = res {
+            match res {
+                selector::Result::Terrain(triangle) => {
+                    println!("{:?}", triangle.p);
+                },
+            }
+        }
+
         self.watch_fps.stop(4);
 
         self.watch_fps.start(5, "Update animations");
