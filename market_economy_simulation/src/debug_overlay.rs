@@ -34,7 +34,7 @@ impl DebugOverlay {
         let scale = 16.0;
 
         // entity index
-        let entity_index_label = wgpu_renderer::label::Label::new(&font, scale, "          ");
+        let entity_index_label = wgpu_renderer::label::Label::new(font, scale, "          ");
         let entity_index_mesh = wgpu_renderer::label::LabelMesh::new(
             renderer,
             entity_index_label.get_image(),
@@ -45,7 +45,7 @@ impl DebugOverlay {
             },
         );
 
-        let entity_kind_label = wgpu_renderer::label::Label::new(&font, scale, "          ");
+        let entity_kind_label = wgpu_renderer::label::Label::new(font, scale, "          ");
         let entity_kind_mesh = wgpu_renderer::label::LabelMesh::new(
             renderer,
             entity_index_label.get_image(),
@@ -61,7 +61,7 @@ impl DebugOverlay {
             },
         );
 
-        let x_coord_label = wgpu_renderer::label::Label::new(&font, scale, "          ");
+        let x_coord_label = wgpu_renderer::label::Label::new(font, scale, "          ");
         let x_coord_mesh = wgpu_renderer::label::LabelMesh::new(
             renderer,
             entity_index_label.get_image(),
@@ -77,7 +77,7 @@ impl DebugOverlay {
             },
         );
 
-        let y_coord_label = wgpu_renderer::label::Label::new(&font, scale, "          ");
+        let y_coord_label = wgpu_renderer::label::Label::new(font, scale, "          ");
         let y_coord_mesh = wgpu_renderer::label::LabelMesh::new(
             renderer,
             entity_index_label.get_image(),
@@ -93,7 +93,7 @@ impl DebugOverlay {
             },
         );
 
-        let z_coord_label = wgpu_renderer::label::Label::new(&font, scale, "          ");
+        let z_coord_label = wgpu_renderer::label::Label::new(font, scale, "          ");
         let z_coord_mesh = wgpu_renderer::label::LabelMesh::new(
             renderer,
             entity_index_label.get_image(),

@@ -9,7 +9,7 @@
 //! "Fast, Minimum Storage Ray/Triangle Intersection". It is still considered today
 //! a fast algorithm that is often used in benchmarks to compare the performances of other methods.
 //!
-//! ```  
+//! ```math
 //!                    C
 //!                    x
 //!   O  D            / \
@@ -20,7 +20,7 @@
 //! ```
 //!
 //! ### Calculation of the intersection point in barycentric coordinates
-//! ```
+//! ```math
 //! (1)   P = (1 - u - v)A + uB + vC
 //! ```
 //!
@@ -30,7 +30,7 @@
 //! C: Third point of the triangle   
 //!
 //! ### Ray's parametric equation:   
-//! ```
+//! ```math
 //! (2)  P = O + tD
 //! ```
 //!
@@ -41,7 +41,7 @@
 //!
 //! ### Place (2) in (1):
 //!
-//! ```
+//! ```math
 //!                               |t|
 //! (3)  [ -D  (B - A)  (C - A) ] |u| = O - A
 //!                               |v|
@@ -49,7 +49,7 @@
 //!
 //! ### Cramer's Rule
 //!
-//! ```
+//! ```math
 //! |t|      1     | det(M_t) |
 //! |u| = -------- | det(M_u) |
 //! |v|    det(M)  | det(M_v) |
@@ -62,7 +62,7 @@
 //!
 //! ### Optimize
 //!
-//! ```
+//! ```math
 //! |t|      1      | |  T E1 E2 | |
 //! |u| = --------  | | -D T  E2 | |
 //! |v|  |-D E1 E2| | | -D E1 T  | |
@@ -144,11 +144,11 @@ pub fn ray_triangle_intersect(
             return None;
         }
 
-        if u < 0.0 || u > 1.0 {
+        if !(0.0..=1.0).contains(&u) {
             return None;
         }
 
-        if v < 0.0 || v > 1.0 {
+        if !(0.0..=1.0).contains(&v) {
             return None;
         }
     }

@@ -33,9 +33,6 @@ impl MouseSelector {
         let cam_trans = cgmath::Matrix3::from_angle_y(-camera_yaw)
             * cgmath::Matrix3::from_angle_z(camera_pitch);
 
-        let mouse_direction =
-            cam_trans * cgmath::Vector3::new(mouse_pos_x, mouse_pos_y, mouse_pos_z);
-
-        mouse_direction
+        cam_trans * cgmath::Vector3::new(mouse_pos_x, mouse_pos_y, mouse_pos_z)
     }
 }
