@@ -1,6 +1,7 @@
 pub mod sliding_average;
 mod sorted_table;
 
+use cgmath::Zero;
 use wgpu_renderer::{
     performance_monitor::{self, watch},
     vertex_color_shader::{
@@ -38,10 +39,7 @@ impl<const SIZE: usize> PerformanceMonitor<SIZE> {
             graph_host.vertices.as_slice(),
             graph_host.colors.as_slice(),
             graph_host.indices.as_slice(),
-            &[vertex_color_shader::Instance {
-                position: glam::Vec3::ZERO,
-                rotation: glam::Quat::IDENTITY,
-            }],
+            &[vertex_color_shader::Instance::zero()]
         );
 
         let scale = 14.0;
@@ -52,12 +50,12 @@ impl<const SIZE: usize> PerformanceMonitor<SIZE> {
             label_60fps_host.get_image(),
             texture_bind_group_layout,
             &vertex_color_shader::Instance {
-                position: glam::Vec3::new(
+                position: cgmath::Vector3::new(
                     graph_host.get_width() as f32 - label_60fps_host.width() as f32,
                     graph_host.get_height_60fps(),
                     0.0,
                 ),
-                rotation: glam::Quat::IDENTITY,
+                rotation: cgmath::Quaternion::zero(),
             },
         );
 

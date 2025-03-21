@@ -1,7 +1,9 @@
 //! Creates vertex data to draw a Rectangle
 //!
 
-use glam::Vec3;
+type Vec3 = cgmath::Vector3<f32>;
+
+use cgmath::InnerSpace;
 
 use super::mesh::MeshInterface;
 

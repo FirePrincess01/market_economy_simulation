@@ -2,6 +2,7 @@ mod animated_object;
 mod ant;
 mod base_factory;
 mod create_entities;
+mod debug_overlay;
 mod deferred_animation_shader;
 mod deferred_color_shader;
 mod deferred_heightmap_shader;
@@ -25,6 +26,7 @@ mod world_mesh;
 use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,
 };
+use debug_overlay::DebugOverlay;
 use market_economy_simulation_server::game_logic::game_logic_interface::{
     GameLogicInterface, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageMedium,
 };
@@ -67,8 +69,8 @@ struct MarketEconomySimulation {
     mouse_pos_x: u32,
     entity_index: u32,
     font: rusttype::Font<'static>,
-    entity_index_label: wgpu_renderer::label::Label,
-    entity_index_mesh: wgpu_renderer::label::LabelMesh,
+
+    debug_overlay: DebugOverlay,
 
     game_logic: market_economy_simulation_server::GameLogicServer,
     ant: ant::Ant,
@@ -131,20 +133,16 @@ impl MarketEconomySimulation {
             "60 ups",
         );
 
-        // show the entity index
+        // Mouse position
         let mouse_pos_y = 0;
         let mouse_pos_x = 0;
 
-        let entity_index_label = wgpu_renderer::label::Label::new(&font, 32.0, "47114711");
-        let mut entity_index_instance = vertex_texture_shader::Instance::zero();
-        entity_index_instance.position.x = 20.0;
-        entity_index_instance.position.y = 120.0;
-
-        let entity_index_mesh = wgpu_renderer::label::LabelMesh::new(
+        // Debug Overlay
+        let debug_overlay = DebugOverlay::new(
             renderer_interface,
-            entity_index_label.get_image(),
             &renderer.texture_bind_group_layout,
-            &entity_index_instance,
+            &font,
+            cgmath::Vector3 { x: 20.0, y: 120.0, z: 0.0 }
         );
 
         // create ant
@@ -217,8 +215,8 @@ impl MarketEconomySimulation {
             mouse_pos_x,
             entity_index: 0,
             font,
-            entity_index_label,
-            entity_index_mesh,
+
+            debug_overlay,
 
             game_logic,
 
@@ -287,12 +285,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         self.renderer.update(renderer_interface, dt);
 
         // update entity index label
-        let text = self.entity_index.to_string();
-        self.entity_index_label.update(&self.font, &text);
-        self.entity_index_mesh.update_texture(
-            renderer_interface.queue(),
-            self.entity_index_label.get_image(),
-        );
+        self.debug_overlay.update_entity(renderer_interface, &self.font, self.entity_index);
 
         self.game_logic.update();
 
@@ -366,7 +359,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             if let Some(res) = res {
                 match res {
                     selector::Result::Terrain(triangle) => {
-                        println!("{:?}", triangle.p);
+                        self.debug_overlay.update_coord(renderer_interface, &self.font, &triangle.p);
                     }
                 }
             }
@@ -460,7 +453,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             &self.point_light_storage,
             &mut self.terrain_storage,
             &self.ant,
-            &self.entity_index_mesh,
+            &self.debug_overlay,
             &self.ambient_light_quad,
             &[
                 &mut self.performance_monitor_fps,
