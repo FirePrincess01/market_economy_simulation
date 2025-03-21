@@ -63,6 +63,7 @@ impl Settings {
             // maximum for the web
             nr_tiles: 64,
             max_depth: 8,
+            
             // nr_tiles: 8,
             // max_depth: 1,
         }
