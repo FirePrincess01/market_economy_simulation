@@ -1,6 +1,7 @@
 //! The % CPU usage table of the performance monitor
 //!
 
+use cgmath::Zero;
 use wgpu_renderer::{
     performance_monitor::watch::{self},
     shape::{self, MeshDataInterface},
@@ -60,12 +61,12 @@ impl<const SIZE: usize> SortedTable<SIZE> {
                 square.triangles(),
                 &color_gradient[i],
                 &[vertex_color_shader::Instance {
-                    position: glam::Vec3::new(
+                    position: cgmath::Vector3::new(
                         position.x,
                         position.y + 2.5 + i as f32 * scale,
                         position.z,
                     ),
-                    rotation: glam::Quat::IDENTITY,
+                    rotation: cgmath::Quaternion::zero(),
                 }],
             );
 
@@ -82,12 +83,12 @@ impl<const SIZE: usize> SortedTable<SIZE> {
                 label.get_image(),
                 texture_bind_group_layout,
                 &vertex_color_shader::Instance {
-                    position: glam::Vec3::new(
+                    position: cgmath::Vector3::new(
                         position.x + scale,
                         position.y + i as f32 * scale,
                         0.0,
                     ),
-                    rotation: glam::Quat::IDENTITY,
+                    rotation: cgmath::Quaternion::zero(),
                 },
             );
 
@@ -105,12 +106,12 @@ impl<const SIZE: usize> SortedTable<SIZE> {
                 label.get_image(),
                 texture_bind_group_layout,
                 &vertex_color_shader::Instance {
-                    position: glam::Vec3::new(
+                    position: cgmath::Vector3::new(
                         position.x + scale + label_percent_with as f32,
                         position.y + i as f32 * scale,
                         0.0,
                     ),
-                    rotation: glam::Quat::IDENTITY,
+                    rotation: cgmath::Quaternion::zero(),
                 },
             );
 

@@ -1,6 +1,6 @@
 //! Combines different geometries into one
 
-use glam::Vec3;
+type Vec3 = cgmath::Vector3<f32>;
 
 pub trait MeshInterface {
     fn vertices(&self) -> &[Vec3];

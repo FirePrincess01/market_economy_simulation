@@ -3,7 +3,7 @@
 
 use std::iter::zip;
 
-use glam::Vec3;
+type Vec3 = cgmath::Vector3<f32>;
 
 use crate::deferred_color_shader;
 

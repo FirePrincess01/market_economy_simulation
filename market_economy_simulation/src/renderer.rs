@@ -61,9 +61,9 @@ pub struct Renderer {
     pipeline_fxaa: fxaa_shader::Pipeline,
 
     // camera
-    camera: Camera,
+    pub camera: Camera,
     camera_controller: CameraController,
-    projection: Projection,
+    pub projection: Projection,
 
     camera_uniform: vertex_color_shader::CameraUniform,
     camera_uniform_buffer: vertex_color_shader::CameraUniformBuffer,
@@ -355,9 +355,11 @@ impl Renderer {
     }
 
     pub fn get_view_position(&self) -> cgmath::Vector3<f32> {
-        let pos = self.camera.position;
+        self.camera.get_view_position()
+    }
 
-        cgmath::Vector3::new(pos.x, pos.y, pos.z)
+    pub fn _get_view_direction(&self) -> cgmath::Vector3<f32> {
+        self.camera.get_view_direction()
     }
 
     #[allow(clippy::too_many_arguments)]
