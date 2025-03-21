@@ -95,7 +95,7 @@ pub struct Triangle {
     pub v0: cgmath::Vector3<f32>,
     /// Second Vertex
     pub v1: cgmath::Vector3<f32>,
-    /// Thrid Vertex
+    /// Third Vertex
     pub v2: cgmath::Vector3<f32>,
 
     /// View position
