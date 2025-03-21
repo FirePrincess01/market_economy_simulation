@@ -325,6 +325,18 @@ fn test_back_face() {
 }
 
 #[test]
+fn test_back_face_2() {
+    let orig = Vec3::new(5.0, 0.0, 1.0);
+    let dir = Vec3::new(-1.0, 0.0, 0.0);
+    let v0 = Vec3::new(3.0, -1.0, 0.0);
+    let v1 = Vec3::new(3.0, 0.0, 3.0);
+    let v2 = Vec3::new(3.0, 1.0, 0.0);
+
+    let res = ray_triangle_intersect(&orig, &dir, &v0, &v1, &v2);
+    assert!(res.is_none());
+}
+
+#[test]
 fn test_outside() {
     let orig = Vec3::new(-1.0, 0.0, 1.0);
     let dir = Vec3::new(1.0, 1.0, 0.0);

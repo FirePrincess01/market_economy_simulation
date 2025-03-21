@@ -20,8 +20,7 @@ mod renderer;
 mod settings;
 mod terrain_storage;
 mod world_mesh;
-mod terrain_selector;
-mod ray_triangle_intersection;
+mod selector;
 
 use animated_object::wgpu_animated_object_renderer::{
     WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,
