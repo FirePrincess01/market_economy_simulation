@@ -15,16 +15,37 @@ impl Ants {
 
         let size: usize = max_nr_ants.isqrt();
 
+        let gradient = colorous::TURBO;
+
         let mut id = 0;
         for y in 0..size {
             for x in 0..size {
+                let color0 = gradient.eval_rational(x  % 10, 10);
+                let color1 = gradient.eval_rational(y  % 10, 10);
+
+                let color0: cgmath::Vector3<f32> = cgmath::Vector3::new(
+                    color0.r as f32 / 255.0,
+                    color0.g as f32 / 255.0,
+                    color0.b as f32 / 255.0,
+                );
+
+                let color1: cgmath::Vector3<f32> = cgmath::Vector3::new(
+                    color1.r as f32 / 255.0,
+                    color1.g as f32 / 255.0,
+                    color1.b as f32 / 255.0,
+                );
+
+                let color =  color0 / 2.0 + color1 / 2.0;
+
+
                 ants.push(Ant {
                     id,
 
                     pos: cgmath::Vector2 { x: x as f32 * 10.0, y: y as f32 * 10.0},
                     rot_z: 0.0,
                     light_strength: 1.0,
-                    light_color: cgmath::Vector3::new(1.0, 1.0, 0.5),
+                    // light_color: cgmath::Vector3::new(1.0, 1.0, 1.0),
+                    light_color: color,
                 });
 
                 id += 1;

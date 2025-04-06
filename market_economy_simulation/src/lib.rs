@@ -148,8 +148,8 @@ impl MarketEconomySimulation {
         );
 
         // create ant
-        let glb_bin = include_bytes!("../res/wiggle_tower2.glb");
-        // let glb_bin = include_bytes!("../res/ant_0_8.glb");
+        // let glb_bin = include_bytes!("../res/wiggle_tower2.glb");
+        let glb_bin = include_bytes!("../res/ant_0_8.glb");
         let animated_object_storage_ant = AnimatedObjectStorage::create_from_glb(
             renderer_interface,
             &renderer.animation_bind_group_layout,
@@ -389,12 +389,16 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
 
         self.watch_fps.start(5, "Update animations");
         {
-            // self.ant_storage
-            //     .animated_object_storage
-            //     .update_animations(&dt);
+            self.ant_storage
+                .animated_object_storage
+                .update_animations(&dt);
+            
+            
             self.ant_storage
                 .animated_object_storage
                 .update_device_data(renderer_interface);
+
+
             self.ant_storage
                 .point_light_storage
                 .update(renderer_interface);

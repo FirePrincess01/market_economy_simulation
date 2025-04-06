@@ -9,7 +9,8 @@ use crate::{
         animated_object_data::AnimationData,
         gltf_importer::GltfImporter,
     },
-    deferred_animation_shader::{self, DeferredAnimationShaderDraw}, selector::ENTITY_ANT_BIT,
+    deferred_animation_shader::{self, DeferredAnimationShaderDraw},
+    selector::ENTITY_ANT_BIT,
 };
 
 pub struct AnimatedObjectStorage {
@@ -24,6 +25,9 @@ pub struct AnimatedObjectStorage {
     instance_device: Vec<AnimatedObjectInstanceDevice>,
 
     update_done: usize,
+
+    instances: Vec<deferred_animation_shader::Instance>,
+    instance_buffer: deferred_animation_shader::InstanceBuffer<deferred_animation_shader::Instance>,
 }
 
 impl AnimatedObjectStorage {
@@ -82,6 +86,20 @@ impl AnimatedObjectStorage {
             });
         }
 
+        let mut instances = Vec::with_capacity(max_instances);
+        for i in 0..max_instances {
+            instances.push(deferred_animation_shader::Instance {
+                position: [0.0, 20.0, 5.0],
+                color: [0.5, 0.5, 0.8],
+                entity: [i as u32 | ENTITY_ANT_BIT, 0, 0],
+            });
+        }
+
+        let instance_buffer = deferred_animation_shader::InstanceBuffer::new(
+            wgpu_renderer.device(),
+            &instances,
+        );
+
         Self {
             skeleton,
             animation_data,
@@ -89,6 +107,8 @@ impl AnimatedObjectStorage {
             instance_host,
             instance_device,
             update_done: 0,
+            instances,
+            instance_buffer,
         }
     }
 
@@ -111,21 +131,25 @@ impl AnimatedObjectStorage {
         let size = self.instance_host.len();
         assert_eq!(size, self.instance_device.len());
 
-        for i in 0..size {
-            if self.update_done < 1000000 {
+        for i in 0..1 {
+            // if self.update_done < 1000000 {
                 self.update_done +=1 ;
 
-                if self.instance_host[i].is_active {
+                // if self.instance_host[i].is_active {
                     self.instance_device[i]
                         .animation_uniform_buffer
                         .update(renderer.queue(), &self.instance_host[i].animation_uniform);
-    
-                    self.instance_device[i]
-                        .instance_buffer
-                        .update(renderer.queue(), &[self.instance_host[i].instance]);
-                }
-            }
+
+                //     self.instance_device[i]
+                //         .instance_buffersa
+                //         .update(renderer.queue(), &[self.instance_host[i].instance]);
+                // }
+                // }
+            // }
         }
+
+        self.instance_buffer
+            .update(renderer.queue(), &self.instances);
     }
 
     pub fn max_instances(&self) -> usize {
@@ -133,7 +157,8 @@ impl AnimatedObjectStorage {
     }
 
     pub fn set_pos(&mut self, id: usize, pos: cgmath::Vector3<f32>) {
-        self.instance_host[id].instance.position = pos.into();
+        // self.instance_host[id].instance.position = pos.into();
+        self.instances[id].position = pos.into();
     }
 
     pub fn set_active(&mut self, id: usize) {
@@ -146,15 +171,21 @@ impl DeferredAnimationShaderDraw for AnimatedObjectStorage {
         let size = self.instance_host.len();
         assert_eq!(size, self.instance_device.len());
 
-        for i in 0..size {
-            if self.instance_host[i].is_active {
-                self.mesh.draw(
-                    render_pass,
-                    &self.instance_device[i].animation_uniform_buffer,
-                    &self.instance_device[i].instance_buffer,
-                );
-            }
-        }
+        // for i in 0..size {
+        //     if self.instance_host[i].is_active {
+        //         self.mesh.draw(
+        //             render_pass,
+        //             &self.instance_device[i].animation_uniform_buffer,
+        //             &self.instance_device[i].instance_buffer,
+        //         );
+        //     }
+        // }
+
+        self.mesh.draw(
+            render_pass,
+            &self.instance_device[0].animation_uniform_buffer,
+            &self.instance_buffer,
+        );
     }
 }
 

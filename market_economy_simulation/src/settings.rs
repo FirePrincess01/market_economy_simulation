@@ -67,7 +67,7 @@ impl Settings {
             // miscellaneous
             // max_point_light_instances: 65536,
             max_point_light_instances: 16348,
-            dbg_point_lights: true,
+            dbg_point_lights: false,
 
             // map size
             nr_tiles: 64,

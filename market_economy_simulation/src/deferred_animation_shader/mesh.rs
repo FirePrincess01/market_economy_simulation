@@ -138,7 +138,7 @@ impl Mesh {
         animation_buffer.bind(render_pass);
         instance_buffer.bind(render_pass);
 
-        render_pass.draw_indexed(0..self.index_buffer.size(), 0, 0..1);
+        render_pass.draw_indexed(0..self.index_buffer.size(), 0, 0..instance_buffer.size());
     }
 }
 

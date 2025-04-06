@@ -1,7 +1,7 @@
 //! Manages all the ant objects on the GPU
 //!
 
-use market_economy_simulation_server::ants;
+use market_economy_simulation_server::{ants, point_lights::Attenuation};
 
 use crate::{
     animated_object::{
@@ -37,10 +37,11 @@ impl AntStorage {
 
     pub fn set_ant(&mut self, ant: &ants::Ant) {
         if ant.id < self.max_ants {
-            let pos = cgmath::Vector3::new(ant.pos.x, ant.pos.y, 5.0);
+            let pos = cgmath::Vector3::new(ant.pos.x, ant.pos.y, 2.0);
             // let pos = cgmath::Vector3::new(0.0, 0.0, 0.0);
             self.animated_object_storage.set_pos(ant.id, pos);
-            self.point_light_storage.set_position(&PointLightIndex{ instance_index: ant.id }, pos);
+            // self.point_light_storage.set_position(&PointLightIndex{ instance_index: ant.id }, pos);
+            self.point_light_storage.set_light(PointLightIndex{ instance_index: ant.id }, pos, ant.light_color, Attenuation::_200);
 
             self.animated_object_storage.set_active(ant.id);
             self.point_light_storage.set_active(&PointLightIndex{ instance_index: ant.id }, true);
