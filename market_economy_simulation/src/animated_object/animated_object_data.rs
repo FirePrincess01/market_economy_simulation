@@ -1,4 +1,6 @@
-#[derive(Clone)]
+use std::fmt::write;
+
+#[derive(Clone, Debug)]
 pub struct AnimationTranslation {
     pub key_times: Vec<f32>,
     pub joint_translations: Vec<cgmath::Vector3<f32>>,
@@ -48,6 +50,21 @@ pub struct AnimationData {
     pub _joint_target_names: Vec<String>,
     pub joint_translations: Vec<AnimationTranslation>,
     pub joint_rotations: Vec<AnimationRotation>,
+}
+
+impl std::fmt::Debug for AnimationData {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "Name: {}", self._name)?;
+        write!(f, "Joints: ")?;
+        for name in &self._joint_target_names {
+            write!(f, "{} ", name)?;
+        }
+        writeln!(f, "")?;
+
+        writeln!(f, "Key Frames: {}", self.joint_rotations[4].joint_rotations.len())?;
+
+        Ok(())
+    }
 }
 
 pub struct MeshData {

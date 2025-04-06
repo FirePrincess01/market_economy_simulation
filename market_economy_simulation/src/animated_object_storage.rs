@@ -1,6 +1,8 @@
 //! Manages all instances of one single animated object
 //!
 
+use std::fmt::Write;
+
 use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
 
 use crate::{
@@ -95,10 +97,8 @@ impl AnimatedObjectStorage {
             });
         }
 
-        let instance_buffer = deferred_animation_shader::InstanceBuffer::new(
-            wgpu_renderer.device(),
-            &instances,
-        );
+        let instance_buffer =
+            deferred_animation_shader::InstanceBuffer::new(wgpu_renderer.device(), &instances);
 
         Self {
             skeleton,
@@ -133,18 +133,18 @@ impl AnimatedObjectStorage {
 
         for i in 0..1 {
             // if self.update_done < 1000000 {
-                self.update_done +=1 ;
+            self.update_done += 1;
 
-                // if self.instance_host[i].is_active {
-                    self.instance_device[i]
-                        .animation_uniform_buffer
-                        .update(renderer.queue(), &self.instance_host[i].animation_uniform);
+            // if self.instance_host[i].is_active {
+            self.instance_device[i]
+                .animation_uniform_buffer
+                .update(renderer.queue(), &self.instance_host[i].animation_uniform);
 
-                //     self.instance_device[i]
-                //         .instance_buffersa
-                //         .update(renderer.queue(), &[self.instance_host[i].instance]);
-                // }
-                // }
+            //     self.instance_device[i]
+            //         .instance_buffersa
+            //         .update(renderer.queue(), &[self.instance_host[i].instance]);
+            // }
+            // }
             // }
         }
 
@@ -163,6 +163,42 @@ impl AnimatedObjectStorage {
 
     pub fn set_active(&mut self, id: usize) {
         self.instance_host[id].is_active = true;
+    }
+}
+
+impl std::fmt::Debug for AnimatedObjectStorage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // f.write_str("Hello From Debug Macro!")
+
+        // f.write_fmt("Hello From Fmt")
+
+        // write!(f, "Hello From Debug Macro!")
+
+        writeln!(f, "Mesh:")?;
+        writeln!(f, "{:?}", self.mesh)?;
+        // writeln!(f)?;
+
+        writeln!(f, "Skeleton:")?;
+        writeln!(f, "{:?}", self.skeleton)?;
+
+        writeln!(f, "Animation:")?;
+        writeln!(f, "{:?}", self.animation_data)?;
+
+
+
+
+        // f.debug_struct("AnimatedObjectStorage")
+        //     .field("skeleton", &self.skeleton)
+        //     .field("animation_data", &self.animation_data)
+        //     .field("instance_host", &self.instance_host)
+        //     .field("mesh", &self.mesh)
+        //     .field("instance_device", &self.instance_device)
+        //     .field("update_done", &self.update_done)
+        //     .field("instances", &self.instances)
+        //     .field("instance_buffer", &self.instance_buffer)
+        //     .finish()
+
+        Ok(())
     }
 }
 

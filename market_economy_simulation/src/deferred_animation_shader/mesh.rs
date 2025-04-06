@@ -142,6 +142,13 @@ impl Mesh {
     }
 }
 
+impl std::fmt::Debug for Mesh {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "Vertices: {}", self._nr_vertices)?;
+        writeln!(f, "Indices: {}", self.index_buffer.size())
+    }
+}
+
 
 
 // impl DeferredAnimationShaderDraw for Mesh {

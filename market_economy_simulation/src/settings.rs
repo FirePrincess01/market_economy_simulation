@@ -62,7 +62,8 @@ impl Settings {
             // game server settings
             // map_size: 10,
             enable_multithreading: true,
-            max_nr_ants: 10000,
+            // max_nr_ants: 10000,
+            max_nr_ants: 100,
 
             // miscellaneous
             // max_point_light_instances: 65536,
