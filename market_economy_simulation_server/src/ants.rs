@@ -1,0 +1,65 @@
+//! Manages all ants instances
+//! 
+
+use std::{cmp::max, sync::mpsc};
+
+use crate::game_logic::game_logic_interface::GameLogicMessageLight;
+
+pub struct Ants {
+    ants: Vec<Ant>
+}
+
+impl Ants {
+    pub fn new(max_nr_ants: usize) -> Self {
+        let mut ants: Vec<Ant> = Vec::new();
+
+        let size: usize = max_nr_ants.isqrt();
+
+        let mut id = 0;
+        for y in 0..size {
+            for x in 0..size {
+                ants.push(Ant {
+                    id,
+
+                    pos: cgmath::Vector2 { x: x as f32 * 10.0, y: y as f32 * 10.0},
+                    rot_z: 0.0,
+                    light_strength: 1.0,
+                    light_color: cgmath::Vector3::new(1.0, 1.0, 0.5),
+                });
+
+                id += 1;
+            }
+        }
+
+        Self { ants }
+    }
+
+    pub fn update(&mut self, channel: &mpsc::Sender<GameLogicMessageLight>) {
+        // if self.requires_update {
+            for elem in &mut self.ants {
+                // elem.position.x += 0.02;
+                // elem.color.x = (elem.color.x + 0.001) % 1.0;
+
+                let res = channel.send(GameLogicMessageLight::UpdateAnt(elem.clone()));
+                match res {
+                    Ok(_) => {}
+                    Err(_err) => {
+                        // println!("{}", err)
+                    }
+                }
+            }
+        }
+    // }
+
+}
+
+#[derive(Clone)]
+pub struct Ant {
+    pub id: usize,
+
+    pub pos: cgmath::Vector2<f32>,
+    pub rot_z: f32,
+
+    pub light_strength: f32,
+    pub light_color: cgmath::Vector3<f32>,
+}

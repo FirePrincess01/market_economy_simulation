@@ -4,6 +4,8 @@
 use crate::{renderer, terrain_storage::TerrainSettings};
 
 pub struct Settings {
+    // render settings
+
     /// On mobile, memory mapped read may may have extremely bad performance.
     /// To still render some demo application, it can be deactivated here.
     pub enable_memory_mapped_read: bool,
@@ -22,11 +24,17 @@ pub struct Settings {
     // The resolution of the window
     pub window_resolution: (u32, u32),
 
+    // game server settings
+
     // enables multithreading if available (no available for the web)
     pub enable_multithreading: bool,
 
+    pub max_nr_ants: usize,
+
     /// Size of the terrain map in both x and y dimension
-    pub map_size: usize,
+    // pub map_size: usize,
+
+    // miscellaneous
 
     /// Maximum number of instances of the point lights
     pub max_point_light_instances: usize,
@@ -52,15 +60,16 @@ impl Settings {
             window_resolution: (1920 / 2, 1080 / 2),
 
             // game server settings
-            map_size: 10,
+            // map_size: 10,
             enable_multithreading: true,
+            max_nr_ants: 10000,
 
             // miscellaneous
             // max_point_light_instances: 65536,
             max_point_light_instances: 16348,
-            dbg_point_lights: false,
+            dbg_point_lights: true,
 
-            // maximum for the web
+            // map size
             nr_tiles: 64,
             max_depth: 8,
             // nr_tiles: 8,
@@ -82,8 +91,9 @@ impl Settings {
         &self,
     ) -> market_economy_simulation_server::game_logic::GameLogicSettings {
         market_economy_simulation_server::game_logic::GameLogicSettings {
-            map_size: self.map_size,
+            // map_size: self.map_size,
             enable_multithreading: self.enable_multithreading,
+            max_nr_ants: self.max_nr_ants,
         }
     }
 

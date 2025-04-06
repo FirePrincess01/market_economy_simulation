@@ -1,0 +1,173 @@
+//! Manages all instances of one single animated object
+//!
+
+use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
+
+use crate::{
+    animated_object::{
+        animated_model::{animation::Animation, skeleton::Skeleton},
+        animated_object_data::AnimationData,
+        gltf_importer::GltfImporter,
+    },
+    deferred_animation_shader::{self, DeferredAnimationShaderDraw}, selector::ENTITY_ANT_BIT,
+};
+
+pub struct AnimatedObjectStorage {
+    // host data
+    skeleton: Skeleton,
+    animation_data: AnimationData,
+
+    instance_host: Vec<AnimatedObjectInstanceHost>,
+
+    // device data
+    mesh: deferred_animation_shader::Mesh,
+    instance_device: Vec<AnimatedObjectInstanceDevice>,
+
+    update_done: usize,
+}
+
+impl AnimatedObjectStorage {
+    pub fn create_from_glb(
+        wgpu_renderer: &mut dyn wgpu_renderer::wgpu_renderer::WgpuRendererInterface,
+        animation_bind_group_layout: &deferred_animation_shader::AnimationBindGroupLayout,
+        glb_bin: &[u8],
+        max_instances: usize,
+    ) -> Self {
+        let animation_object_data = GltfImporter::create(glb_bin);
+
+        let skeleton = Skeleton::new(&animation_object_data);
+        let animation_data = animation_object_data.animations[0].clone();
+        // let animation_0 = Animation::new(&animation_data);
+        let animation_uniform = deferred_animation_shader::AnimationUniform::zero();
+
+        // let instance = deferred_animation_shader::Instance {
+        //     position: [0.0, 20.0, 5.0],
+        //     color: [0.5, 0.5, 0.8],
+        //     entity: [99, 0, 0],
+        // };
+
+        let mesh = deferred_animation_shader::Mesh::from_animation_data(
+            wgpu_renderer,
+            // animation_bind_group_layout,
+            &animation_object_data,
+            // &[instance],
+        );
+
+        let mut instance_host = Vec::with_capacity(max_instances);
+        let mut instance_device = Vec::with_capacity(max_instances);
+
+        for i in 0..max_instances {
+            instance_host.push(AnimatedObjectInstanceHost {
+                animation: Animation::new(&animation_data),
+                is_active: false,
+                animation_uniform,
+                instance: deferred_animation_shader::Instance {
+                    position: [0.0, 20.0, 5.0],
+                    color: [0.5, 0.5, 0.8],
+                    entity: [i as u32 | ENTITY_ANT_BIT, 0, 0],
+                },
+            });
+        }
+
+        for _i in 0..max_instances {
+            instance_device.push(AnimatedObjectInstanceDevice {
+                animation_uniform_buffer: deferred_animation_shader::AnimationUniformBuffer::new(
+                    wgpu_renderer.device(),
+                    animation_bind_group_layout,
+                ),
+                instance_buffer: deferred_animation_shader::InstanceBuffer::new(
+                    wgpu_renderer.device(),
+                    &[deferred_animation_shader::Instance::new()],
+                ),
+            });
+        }
+
+        Self {
+            skeleton,
+            animation_data,
+            mesh,
+            instance_host,
+            instance_device,
+            update_done: 0,
+        }
+    }
+
+    /// Updates the animations
+    pub fn update_animations(&mut self, dt: &instant::Duration) {
+        for elem in &mut self.instance_host {
+            if elem.is_active {
+                elem.animation.increment_time(dt);
+                elem.animation.update_animation_uniform(
+                    &self.skeleton,
+                    &self.animation_data,
+                    &mut elem.animation_uniform,
+                );
+            }
+        }
+    }
+
+    /// Copies the data from the host to the device
+    pub fn update_device_data(&mut self, renderer: &mut dyn WgpuRendererInterface) {
+        let size = self.instance_host.len();
+        assert_eq!(size, self.instance_device.len());
+
+        for i in 0..size {
+            if self.update_done < 1000000 {
+                self.update_done +=1 ;
+
+                if self.instance_host[i].is_active {
+                    self.instance_device[i]
+                        .animation_uniform_buffer
+                        .update(renderer.queue(), &self.instance_host[i].animation_uniform);
+    
+                    self.instance_device[i]
+                        .instance_buffer
+                        .update(renderer.queue(), &[self.instance_host[i].instance]);
+                }
+            }
+        }
+    }
+
+    pub fn max_instances(&self) -> usize {
+        self.instance_host.len()
+    }
+
+    pub fn set_pos(&mut self, id: usize, pos: cgmath::Vector3<f32>) {
+        self.instance_host[id].instance.position = pos.into();
+    }
+
+    pub fn set_active(&mut self, id: usize) {
+        self.instance_host[id].is_active = true;
+    }
+}
+
+impl DeferredAnimationShaderDraw for AnimatedObjectStorage {
+    fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
+        let size = self.instance_host.len();
+        assert_eq!(size, self.instance_device.len());
+
+        for i in 0..size {
+            if self.instance_host[i].is_active {
+                self.mesh.draw(
+                    render_pass,
+                    &self.instance_device[i].animation_uniform_buffer,
+                    &self.instance_device[i].instance_buffer,
+                );
+            }
+        }
+    }
+}
+
+struct AnimatedObjectInstanceHost {
+    pub animation: Animation,
+    pub animation_uniform: deferred_animation_shader::AnimationUniform,
+    pub instance: deferred_animation_shader::Instance,
+
+    pub is_active: bool,
+}
+
+struct AnimatedObjectInstanceDevice {
+    pub animation_uniform_buffer: deferred_animation_shader::AnimationUniformBuffer,
+    pub instance_buffer:
+        deferred_animation_shader::InstanceBuffer<deferred_animation_shader::Instance>,
+}

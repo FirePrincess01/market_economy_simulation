@@ -24,6 +24,7 @@ pub struct Selector {
 }
 
 pub const ENTITY_TERRAIN_BIT: u32 = 1 << 31;
+pub const ENTITY_ANT_BIT: u32 = 1 << 30;
 
 impl Selector {
     pub fn new() -> Self {
@@ -84,6 +85,9 @@ impl Selector {
                 return Some(Result::Terrain(triangle));
             }
         }
+        else if entity_bit_mask == ENTITY_ANT_BIT {
+            return Some((Result::Ant(entity_index)));
+        }
 
         None
     }
@@ -116,4 +120,5 @@ pub struct Triangle {
 
 pub enum Result {
     Terrain(Triangle),
+    Ant(usize)
 }

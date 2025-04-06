@@ -67,7 +67,8 @@ impl HeightMapGenerator {
                     (p_x + x as isize * distance as isize - a as isize / 2) as f32 / 20.0,
                 ) as f64;
 
-                heights.push(height as f32);
+                // heights.push(height as f32);
+                heights.push(0.0);
             }
         }
 
