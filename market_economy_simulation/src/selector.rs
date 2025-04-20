@@ -86,7 +86,7 @@ impl Selector {
             }
         }
         else if entity_bit_mask == ENTITY_ANT_BIT {
-            return Some((Result::Ant(entity_index)));
+            return Some(Result::Ant(entity_index));
         }
 
         None

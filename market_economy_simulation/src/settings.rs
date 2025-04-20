@@ -31,8 +31,6 @@ pub struct Settings {
 
     pub max_nr_ants: usize,
 
-    /// Size of the terrain map in both x and y dimension
-    // pub map_size: usize,
 
     // miscellaneous
 
@@ -60,7 +58,6 @@ impl Settings {
             window_resolution: (1920 / 2, 1080 / 2),
 
             // game server settings
-            // map_size: 10,
             enable_multithreading: true,
             // max_nr_ants: 10000,
             max_nr_ants: 100,
@@ -92,7 +89,6 @@ impl Settings {
         &self,
     ) -> market_economy_simulation_server::game_logic::GameLogicSettings {
         market_economy_simulation_server::game_logic::GameLogicSettings {
-            // map_size: self.map_size,
             enable_multithreading: self.enable_multithreading,
             max_nr_ants: self.max_nr_ants,
         }

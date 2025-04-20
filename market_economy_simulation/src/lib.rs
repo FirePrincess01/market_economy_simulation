@@ -157,7 +157,7 @@ impl MarketEconomySimulation {
             settings.max_nr_ants,
         );
 
-        println!("{:?}", animated_object_storage_ant);
+        // println!("{:?}", animated_object_storage_ant);
 
         let point_light_storage_ant = PointLightStorage::new(
             renderer_interface,
@@ -383,7 +383,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
                             &triangle.p,
                         );
                     }
-                    selector::Result::Ant(ant) => {}
+                    selector::Result::Ant(_ant) => {}
                 }
             }
         }

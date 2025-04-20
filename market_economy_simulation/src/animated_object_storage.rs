@@ -168,35 +168,15 @@ impl AnimatedObjectStorage {
 
 impl std::fmt::Debug for AnimatedObjectStorage {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        // f.write_str("Hello From Debug Macro!")
-
-        // f.write_fmt("Hello From Fmt")
-
-        // write!(f, "Hello From Debug Macro!")
 
         writeln!(f, "Mesh:")?;
         writeln!(f, "{:?}", self.mesh)?;
-        // writeln!(f)?;
 
         writeln!(f, "Skeleton:")?;
         writeln!(f, "{:?}", self.skeleton)?;
 
         writeln!(f, "Animation:")?;
         writeln!(f, "{:?}", self.animation_data)?;
-
-
-
-
-        // f.debug_struct("AnimatedObjectStorage")
-        //     .field("skeleton", &self.skeleton)
-        //     .field("animation_data", &self.animation_data)
-        //     .field("instance_host", &self.instance_host)
-        //     .field("mesh", &self.mesh)
-        //     .field("instance_device", &self.instance_device)
-        //     .field("update_done", &self.update_done)
-        //     .field("instances", &self.instances)
-        //     .field("instance_buffer", &self.instance_buffer)
-        //     .finish()
 
         Ok(())
     }
@@ -206,16 +186,6 @@ impl DeferredAnimationShaderDraw for AnimatedObjectStorage {
     fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         let size = self.instance_host.len();
         assert_eq!(size, self.instance_device.len());
-
-        // for i in 0..size {
-        //     if self.instance_host[i].is_active {
-        //         self.mesh.draw(
-        //             render_pass,
-        //             &self.instance_device[i].animation_uniform_buffer,
-        //             &self.instance_device[i].instance_buffer,
-        //         );
-        //     }
-        // }
 
         self.mesh.draw(
             render_pass,
