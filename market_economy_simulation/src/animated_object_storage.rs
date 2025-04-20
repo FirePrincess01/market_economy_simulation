@@ -1,8 +1,6 @@
 //! Manages all instances of one single animated object
 //!
 
-use std::fmt::Write;
-
 use wgpu_renderer::wgpu_renderer::WgpuRendererInterface;
 
 use crate::{
@@ -67,7 +65,7 @@ impl AnimatedObjectStorage {
                 animation: Animation::new(&animation_data),
                 is_active: false,
                 animation_uniform,
-                instance: deferred_animation_shader::Instance {
+                _instance: deferred_animation_shader::Instance {
                     position: [0.0, 20.0, 5.0],
                     color: [0.5, 0.5, 0.8],
                     entity: [i as u32 | ENTITY_ANT_BIT, 0, 0],
@@ -81,7 +79,7 @@ impl AnimatedObjectStorage {
                     wgpu_renderer.device(),
                     animation_bind_group_layout,
                 ),
-                instance_buffer: deferred_animation_shader::InstanceBuffer::new(
+                _instance_buffer: deferred_animation_shader::InstanceBuffer::new(
                     wgpu_renderer.device(),
                     &[deferred_animation_shader::Instance::new()],
                 ),
@@ -168,7 +166,6 @@ impl AnimatedObjectStorage {
 
 impl std::fmt::Debug for AnimatedObjectStorage {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-
         writeln!(f, "Mesh:")?;
         writeln!(f, "{:?}", self.mesh)?;
 
@@ -198,13 +195,13 @@ impl DeferredAnimationShaderDraw for AnimatedObjectStorage {
 struct AnimatedObjectInstanceHost {
     pub animation: Animation,
     pub animation_uniform: deferred_animation_shader::AnimationUniform,
-    pub instance: deferred_animation_shader::Instance,
+    pub _instance: deferred_animation_shader::Instance,
 
     pub is_active: bool,
 }
 
 struct AnimatedObjectInstanceDevice {
     pub animation_uniform_buffer: deferred_animation_shader::AnimationUniformBuffer,
-    pub instance_buffer:
+    pub _instance_buffer:
         deferred_animation_shader::InstanceBuffer<deferred_animation_shader::Instance>,
 }

@@ -35,7 +35,7 @@ pub struct Settings {
     // miscellaneous
 
     /// Maximum number of instances of the point lights
-    pub max_point_light_instances: usize,
+    // pub max_point_light_instances: usize,
 
     // Draws a sphere around the point lights for debugging purposes
     pub dbg_point_lights: bool,
@@ -64,7 +64,7 @@ impl Settings {
 
             // miscellaneous
             // max_point_light_instances: 65536,
-            max_point_light_instances: 16348,
+            // max_point_light_instances: 16348,
             dbg_point_lights: false,
 
             // map size

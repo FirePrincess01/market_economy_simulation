@@ -2,9 +2,6 @@
 //!
 
 use super::animation_uniform_buffer::AnimationUniformBuffer;
-use super::AnimationBindGroupLayout;
-use super::AnimationUniform;
-use super::DeferredAnimationShaderDraw;
 use super::Instance;
 use super::Vertex;
 
@@ -99,8 +96,6 @@ impl Mesh {
             indices.push(*elem as u32);
         }
 
-        let animation_uniform = AnimationUniform::zero();
-
         Self::new(
             wgpu_renderer,
             // animation_bind_group_layout,
@@ -128,11 +123,12 @@ impl Mesh {
     //     self.nr_instances = u32::min(instances.len() as u32, self.max_instances);
     // }
 
-    pub fn draw<'a>(&'a self, 
-    render_pass: &mut wgpu::RenderPass<'a>,
-    animation_buffer: &'a AnimationUniformBuffer,
-    instance_buffer: &'a InstanceBuffer<Instance>,
-) {
+    pub fn draw<'a>(
+        &'a self,
+        render_pass: &mut wgpu::RenderPass<'a>,
+        animation_buffer: &'a AnimationUniformBuffer,
+        instance_buffer: &'a InstanceBuffer<Instance>,
+    ) {
         self.vertex_buffer.bind(render_pass);
         self.index_buffer.bind(render_pass);
         animation_buffer.bind(render_pass);
@@ -149,10 +145,8 @@ impl std::fmt::Debug for Mesh {
     }
 }
 
-
-
 // impl DeferredAnimationShaderDraw for Mesh {
-//     fn draw<'a>(&'a self, 
+//     fn draw<'a>(&'a self,
 //     render_pass: &mut wgpu::RenderPass<'a>,
 //     animation_buffer: &AnimationUniformBuffer,
 //     instance_buffer: &InstanceBuffer<Instance>,

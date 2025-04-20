@@ -1,7 +1,7 @@
 //! Manages all ants instances
 //! 
 
-use std::{cmp::max, sync::mpsc};
+use std::sync::mpsc;
 
 use crate::game_logic::game_logic_interface::GameLogicMessageLight;
 

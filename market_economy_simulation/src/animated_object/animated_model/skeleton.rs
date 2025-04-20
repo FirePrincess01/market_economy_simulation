@@ -112,7 +112,7 @@ impl Skeleton {
     fn print_children(&self, f: &mut std::fmt::Formatter<'_>, index: usize, depth: usize) -> std::fmt::Result
     {
         let joint = &self.joints[index];
-        for i in 0..depth {
+        for _i in 0..depth {
             write!(f, " |")?;
         }
 

@@ -31,7 +31,7 @@ use debug_overlay::DebugOverlay;
 use market_economy_simulation_server::game_logic::game_logic_interface::{
     GameLogicInterface, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageMedium,
 };
-use point_light_storage::{PointLightIndex, PointLightInterface, PointLightStorage};
+use point_light_storage::PointLightStorage;
 use selector::Selector;
 use terrain_storage::TerrainStorage;
 use wgpu_renderer::{
@@ -309,7 +309,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             let light_messages = self.game_logic.get_light_messages();
             for msg in light_messages.try_iter() {
                 match msg {
-                    GameLogicMessageLight::UpdatePointLight(point_light) => {
+                    GameLogicMessageLight::UpdatePointLight(_point_light) => {
                         // let index = PointLightIndex {
                         //     instance_index: point_light.id as usize,
                         // };

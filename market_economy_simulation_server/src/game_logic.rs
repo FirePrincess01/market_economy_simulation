@@ -6,7 +6,8 @@ use game_logic_interface::{
 };
 use wgpu_renderer::performance_monitor::watch;
 
-use crate::{ants, heightmap_generator, point_lights, terrain};
+use crate::ants;
+use crate::heightmap_generator;
 
 pub mod game_logic_interface;
 

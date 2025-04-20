@@ -4,9 +4,6 @@
 use market_economy_simulation_server::{ants, point_lights::Attenuation};
 
 use crate::{
-    animated_object::{
-        animated_object_data::AnimatedObjectData, animated_object_renderer::AnimatedObjectRenderer,
-    },
     animated_object_storage::AnimatedObjectStorage,
     point_light_storage::{PointLightIndex, PointLightInterface, PointLightStorage},
 };

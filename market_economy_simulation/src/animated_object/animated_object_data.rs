@@ -1,4 +1,3 @@
-use std::fmt::write;
 
 #[derive(Clone, Debug)]
 pub struct AnimationTranslation {
