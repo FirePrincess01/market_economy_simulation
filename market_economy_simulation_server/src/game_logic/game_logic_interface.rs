@@ -3,6 +3,7 @@ use std::sync::mpsc;
 use wgpu_renderer::performance_monitor::watch;
 
 use crate::{
+    ants,
     heightmap_generator::{HeightMap, HeightMapDetails},
     point_lights,
 };
@@ -23,6 +24,7 @@ pub enum GameLogicMessageMedium {
 
 pub enum GameLogicMessageLight {
     UpdatePointLight(point_lights::PointLight), // updates the data of a point light
+    UpdateAnt(ants::Ant),                       // updates the data of an ant
 }
 
 pub enum GameLogicMessageCritical {}

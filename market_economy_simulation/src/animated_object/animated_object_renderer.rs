@@ -1,6 +1,6 @@
-pub struct AnimatedObjectRendererResult {
-    pub _index: usize,
-}
+// pub struct AnimatedObjectRendererResult {
+//     pub _index: usize,
+// }
 
 #[allow(dead_code)]
 pub trait AnimatedObjectRenderer {

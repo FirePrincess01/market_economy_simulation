@@ -2,6 +2,7 @@
 
 use noise::NoiseFn;
 
+#[allow(unused)]
 pub struct HeightMapGenerator {
     perlin: noise::Perlin,
 }
@@ -12,6 +13,7 @@ impl Default for HeightMapGenerator {
     }
 }
 
+#[allow(unused)]
 impl HeightMapGenerator {
     pub fn new() -> Self {
         let perlin: noise::Perlin = noise::Perlin::new(1);
@@ -67,7 +69,8 @@ impl HeightMapGenerator {
                     (p_x + x as isize * distance as isize - a as isize / 2) as f32 / 20.0,
                 ) as f64;
 
-                heights.push(height as f32);
+                // heights.push(height as f32);
+                heights.push(0.0);
             }
         }
 

@@ -2,6 +2,7 @@
 //! Intended to be easily ported to be used in a multiplayer session,
 //! if this feature may ever be implemented
 
+pub mod ants;
 pub mod game_logic;
 pub mod heightmap_generator;
 pub mod point_lights;

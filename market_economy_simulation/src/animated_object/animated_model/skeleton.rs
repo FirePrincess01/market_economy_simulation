@@ -108,4 +108,32 @@ impl Skeleton {
 
         joint_transforms
     }
+
+    fn print_children(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+        index: usize,
+        depth: usize,
+    ) -> std::fmt::Result {
+        let joint = &self.joints[index];
+        for _i in 0..depth {
+            write!(f, " |")?;
+        }
+
+        writeln!(f, "{} ", joint._get_name())?;
+
+        for child_index in joint.get_children_indices() {
+            self.print_children(f, *child_index, depth + 1)?;
+        }
+
+        Ok(())
+    }
+}
+
+impl std::fmt::Debug for Skeleton {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "Nr Joints: {} ", self.joints.len())?;
+        self.print_children(f, 0, 0)?;
+        Ok(())
+    }
 }

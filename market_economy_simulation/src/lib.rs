@@ -1,5 +1,7 @@
 mod animated_object;
+mod animated_object_storage;
 mod ant;
+mod ant_storage;
 mod base_factory;
 mod create_entities;
 mod debug_overlay;
@@ -23,14 +25,13 @@ mod settings;
 mod terrain_storage;
 mod world_mesh;
 
-use animated_object::wgpu_animated_object_renderer::{
-    WgpuAnimatedObjectRenderer, WgpuAnimatedObjectStorage,
-};
+use animated_object_storage::AnimatedObjectStorage;
+use ant_storage::AntStorage;
 use debug_overlay::DebugOverlay;
 use market_economy_simulation_server::game_logic::game_logic_interface::{
     GameLogicInterface, GameLogicMessageHeavy, GameLogicMessageLight, GameLogicMessageMedium,
 };
-use point_light_storage::{PointLightIndex, PointLightInterface};
+use point_light_storage::PointLightStorage;
 use selector::Selector;
 use terrain_storage::TerrainStorage;
 use wgpu_renderer::{
@@ -57,7 +58,7 @@ struct MarketEconomySimulation {
     // world_mesh: world_mesh::WorldMesh,
 
     // ant: deferred_color_shader::Mesh,
-    animated_object_storage: WgpuAnimatedObjectStorage,
+    ant_storage: AntStorage,
 
     // performance monitor
     watch_fps: watch::Watch<WATCH_POINTS_SIZE>,
@@ -76,8 +77,7 @@ struct MarketEconomySimulation {
     ant: ant::Ant,
 
     ambient_light_quad: deferred_light_shader::Mesh, // Quad running the global ambient light shader
-    point_light_storage: point_light_storage::PointLightStorage,
-
+    // point_light_storage: point_light_storage::PointLightStorage,
     terrain_storage: TerrainStorage,
 
     selector: Selector,
@@ -111,8 +111,6 @@ impl MarketEconomySimulation {
 
         // world mesh
         let _world_mesh = world_mesh::WorldMesh::new(renderer_interface, &world);
-
-        let mut animated_object_storage = WgpuAnimatedObjectStorage::new();
 
         // performance monitor
         let watch_fps = watch::Watch::new();
@@ -150,15 +148,28 @@ impl MarketEconomySimulation {
         );
 
         // create ant
-        let mut animated_object_renderer = WgpuAnimatedObjectRenderer {
-            storage: &mut animated_object_storage,
-            wgpu_renderer: renderer_interface,
-            animation_bind_group_layout: &renderer.animation_bind_group_layout,
-        };
-
-        let glb_bin = include_bytes!("../res/ant_0_8.glb");
         // let glb_bin = include_bytes!("../res/wiggle_tower2.glb");
-        animated_object_renderer.create_from_glb(glb_bin);
+        let glb_bin = include_bytes!("../res/ant_0_8.glb");
+        let animated_object_storage_ant = AnimatedObjectStorage::create_from_glb(
+            renderer_interface,
+            &renderer.animation_bind_group_layout,
+            glb_bin,
+            settings.max_nr_ants,
+        );
+
+        // println!("{:?}", animated_object_storage_ant);
+
+        let point_light_storage_ant = PointLightStorage::new(
+            renderer_interface,
+            settings.max_nr_ants,
+            settings.dbg_point_lights,
+        );
+
+        let ant_storage = AntStorage::new(
+            point_light_storage_ant,
+            animated_object_storage_ant,
+            settings.max_nr_ants,
+        );
 
         // create game server
         let game_logic =
@@ -182,12 +193,12 @@ impl MarketEconomySimulation {
             &[ambient_light_quad_instance],
         );
 
-        // point light storage
-        let point_light_storage = point_light_storage::PointLightStorage::new(
-            renderer_interface,
-            settings.max_point_light_instances,
-            settings.dbg_point_lights,
-        );
+        // // point light storage
+        // let point_light_storage = point_light_storage::PointLightStorage::new(
+        //     renderer_interface,
+        //     settings.max_point_light_instances,
+        //     settings.dbg_point_lights,
+        // );
 
         // terrain storage
         let terrain_storage = TerrainStorage::new(
@@ -209,7 +220,7 @@ impl MarketEconomySimulation {
 
             _world: world,
             // world_mesh,
-            animated_object_storage,
+            ant_storage,
 
             watch_fps,
             performance_monitor_fps,
@@ -227,8 +238,7 @@ impl MarketEconomySimulation {
             ant,
 
             ambient_light_quad,
-            point_light_storage,
-
+            // point_light_storage,
             terrain_storage,
 
             selector,
@@ -299,16 +309,19 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             let light_messages = self.game_logic.get_light_messages();
             for msg in light_messages.try_iter() {
                 match msg {
-                    GameLogicMessageLight::UpdatePointLight(point_light) => {
-                        let index = PointLightIndex {
-                            instance_index: point_light.id as usize,
-                        };
-                        self.point_light_storage.set_light(
-                            index,
-                            point_light.position,
-                            point_light.color,
-                            point_light.attenuation,
-                        );
+                    GameLogicMessageLight::UpdatePointLight(_point_light) => {
+                        // let index = PointLightIndex {
+                        //     instance_index: point_light.id as usize,
+                        // };
+                        // self.point_light_storage.set_light(
+                        //     index,
+                        //     point_light.position,
+                        //     point_light.color,
+                        //     point_light.attenuation,
+                        // );
+                    }
+                    GameLogicMessageLight::UpdateAnt(ant) => {
+                        self.ant_storage.set_ant(&ant);
                     }
                 }
             }
@@ -339,7 +352,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
                 }
             }
 
-            self.point_light_storage.update(renderer_interface);
+            // self.point_light_storage.update(renderer_interface);
 
             self.terrain_storage
                 .update_view_position(&self.renderer.get_view_position());
@@ -370,6 +383,7 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
                             &triangle.p,
                         );
                     }
+                    selector::Result::Ant(_ant) => {}
                 }
             }
         }
@@ -377,7 +391,17 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
 
         self.watch_fps.start(5, "Update animations");
         {
-            self.animated_object_storage.update(renderer_interface, &dt);
+            self.ant_storage
+                .animated_object_storage
+                .update_animations(&dt);
+
+            self.ant_storage
+                .animated_object_storage
+                .update_device_data(renderer_interface);
+
+            self.ant_storage
+                .point_light_storage
+                .update(renderer_interface);
         }
         self.watch_fps.stop(5);
 
@@ -458,8 +482,8 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
         // render current frame
         self.renderer.render(
             renderer_interface,
-            &self.animated_object_storage,
-            &self.point_light_storage,
+            &self.ant_storage.animated_object_storage,
+            &self.ant_storage.point_light_storage,
             &mut self.terrain_storage,
             &self.ant,
             &self.debug_overlay,

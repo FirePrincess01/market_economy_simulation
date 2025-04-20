@@ -79,6 +79,10 @@ impl PointLightStorage {
         self.light
             .update_instance_buffer(renderer.queue(), &active_instances[0..j]);
     }
+
+    pub fn max_instances(&self) -> usize {
+        self.max_instances
+    }
 }
 
 #[allow(unused)]

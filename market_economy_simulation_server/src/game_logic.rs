@@ -6,13 +6,15 @@ use game_logic_interface::{
 };
 use wgpu_renderer::performance_monitor::watch;
 
-use crate::{heightmap_generator, point_lights, terrain};
+use crate::ants;
+use crate::heightmap_generator;
 
 pub mod game_logic_interface;
 
 pub struct GameLogicSettings {
-    pub map_size: usize,
+    // pub map_size: usize,
     pub enable_multithreading: bool,
+    pub max_nr_ants: usize,
 }
 
 pub struct GameLogic {
@@ -25,9 +27,9 @@ pub struct GameLogic {
     _channel_4_tx: mpsc::Sender<GameLogicMessageCritical>,
 
     heightmap_generator: heightmap_generator::HeightMapGenerator,
+    ants: ants::Ants,
     // terrain: terrain::Terrain,
-    point_lights: point_lights::PointLights,
-
+    // point_lights: point_lights::PointLights,
     watch: watch::Watch<{ game_logic_interface::WATCH_POINT_SIZE }>,
 }
 
@@ -40,12 +42,13 @@ impl GameLogic {
         channel_3_tx: mpsc::Sender<GameLogicMessageLight>,
         channel_4_tx: mpsc::Sender<GameLogicMessageCritical>,
     ) -> Self {
-        let size = settings.map_size;
+        // let size = settings.map_size;
 
         let heightmap_generator = heightmap_generator::HeightMapGenerator::new();
+        let ants = ants::Ants::new(settings.max_nr_ants);
 
-        let terrain = terrain::Terrain::new(size, size, 1.0);
-        let point_lights = point_lights::PointLights::new(&terrain);
+        // let terrain = terrain::Terrain::new(size, size, 1.0);
+        // let point_lights = point_lights::PointLights::new(&terrain);
 
         let watch = watch::Watch::new();
 
@@ -59,9 +62,9 @@ impl GameLogic {
             _channel_4_tx: channel_4_tx,
 
             heightmap_generator,
+            ants,
             // terrain,
-            point_lights,
-
+            // point_lights,
             watch,
         }
     }
@@ -101,7 +104,8 @@ impl GameLogic {
         self.watch.start(1, "Update point lights");
         {
             // point lights
-            self.point_lights.update(&self.channel_3_tx);
+            // self.point_lights.update(&self.channel_3_tx);
+            self.ants.update(&self.channel_3_tx);
         }
         self.watch.stop(1);
     }

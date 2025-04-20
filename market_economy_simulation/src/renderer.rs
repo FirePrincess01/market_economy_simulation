@@ -3,7 +3,7 @@
 
 mod camera_controller;
 
-use crate::animated_object::wgpu_animated_object_renderer::WgpuAnimatedObjectStorage;
+use crate::animated_object_storage::AnimatedObjectStorage;
 use crate::deferred_color_shader::entity_buffer::MousePosition;
 use crate::deferred_color_shader::{self, DeferredShaderDraw, EntityBuffer, GBuffer};
 use crate::deferred_light_shader::DeferredLightShaderDraw;
@@ -371,7 +371,7 @@ impl Renderer {
         meshes: &[&dyn DeferredShaderDraw],
         ant_light_orbs: &dyn DeferredShaderDraw,
         terrain_storage: &mut TerrainStorage,
-        animated_object_storage: &WgpuAnimatedObjectStorage,
+        animated_object_storage: &AnimatedObjectStorage,
     ) {
         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             label: Some("Deferred Render Pass"),
@@ -668,7 +668,7 @@ impl Renderer {
         // deferred: & impl DeferredShaderDraw,
         // deferred_light: & impl DeferredLightShaderDraw,
         // deferred_combined: &(impl DeferredShaderDraw + DeferredLightShaderDraw),
-        animated_object_storage: &WgpuAnimatedObjectStorage,
+        animated_object_storage: &AnimatedObjectStorage,
         point_light_storage: &PointLightStorage,
         terrain_storage: &mut TerrainStorage,
 
