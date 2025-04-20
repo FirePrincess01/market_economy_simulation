@@ -24,11 +24,10 @@ impl AntStorage {
         assert_eq!(max_ants, point_light_storage.max_instances());
         assert_eq!(max_ants, animated_object_storage.max_instances());
 
-
         Self {
             point_light_storage,
             animated_object_storage,
-            max_ants
+            max_ants,
         }
     }
 
@@ -38,10 +37,22 @@ impl AntStorage {
             // let pos = cgmath::Vector3::new(0.0, 0.0, 0.0);
             self.animated_object_storage.set_pos(ant.id, pos);
             // self.point_light_storage.set_position(&PointLightIndex{ instance_index: ant.id }, pos);
-            self.point_light_storage.set_light(PointLightIndex{ instance_index: ant.id }, pos, ant.light_color, Attenuation::_200);
+            self.point_light_storage.set_light(
+                PointLightIndex {
+                    instance_index: ant.id,
+                },
+                pos,
+                ant.light_color,
+                Attenuation::_200,
+            );
 
             self.animated_object_storage.set_active(ant.id);
-            self.point_light_storage.set_active(&PointLightIndex{ instance_index: ant.id }, true);
+            self.point_light_storage.set_active(
+                &PointLightIndex {
+                    instance_index: ant.id,
+                },
+                true,
+            );
         }
     }
 }

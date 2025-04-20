@@ -30,7 +30,6 @@ pub struct GameLogic {
     ants: ants::Ants,
     // terrain: terrain::Terrain,
     // point_lights: point_lights::PointLights,
-
     watch: watch::Watch<{ game_logic_interface::WATCH_POINT_SIZE }>,
 }
 
@@ -66,7 +65,6 @@ impl GameLogic {
             ants,
             // terrain,
             // point_lights,
-
             watch,
         }
     }

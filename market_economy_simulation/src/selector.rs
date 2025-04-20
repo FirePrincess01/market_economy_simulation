@@ -84,8 +84,7 @@ impl Selector {
             if let Some(triangle) = res {
                 return Some(Result::Terrain(triangle));
             }
-        }
-        else if entity_bit_mask == ENTITY_ANT_BIT {
+        } else if entity_bit_mask == ENTITY_ANT_BIT {
             return Some(Result::Ant(entity_index));
         }
 
@@ -120,5 +119,5 @@ pub struct Triangle {
 
 pub enum Result {
     Terrain(Triangle),
-    Ant(usize)
+    Ant(usize),
 }

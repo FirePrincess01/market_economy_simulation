@@ -394,12 +394,10 @@ impl DefaultApplicationInterface for MarketEconomySimulation {
             self.ant_storage
                 .animated_object_storage
                 .update_animations(&dt);
-            
-            
+
             self.ant_storage
                 .animated_object_storage
                 .update_device_data(renderer_interface);
-
 
             self.ant_storage
                 .point_light_storage

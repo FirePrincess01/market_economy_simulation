@@ -5,7 +5,6 @@ use crate::{renderer, terrain_storage::TerrainSettings};
 
 pub struct Settings {
     // render settings
-
     /// On mobile, memory mapped read may may have extremely bad performance.
     /// To still render some demo application, it can be deactivated here.
     pub enable_memory_mapped_read: bool,
@@ -31,9 +30,7 @@ pub struct Settings {
 
     pub max_nr_ants: usize,
 
-
     // miscellaneous
-
     /// Maximum number of instances of the point lights
     // pub max_point_light_instances: usize,
 

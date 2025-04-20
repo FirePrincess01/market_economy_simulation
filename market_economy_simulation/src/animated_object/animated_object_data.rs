@@ -1,4 +1,3 @@
-
 #[derive(Clone, Debug)]
 pub struct AnimationTranslation {
     pub key_times: Vec<f32>,
@@ -60,7 +59,11 @@ impl std::fmt::Debug for AnimationData {
         }
         writeln!(f)?;
 
-        writeln!(f, "Key Frames: {}", self.joint_rotations[4].joint_rotations.len())?;
+        writeln!(
+            f,
+            "Key Frames: {}",
+            self.joint_rotations[4].joint_rotations.len()
+        )?;
 
         Ok(())
     }
