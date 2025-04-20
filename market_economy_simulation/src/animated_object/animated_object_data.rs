@@ -58,7 +58,7 @@ impl std::fmt::Debug for AnimationData {
         for name in &self._joint_target_names {
             write!(f, "{} ", name)?;
         }
-        writeln!(f, "")?;
+        writeln!(f)?;
 
         writeln!(f, "Key Frames: {}", self.joint_rotations[4].joint_rotations.len())?;
 
